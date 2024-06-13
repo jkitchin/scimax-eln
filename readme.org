@@ -1,0 +1,31 @@
+#+title: Scimax electronic laboratory notebook
+
+#+attr_org: :width 800
+[[./screenshots/date-13-06-2024-time-08-08-29.png]]
+
+
+I plan to use this repo to explore using scimax as an electronic laboratory notebook. I will use the examples to determine the extent to which it provides FAIR [fn:1] (Findable, Accessible, Interoperable, Reusable) data, and how to balance that with usability.
+
+Repo: https://github.com/jkitchin/scimax-eln
+
+* pycse
+
+[[./pycse/readme.org]]
+
+
+* TODO Molecular simulation
+
+[[./molsim/readme.org]]
+
+* TODO SDL-light - running a remote instrument
+
+See [[./sdl-light/readme.org]]
+
+* TODO Temperature control lab
+
+https://apmonitor.com/pdc/index.php/Main/PurchaseLabKit
+
+
+* Footnotes
+
+[fn:1] https://www.go-fair.org/fair-principles/ 
