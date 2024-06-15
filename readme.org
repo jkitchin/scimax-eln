@@ -24,10 +24,18 @@ Repo: https://github.com/jkitchin/scimax-eln
 
 See [[./sdl-light/readme.org]]
 
+** TODO get instruments
+DEADLINE: <2024-06-19 Wed>
+
+ordered: https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox/FMfcgzQVwxGRSPSPlBmblnVHLqHkVTTj
+
 * TODO Temperature control lab
 
 https://apmonitor.com/pdc/index.php/Main/PurchaseLabKit
 
+** TODO Get order
+DEADLINE: <2024-06-19 Wed>
+ordered: https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox/FMfcgzQVwxGRSPSXwSGTBhpFZFrvBXnM
 
 * Footnotes
 

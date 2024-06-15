@@ -1,0 +1,272 @@
+* Using joblib in an eln for cache
+
+We explore using joblib to cache results for reuse.
+
+#+BEGIN_SRC jupyter-python
+from joblib import Memory
+mem = Memory('.')
+
+from scipy.integrate import solve_ivp
+import nava
+
+@mem.cache
+def solution(k):
+    '''Get solution for k.'''
+    nu = 1
+    Vspan = (0, 2)
+    Fa0 = 1
+
+    # define the ODE
+    def ode(V, Fa, k):
+        return -k * Fa / nu
+
+    sol = solve_ivp(ode, Vspan, (Fa0,), args=(k,))
+    nava.play('../../../../cash-register-fake-88639.mp3')
+    return sol
+
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC jupyter-python  
+solution(0.1)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: ________________________________________________________________________________
+: [Memory] Calling __main__--var-folders-3q-ht_2mtk52hl7ydxrcr87z2gr0000gn-T-ipykernel-3623200184.solution...
+: solution(0.1)
+: _________________________________________________________solution - 3.4s, 0.1min
+#+begin_example
+  message: The solver successfully reached the end of the integration interval.
+  success: True
+   status: 0
+        t: [ 0.000e+00  1.585e-01  1.744e+00  2.000e+00]
+        y: [[ 1.000e+00  9.843e-01  8.400e-01  8.187e-01]]
+      sol: None
+ t_events: None
+ y_events: None
+     nfev: 20
+     njev: 0
+      nlu: 0
+#+end_example
+:END:
+
+#+BEGIN_SRC jupyter-python  
+solution(0.1)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  message: The solver successfully reached the end of the integration interval.
+  success: True
+   status: 0
+        t: [ 0.000e+00  1.585e-01  1.744e+00  2.000e+00]
+        y: [[ 1.000e+00  9.843e-01  8.400e-01  8.187e-01]]
+      sol: None
+ t_events: None
+ y_events: None
+     nfev: 20
+     njev: 0
+      nlu: 0
+#+end_example
+
+#+BEGIN_SRC jupyter-python
+K = [0.1, 0.2, 0.4]
+SOL = [solution(k) for k in K]
+#+END_SRC
+
+#+RESULTS:
+: ________________________________________________________________________________
+: [Memory] Calling __main__--var-folders-3q-ht_2mtk52hl7ydxrcr87z2gr0000gn-T-ipykernel-2224898908.solution...
+: solution(0.2)
+: _________________________________________________________solution - 3.4s, 0.1min
+: ________________________________________________________________________________
+: [Memory] Calling __main__--var-folders-3q-ht_2mtk52hl7ydxrcr87z2gr0000gn-T-ipykernel-2224898908.solution...
+: solution(0.4)
+: _________________________________________________________solution - 3.2s, 0.1min
+
+#+BEGIN_SRC jupyter-python
+[sol.y[0][-1] for sol in SOL]
+#+END_SRC
+
+#+RESULTS:
+| 0.8187307577762143 | 0.6703201753500971 | 0.4493323314834313 |
+
+** Finding what we have done
+
+#+BEGIN_SRC sh
+find joblib -name metadata.json
+#+END_SRC
+
+#+RESULTS:
+| joblib/__main__--Users-jkitchin-Dropbox-emacs-projects-scimax-eln-journal-2024-06-15-solution/solution/52b1f292dd1f9eea8d95cb868ddd7ff7/metadata.json |
+| joblib/__main__--var-folders-3q-ht_2mtk52hl7ydxrcr87z2gr0000gn-T-ipykernel-1908837827/solution/52b1f292dd1f9eea8d95cb868ddd7ff7/metadata.json |
+| joblib/__main__--var-folders-3q-ht_2mtk52hl7ydxrcr87z2gr0000gn-T-ipykernel-2224898908/solution/5e0a8e02d46d0d7ecfc9bf0b03f51f72/metadata.json |
+| joblib/__main__--var-folders-3q-ht_2mtk52hl7ydxrcr87z2gr0000gn-T-ipykernel-2224898908/solution/ad2f46f966cda1dfa767ca1498398294/metadata.json |
+| joblib/__main__--var-folders-3q-ht_2mtk52hl7ydxrcr87z2gr0000gn-T-ipykernel-2224898908/solution/52b1f292dd1f9eea8d95cb868ddd7ff7/metadata.json |
+| joblib/__main__--var-folders-3q-ht_2mtk52hl7ydxrcr87z2gr0000gn-T-ipykernel-1939124070/g/d3ffa92536e9b2aeb96c6d0e11ccd857/metadata.json |
+| joblib/__main__--var-folders-3q-ht_2mtk52hl7ydxrcr87z2gr0000gn-T-ipykernel-2533556473/g/d3ffa92536e9b2aeb96c6d0e11ccd857/metadata.json |
+| joblib/__main__--var-folders-3q-ht_2mtk52hl7ydxrcr87z2gr0000gn-T-ipykernel-3623200184/solution/52b1f292dd1f9eea8d95cb868ddd7ff7/metadata.json |
+| joblib/__main__--Users-jkitchin-Dropbox-emacs-projects-scimax-eln-journal-2024-06-15-<stdin>/solution/52b1f292dd1f9eea8d95cb868ddd7ff7/metadata.json |
+
+
+#+BEGIN_SRC jupyter-python  
+import glob
+import json
+import pickle
+from pathlib import Path
+import joblib
+
+for f in glob.glob('joblib/**/metadata.json',
+          recursive=True):
+    with open(f) as _f:
+        data = json.loads(_f.read())
+        if data['input_args'] == {'k': '0.4'}:
+            pkl = Path(f).parent / 'output.pkl'
+            print(joblib.load(pkl))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  message: The solver successfully reached the end of the integration interval.
+  success: True
+   status: 0
+        t: [ 0.000e+00  1.201e-01  1.322e+00  2.000e+00]
+        y: [[ 1.000e+00  9.531e-01  5.894e-01  4.493e-01]]
+      sol: None
+ t_events: None
+ y_events: None
+     nfev: 20
+     njev: 0
+      nlu: 0
+#+end_example
+
+
+With joblib:
+- Somewhat findable
+- definitely reusable
+- not interoperable
+- locally accessible
+
+Many other good ideas: hash, json data storage
+
+
+** limitations
+
+*** Running in different ways leads to running multiple times
+
+#+BEGIN_SRC python
+from joblib import Memory
+mem = Memory('.')
+
+from scipy.integrate import solve_ivp
+import nava
+
+@mem.cache
+def solution(k):
+    nu = 1
+    Vspan = (0, 2)
+    Fa0 = 1
+
+    def ode(V, Fa, k):
+        return -k * Fa / nu
+
+    sol = solve_ivp(ode, Vspan, (Fa0,), args=(k,))
+    nava.play('../../../../cash-register-fake-88639.mp3')
+    return sol
+
+return solution(0.1)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+message: The solver successfully reached the end of the integration interval.
+  success: True
+   status: 0
+        t: [ 0.000e+00  1.585e-01  1.744e+00  2.000e+00]
+        y: [[ 1.000e+00  9.843e-01  8.400e-01  8.187e-01]]
+      sol: None
+ t_events: None
+ y_events: None
+     nfev: 20
+     njev: 0
+      nlu: 0
+#+end_example
+
+#+BEGIN_SRC python :tangle solution.py
+from joblib import Memory
+mem = Memory('.')
+
+from scipy.integrate import solve_ivp
+import nava
+
+@mem.cache
+def solution(k):
+    nu = 1
+    Vspan = (0, 2)
+    Fa0 = 1
+
+    def ode(V, Fa, k):
+        return -k * Fa / nu
+
+    sol = solve_ivp(ode, Vspan, (Fa0,), args=(k,))
+    nava.play('../../../../cash-register-fake-88639.mp3')
+    return sol
+
+print(solution(0.1))
+#+END_SRC
+
+
+#+BEGIN_SRC sh
+python solution.py
+#+END_SRC
+
+#+RESULTS:
+| message:  | The  | solver | successfully | reached | the        | end | of | the | integration | interval. |
+| success:  | True |        |              |         |            |     |    |     |             |           |
+| status:   | 0    |        |              |         |            |     |    |     |             |           |
+| t:        | [    |    0.0 |       0.1585 |   1.744 | 2.000e+00] |     |    |     |             |           |
+| y:        | [[     |    1.0 |       0.9843 |    0.84 | 8.187e-01]]  |     |    |     |             |           |
+| sol:      | None |        |              |         |            |     |    |     |             |           |
+| t_events: | None |        |              |         |            |     |    |     |             |           |
+| y_events: | None |        |              |         |            |     |    |     |             |           |
+| nfev:     | 20   |        |              |         |            |     |    |     |             |           |
+| njev:     | 0    |        |              |         |            |     |    |     |             |           |
+| nlu:      | 0    |        |              |         |            |     |    |     |             |           |
+
+
+
+*** internal changes to functions don't invalidate the cache
+
+#+BEGIN_SRC jupyter-python
+def f(x):
+    return 40 * x
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC jupyter-python
+@mem.cache
+def g(x):
+    nava.play('../../../../cash-register-fake-88639.mp3')
+    return f(x)**2
+#+END_SRC
+
+#+RESULTS:
+
+
+
+#+BEGIN_SRC jupyter-python  
+g(1)
+#+END_SRC
+
+#+RESULTS:
+: 16
+
+
+#+BEGIN_SRC jupyter-python  
+
+#+END_SRC
+
