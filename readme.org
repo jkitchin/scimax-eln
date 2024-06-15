@@ -12,15 +12,8 @@ Repo: https://github.com/jkitchin/scimax-eln
 
 [[./pycse/readme.org]]
 
-** Video 1
-
-#+BEGIN_EXPORT html
-<iframe width="560" height="315" src="https://www.youtube.com/embed/KodhYAo4xn0?si=XW5fypQFSl4eIsnT" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-#+END_EXPORT
-
-** Video 2 - joblib
-
-https://www.youtube.com/watch?v=sHiMOQkNFKQ
+- Video 1 - https://www.youtube.com/watch?v=KodhYAo4xn0&t=0s
+- Video 2 - joblib https://www.youtube.com/watch?v=sHiMOQkNFKQ
 
 
 * TODO Molecular simulation
