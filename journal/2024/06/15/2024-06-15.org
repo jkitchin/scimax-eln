@@ -237,7 +237,6 @@ python solution.py
 | nlu:      | 0    |        |              |         |            |     |    |     |             |           |
 
 
-
 *** internal changes to functions don't invalidate the cache
 
 #+BEGIN_SRC jupyter-python
@@ -266,7 +265,4 @@ g(1)
 : 16
 
 
-#+BEGIN_SRC jupyter-python  
-
-#+END_SRC
 

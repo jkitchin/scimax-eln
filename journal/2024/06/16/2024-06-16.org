@@ -1,0 +1,308 @@
+* hashcache
+
+
+
+#+attr_org: :width 800
+[[./screenshots/date-16-06-2024-time-08-59-47.png]]
+
+#+BEGIN_SRC jupyter-python
+from pycse.hashcache import hashcache
+import nava
+
+@hashcache(verbose=True)
+def f(a, b=1):
+    nava.play('../../../../cash-register-fake-88639.mp3')
+    return (a, b)
+    
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC jupyter-python  
+f(1)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+#+begin_example
+{   'args': (1,),
+    'cwd': '/Users/jkitchin/Dropbox/emacs/projects/scimax-eln/journal/2024/06/16',
+    'elapsed_time': 3.2506940364837646,
+    'func': 'f',
+    'hash': '61884a61832111414e9b0665624c7bbf6611386a',
+    'kwargs': {},
+    'module': '__main__',
+    'output': (1, 1),
+    'run-at': 1718542971.632166,
+    'run-at-human': 'Sun Jun 16 09:02:51 2024',
+    'standardized-kwargs': {'a': 1, 'b': 1},
+    'user': 'jkitchin',
+    'version': '0.0.2'}
+#+end_example
+| 1 | 1 |
+:END:
+
+
+#+BEGIN_SRC jupyter-python  
+f(b=1, a=10)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+#+begin_example
+wrote cache/d0/d0f85b4bbc6cb2bfc1f9e6b5777f602d6a542ec2
+{   'args': (),
+    'cwd': '/Users/jkitchin/Dropbox/emacs/projects/scimax-eln/journal/2024/06/16',
+    'elapsed_time': 3.278104066848755,
+    'func': 'f',
+    'hash': 'd0f85b4bbc6cb2bfc1f9e6b5777f602d6a542ec2',
+    'kwargs': {'a': 10, 'b': 1},
+    'module': '__main__',
+    'output': (10, 1),
+    'run-at': 1718543137.987861,
+    'run-at-human': 'Sun Jun 16 09:05:37 2024',
+    'standardized-kwargs': {'a': 10, 'b': 1},
+    'user': 'jkitchin',
+    'version': '0.0.2'}
+#+end_example
+| 10 | 1 |
+:END:
+
+
+
+#+BEGIN_SRC jupyter-python
+import numpy as np
+f(np.linspace(0, 1, 5))
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+#+begin_example
+wrote cache/d5/d5524d40f3d403ba02438cf553f5a83e8bd18483
+{   'args': (array([0.  , 0.25, 0.5 , 0.75, 1.  ]),),
+    'cwd': '/Users/jkitchin/Dropbox/emacs/projects/scimax-eln/journal/2024/06/16',
+    'elapsed_time': 3.3605730533599854,
+    'func': 'f',
+    'hash': 'd5524d40f3d403ba02438cf553f5a83e8bd18483',
+    'kwargs': {},
+    'module': '__main__',
+    'output': (array([0.  , 0.25, 0.5 , 0.75, 1.  ]), 1),
+    'run-at': 1718543440.90858,
+    'run-at-human': 'Sun Jun 16 09:10:40 2024',
+    'standardized-kwargs': {'a': array([0.  , 0.25, 0.5 , 0.75, 1.  ]), 'b': 1},
+    'user': 'jkitchin',
+    'version': '0.0.2'}
+#+end_example
+| array | ((0 0.25 0.5 0.75 1)) | 1 |
+:END:
+
+#+BEGIN_SRC jupyter-python  
+from ase.build import bulk
+a = bulk('Cu')
+
+f(a)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+#+begin_example
+wrote cache/9a/9ab6deadac197ba47b9ee0442db128d441465435
+{   'args': (   Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]]),),
+    'cwd': '/Users/jkitchin/Dropbox/emacs/projects/scimax-eln/journal/2024/06/16',
+    'elapsed_time': 3.2681891918182373,
+    'func': 'f',
+    'hash': '9ab6deadac197ba47b9ee0442db128d441465435',
+    'kwargs': {},
+    'module': '__main__',
+    'output': (   Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]]),
+                  1),
+    'run-at': 1718543494.253084,
+    'run-at-human': 'Sun Jun 16 09:11:34 2024',
+    'standardized-kwargs': {   'a': Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]]),
+                               'b': 1},
+    'user': 'jkitchin',
+    'version': '0.0.2'}
+#+end_example
+| Atoms | (symbols= Cu pbc=True cell= ((0.0 1.805 1.805) (1.805 0.0 1.805) (1.805 1.805 0.0))) | 1 |
+:END:
+
+#+BEGIN_SRC jupyter-python  
+import glob
+import joblib
+for _f in glob.glob('cache/**/*'):
+    data = joblib.load(_f)
+#    if data['standardized-kwargs'].get('a') == 10:
+#        print(data)
+    print(data)
+#+END_SRC
+
+#+RESULTS:
+: {'output': (1, 1), 'hash': '61884a61832111414e9b0665624c7bbf6611386a', 'func': 'f', 'module': '__main__', 'args': (1,), 'kwargs': {}, 'standardized-kwargs': {'a': 1, 'b': 1}, 'version': '0.0.2', 'cwd': '/Users/jkitchin/Dropbox/emacs/projects/scimax-eln/journal/2024/06/16', 'user': 'jkitchin', 'run-at': 1718542971.632166, 'run-at-human': 'Sun Jun 16 09:02:51 2024', 'elapsed_time': 3.2506940364837646}
+: {'output': (10, 1), 'hash': 'd0f85b4bbc6cb2bfc1f9e6b5777f602d6a542ec2', 'func': 'f', 'module': '__main__', 'args': (), 'kwargs': {'b': 1, 'a': 10}, 'standardized-kwargs': {'a': 10, 'b': 1}, 'version': '0.0.2', 'cwd': '/Users/jkitchin/Dropbox/emacs/projects/scimax-eln/journal/2024/06/16', 'user': 'jkitchin', 'run-at': 1718543137.987861, 'run-at-human': 'Sun Jun 16 09:05:37 2024', 'elapsed_time': 3.278104066848755}
+: {'output': (Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]]), 1), 'hash': '9ab6deadac197ba47b9ee0442db128d441465435', 'func': 'f', 'module': '__main__', 'args': (Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]]),), 'kwargs': {}, 'standardized-kwargs': {'a': Atoms(symbols='Cu', pbc=True, cell=[[0.0, 1.805, 1.805], [1.805, 0.0, 1.805], [1.805, 1.805, 0.0]]), 'b': 1}, 'version': '0.0.2', 'cwd': '/Users/jkitchin/Dropbox/emacs/projects/scimax-eln/journal/2024/06/16', 'user': 'jkitchin', 'run-at': 1718543494.253084, 'run-at-human': 'Sun Jun 16 09:11:34 2024', 'elapsed_time': 3.2681891918182373}
+: {'output': (array([0.  , 0.25, 0.5 , 0.75, 1.  ]), 1), 'hash': 'd5524d40f3d403ba02438cf553f5a83e8bd18483', 'func': 'f', 'module': '__main__', 'args': (array([0.  , 0.25, 0.5 , 0.75, 1.  ]),), 'kwargs': {}, 'standardized-kwargs': {'a': array([0.  , 0.25, 0.5 , 0.75, 1.  ]), 'b': 1}, 'version': '0.0.2', 'cwd': '/Users/jkitchin/Dropbox/emacs/projects/scimax-eln/journal/2024/06/16', 'user': 'jkitchin', 'run-at': 1718543440.90858, 'run-at-human': 'Sun Jun 16 09:10:40 2024', 'elapsed_time': 3.3605730533599854}
+
+
+** run as python in org-mode
+
+#+BEGIN_SRC python :results output
+from pycse.hashcache import hashcache
+import nava
+
+@hashcache(verbose=True)
+def f(a, b=1):
+    nava.play('../../../../cash-register-fake-88639.mp3')
+    return (a, b)
+
+print(f(1))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+wrote cache/f4/f4c78d473d32bf6d897988a6f463af99f879ab29
+{   'args': (1,),
+    'cwd': '/Users/jkitchin/Dropbox/emacs/projects/scimax-eln/journal/2024/06/16',
+    'elapsed_time': 3.2622828483581543,
+    'func': 'f',
+    'hash': 'f4c78d473d32bf6d897988a6f463af99f879ab29',
+    'kwargs': {},
+    'module': '__main__',
+    'output': (1, 1),
+    'run-at': 1718543597.753663,
+    'run-at-human': 'Sun Jun 16 09:13:17 2024',
+    'standardized-kwargs': {'a': 1, 'b': 1},
+    'user': 'jkitchin',
+    'version': '0.0.2'}
+(1, 1)
+#+end_example
+
+** from a python file
+
+#+BEGIN_SRC python :tangle ph.py
+from pycse.hashcache import hashcache
+import nava
+
+@hashcache(verbose=True)
+def f(a, b=1):
+    nava.play('../../../../cash-register-fake-88639.mp3')
+    return (a, b)
+
+print(f(1))
+#+END_SRC
+
+#+BEGIN_SRC sh :var tangled=(org-babel-tangle)
+python ph.py
+#+END_SRC
+
+#+RESULTS:
+| {                      | 'args':                                                                 | (1,), |      |          |        |
+| 'cwd':                 | '/Users/jkitchin/Dropbox/emacs/projects/scimax-eln/journal/2024/06/16', |       |      |          |        |
+| 'elapsed_time':        | 3.2622828483581543,                                                     |       |      |          |        |
+| 'func':                | 'f',                                                                    |       |      |          |        |
+| 'hash':                | 'f4c78d473d32bf6d897988a6f463af99f879ab29',                             |       |      |          |        |
+| 'kwargs':              | {},                                                                     |       |      |          |        |
+| 'module':              | '__main__',                                                             |       |      |          |        |
+| 'output':              | (1,                                                                     | 1),   |      |          |        |
+| 'run-at':              | 1718543597.753663,                                                      |       |      |          |        |
+| 'run-at-human':        | 'Sun                                                                    | Jun   |   16 | 09:13:17 | 2024', |
+| 'standardized-kwargs': | {'a':                                                                   | 1,    | 'b': |      1}, |        |
+| 'user':                | 'jkitchin',                                                             |       |      |          |        |
+| 'version':             | '0.0.2'}                                                                |       |      |          |        |
+| (1,                    | 1)                                                                      |       |      |          |        |
+
+#+BEGIN_SRC jupyter-python
+@hashcache(verbose=True)
+def f(x, b=1):
+    'return a tuple of (a,b)'
+    # a comment
+    nava.play('../../../../cash-register-fake-88639.mp3')
+    return (x, b)
+
+f(1)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+#+begin_example
+wrote cache/0c/0c1690a299b7dba48e7bd16c5ed3593da5af2549
+{   'args': (1,),
+    'cwd': '/Users/jkitchin/Dropbox/emacs/projects/scimax-eln/journal/2024/06/16',
+    'elapsed_time': 3.262784957885742,
+    'func': 'f',
+    'hash': '0c1690a299b7dba48e7bd16c5ed3593da5af2549',
+    'kwargs': {},
+    'module': '__main__',
+    'output': (1, 1),
+    'run-at': 1718543817.5956411,
+    'run-at-human': 'Sun Jun 16 09:16:57 2024',
+    'standardized-kwargs': {'b': 1, 'x': 1},
+    'user': 'jkitchin',
+    'version': '0.0.2'}
+#+end_example
+| 1 | 1 |
+:END:
+
+** serializing data with json
+
+#+BEGIN_SRC jupyter-python
+from scipy.integrate import solve_ivp
+
+def ode(x, y):
+    return y
+
+sol = solve_ivp(ode, (0, 1), (1,))
+sol
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  message: The solver successfully reached the end of the integration interval.
+  success: True
+   status: 0
+        t: [ 0.000e+00  1.000e-01  1.000e+00]
+        y: [[ 1.000e+00  1.105e+00  2.718e+00]]
+      sol: None
+ t_events: None
+ y_events: None
+     nfev: 14
+     njev: 0
+      nlu: 0
+#+end_example
+
+#+BEGIN_SRC jupyter-python :results raw
+import json
+
+d = {'a': 1,
+            'b': 'a string',
+            'c': (1, 3),
+            'd': [1, '2'],
+            'e': sol,
+            2: {1: 'tree'}}
+print(json.dumps(d))
+#+END_SRC
+
+#+RESULTS:
+# [goto error]
+# [goto error]
+# [goto error]
+
+#+BEGIN_SRC jupyter-python
+import orjson
+
+d = {'a': 1,
+            'b': 'a string',
+            'c': (1, 3),
+            'd': [1, '2'],
+            'e': sol,
+            'atoms': bulk('Cu').todict(),
+            '2': {'1': 'tree'}}
+
+orjson.dumps(d, option=orjson.OPT_SERIALIZE_NUMPY)
+#+END_SRC
+
+#+RESULTS:
+: b'{"a":1,"b":"a string","c":[1,3],"d":[1,"2"],"e":{"t":[0.0,0.10001999200479661,1.0],"y":[[1.0,1.1051930131367926,2.7183269995016897]],"sol":null,"t_events":null,"y_events":null,"nfev":14,"njev":0,"nlu":0,"status":0,"message":"The solver successfully reached the end of the integration interval.","success":true},"atoms":{"numbers":[29],"positions":[[0.0,0.0,0.0]],"cell":[[0.0,1.805,1.805],[1.805,0.0,1.805],[1.805,1.805,0.0]],"pbc":[true,true,true]},"2":{"1":"tree"}}'
+
+*************** TODO next time
+Integrate orjson for serialization into hashcache with storage in sqlite, and searching from json.
+*************** END
