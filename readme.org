@@ -14,6 +14,7 @@ Repo: https://github.com/jkitchin/scimax-eln
 
 - Video 1 - https://www.youtube.com/watch?v=KodhYAo4xn0&t=0s
 - Video 2 - joblib https://www.youtube.com/watch?v=sHiMOQkNFKQ
+- Video 3 - hashcache https://youtube.com/live/d3zcfdylKOc
 
 
 * TODO Molecular simulation
