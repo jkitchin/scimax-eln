@@ -1,0 +1,12 @@
+
+
+#+BEGIN_SRC jupyter-python
+from pycse.hashcache import SqlCache
+
+SqlCache.cache = '../18/cache.sqlite'
+
+SqlCache.load('13f1c3c92ec8126d1f6a921024991bdf')
+#+END_SRC
+
+#+RESULTS:
+| K | : | (0.1 0.2 0.4) | SOL | : | ((t : (0.0 0.15852100443841718 1.743731048822589 2.0) y : ((1.0 0.9842728828131972 0.8399834420839267 0.8187307577762143)) sol : None t_events : None y_events : None nfev : 20 njev : 0 nlu : 0 status : 0 message : The solver successfully reached the end of the integration interval. success : True) (t : (0.0 0.13800054970813147 1.5180060467894463 2.0) y : ((1.0 0.9727772930008116 0.7381553193469036 0.6703201753500971)) sol : None t_events : None y_events : None nfev : 20 njev : 0 nlu : 0 status : 0 message : The solver successfully reached the end of the integration interval. success : True) (t : (0.0 0.12013645628358863 1.321501019119475 2.0) y : ((1.0 0.9530817640630896 0.589433668842021 0.4493323314834313)) sol : None t_events : None y_events : None nfev : 20 njev : 0 nlu : 0 status : 0 message : The solver successfully reached the end of the integration interval. success : True)) |
