@@ -225,7 +225,7 @@ d['fig'].get_axes()
 
 * automating the pipeline
 
-#+BEGIN_SRC jupyter-python :restart
+#+BEGIN_SRC jupyter-python 
 from pycse.hashcache import HashCache
 from ase.build import bulk
 from ase.calculators.emt import EMT
@@ -308,4 +308,75 @@ plt.legend();
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/eec56b93f2809b313b8d9765cca191a7fccb636e.png]]
+[[file:./.ob-jupyter/eec56b93f2809b313b8d9765cca191a7fccb636e.png]
+
+#+BEGIN_SRC jupyter-python  
+HashCache.dump(Cu=get_volumes_energies('Cu'),
+               Pd=get_volumes_energies('Pd'),
+               Au=get_volumes_energies('Au'))
+#+END_SRC
+
+#+RESULTS:
+: a1cb8cb213c239d6ca6a70bc3daf9e55
+
+#+BEGIN_SRC jupyter-python
+data = HashCache.load('a1cb8cb213c239d6ca6a70bc3daf9e55')
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC jupyter-python
+from ase.eos import EquationOfState
+
+table = []
+syms = ['Cu', 'Pd', 'Au']
+for sym in syms:
+    v, e = data[sym]
+    eos = EquationOfState(v, e)
+    V0, E0, _ = eos.fit()
+    table += [[sym, np.round(V0, 2), np.round(E0, 5)]]
+
+table    
+#+END_SRC
+
+#+RESULTS:
+| Cu | 11.56 | -0.00629 |
+| Pd | 14.59 | -0.00065 |
+| Au | 16.68 | -0.00088 |
+
+#+name: tab_eos
+#+BEGIN_SRC jupyter-python  
+from pycse.orgmode import Table
+
+Table(table, headers=['symbol', 'V0', 'E0'],
+      caption='Equation of state data',
+      name='tab:eos')
+#+END_SRC
+
+#+RESULTS: tab_eos
+#+name: tab:eos
+#+caption: Equation of state data
+| symbol |    V0 |       E0 |
+|--------+-------+----------|
+| Cu     | 11.56 | -0.00629 |
+| Pd     | 14.59 | -0.00065 |
+| Au     | 16.68 | -0.00088 |
+
+#+RESULTS: tab:eos
+#+name: tab:eos
+#+caption: Equation of state data
+| symbol |    V0 |       E0 |
+|--------+-------+----------|
+| Cu     | 11.56 | -0.00629 |
+| Pd     | 14.59 | -0.00065 |
+| Au     | 16.68 | -0.00088 |
+
+#+RESULTS:
+#+name: tab:eos
+#+caption: Equation of state data
+| symbol |    V0 |       E0 |
+|--------+-------+----------|
+| Cu     | 11.56 | -0.00629 |
+| Pd     | 14.59 | -0.00065 |
+| Au     | 16.68 | -0.00088 |
+

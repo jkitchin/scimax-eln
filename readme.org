@@ -16,10 +16,17 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 2 - joblib https://www.youtube.com/watch?v=sHiMOQkNFKQ
 - Video 3 - hashcache https://youtube.com/live/d3zcfdylKOc
 - Video 4 - SqlCache https://youtube.com/live/aWnYGOWWIqY
+- Video 5 - molecular simulation https://youtube.com/live/eQcTubl-7kw
 
-* TODO Molecular simulation
+* Molecular simulation
 
 [[./molsim/readme.org]]
+
+* TODO Temperature control lab
+
+https://apmonitor.com/pdc/index.php/Main/PurchaseLabKit
+
+See [[./tclab/]] and [[./tclab_jupyter/]]
 
 * TODO SDL-light - running a remote instrument
 
@@ -29,14 +36,6 @@ See [[./sdl-light/readme.org]]
 DEADLINE: <2024-06-19 Wed>
 
 ordered: https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox/FMfcgzQVwxGRSPSPlBmblnVHLqHkVTTj
-
-* TODO Temperature control lab
-
-https://apmonitor.com/pdc/index.php/Main/PurchaseLabKit
-
-** TODO Get order
-DEADLINE: <2024-06-19 Wed>
-ordered: https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox/FMfcgzQVwxGRSPSXwSGTBhpFZFrvBXnM
 
 * Footnotes
 

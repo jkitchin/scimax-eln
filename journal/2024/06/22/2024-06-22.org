@@ -1,0 +1,51 @@
+#+title: Report on equations of state
+#+options: toc:nil
+
+\maketitle
+\tableofcontents
+
+*Abstract* Brief report on equations of state for Cu, Pd and Au.
+
+
+* Introduction
+
+We use an EOS [[cite:&rose-1984-univer-featur]].
+
+The results are summarized in Table ref:tab:eos.
+#+call: ../../../../molsim/readme.org:tab_eos()
+
+#+RESULTS:
+#+name: tab:eos
+#+caption: Equation of state data
+| symbol |    V0 |       E0 |
+|--------+-------+----------|
+| Cu     | 11.56 | -0.00629 |
+| Pd     | 14.59 | -0.00065 |
+| Au     | 16.68 | -0.00088 |
+
+#+name: fig-eos
+#+attr_latex: :placement [H] :width 3in
+#+caption: The equations of state we computed.
+[[./../../../../molsim/.ob-jupyter/eec56b93f2809b313b8d9765cca191a7fccb636e.png]]
+
+* conclusions
+
+it worked.
+
+bibliographystyle:unsrtnat
+[[bibliography:/Users/jkitchin/Dropbox/emacs/bibliography/master.bib]]
+* Code                                                             :noexport:
+
+#+BEGIN_SRC jupyter-python :restart
+from pycse.hashcache import HashCache
+
+data = HashCache.load('a1cb8cb213c239d6ca6a70bc3daf9e55',
+                      cache='../../../../molsim/cache.sqlite')
+print(data)
+#+END_SRC
+
+#+RESULTS:
+: None
+
+*************** TODO fix cache location in load
+*************** END
