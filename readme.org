@@ -8,25 +8,38 @@ I plan to use this repo to explore using scimax as an electronic laboratory note
 
 Repo: https://github.com/jkitchin/scimax-eln
 
-* pycse
-
-[[./pycse/readme.org]]
-
 - Video 1 - https://www.youtube.com/watch?v=KodhYAo4xn0&t=0s
 - Video 2 - joblib https://www.youtube.com/watch?v=sHiMOQkNFKQ
 - Video 3 - hashcache https://youtube.com/live/d3zcfdylKOc
 - Video 4 - SqlCache https://youtube.com/live/aWnYGOWWIqY
 - Video 5 - molecular simulation https://youtube.com/live/eQcTubl-7kw
+- Video 6 - writing reports in the notebook https://youtube.com/live/c9saatJ2o7A
+- Video 7 - Interoperability and extendability
+
+
+* pycse
+
+[[./pycse/readme.org]]
 
 * Molecular simulation
 
 [[./molsim/readme.org]]
+
+* TODO Circuit Playground
+
+Talk about interoperability with software, instruments
 
 * TODO Temperature control lab
 
 https://apmonitor.com/pdc/index.php/Main/PurchaseLabKit
 
 See [[./tclab/]] and [[./tclab_jupyter/]]
+
+Notes for setup:
+
+
+
+
 
 * TODO SDL-light - running a remote instrument
 
