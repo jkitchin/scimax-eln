@@ -308,7 +308,7 @@ plt.legend();
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/eec56b93f2809b313b8d9765cca191a7fccb636e.png]
+[[file:./.ob-jupyter/eec56b93f2809b313b8d9765cca191a7fccb636e.png]]
 
 #+BEGIN_SRC jupyter-python  
 HashCache.dump(Cu=get_volumes_energies('Cu'),
