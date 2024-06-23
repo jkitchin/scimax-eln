@@ -25,9 +25,11 @@ Repo: https://github.com/jkitchin/scimax-eln
 
 [[./molsim/readme.org]]
 
-* TODO Circuit Playground
+* Circuit Playground
 
 Talk about interoperability with software, instruments
+
+[[./journal/2024/06/23/2024-06-23.org]]
 
 * TODO Temperature control lab
 
