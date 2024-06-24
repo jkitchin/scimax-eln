@@ -1,0 +1,18 @@
+#+title: Is your electronic notebook searchable the way you want?
+
+
+
+
+#+attr_org: :width 800
+[[./screenshots/date-24-06-2024-time-13-23-38.png]]
+
+
+1. query - file, text, image, ...
+2. scope
+
+
+org-db
+- headings
+- src-block
+- text
+- image
