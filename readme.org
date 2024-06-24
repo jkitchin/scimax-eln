@@ -14,8 +14,8 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 4 - SqlCache https://youtube.com/live/aWnYGOWWIqY
 - Video 5 - molecular simulation https://youtube.com/live/eQcTubl-7kw
 - Video 6 - writing reports in the notebook https://youtube.com/live/c9saatJ2o7A
-- Video 7 - Interoperability and extendability
-
+- Video 7 - Interoperability and extendability https://youtube.com/live/RumU94MxqN4
+- Video 8 - Searching your notebook https://youtube.com/live/C02FFd520MI
 
 * pycse
 
@@ -47,7 +47,7 @@ Notes for setup:
 
 See [[./sdl-light/readme.org]]
 
-** TODO get instruments
+** TODO get SDL-Light instruments
 DEADLINE: <2024-06-19 Wed>
 
 ordered: https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox/FMfcgzQVwxGRSPSPlBmblnVHLqHkVTTj
@@ -55,3 +55,7 @@ ordered: https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox/FMfcgzQVwxGRSPSPlBm
 * Footnotes
 
 [fn:1] https://www.go-fair.org/fair-principles/ 
+
+# Local Variables:
+# eval: (sem-mode)
+# End:
