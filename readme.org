@@ -16,6 +16,7 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 6 - writing reports in the notebook https://youtube.com/live/c9saatJ2o7A
 - Video 7 - Interoperability and extendability https://youtube.com/live/RumU94MxqN4
 - Video 8 - Searching your notebook https://youtube.com/live/C02FFd520MI
+- Video 9 - Running Arduino devices https://youtube.com/live/Fn7sq8uRsGQ
 
 * pycse
 
@@ -31,6 +32,13 @@ Talk about interoperability with software, instruments
 
 [[./journal/2024/06/23/2024-06-23.org]]
 
+* Arduino temperature
+
+- show video capability with search of audio
+- try image text recognition from a written note in image
+- show scimax-ob-arduino
+- work out how to capture data from it
+
 * TODO Temperature control lab
 
 https://apmonitor.com/pdc/index.php/Main/PurchaseLabKit
@@ -40,15 +48,12 @@ See [[./tclab/]] and [[./tclab_jupyter/]]
 Notes for setup:
 
 
-
-
-
 * TODO SDL-light - running a remote instrument
 
 See [[./sdl-light/readme.org]]
 
 ** TODO get SDL-Light instruments
-DEADLINE: <2024-06-19 Wed>
+DEADLINE: <2024-07-01 Mon>
 
 ordered: https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox/FMfcgzQVwxGRSPSPlBmblnVHLqHkVTTj
 
