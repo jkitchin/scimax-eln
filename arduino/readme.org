@@ -209,6 +209,4 @@ df.plot(x='time', y='degC')
 :END:
 
 
-* TODO why isn't screenshot showing
 
-* TODO audio and video don't seem to have synced?
