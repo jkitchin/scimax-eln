@@ -10,24 +10,22 @@ jobs:
       fail-fast: false
       matrix:
         emacs_version:
-          - 29.1
+          - snapshot
 
     steps:
     - uses: purcell/setup-emacs@master
       with:
         version: ${{ matrix.emacs_version }}
 
-    - name: Install aspell
-      run: sudo apt-get install -y aspell
       
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: org-publish
       run: |
         emacs -batch -nw -l publish.el
 
     # Deploy the book's HTML to gh-pages branch
     - name: GitHub Pages action
-      uses: peaceiris/actions-gh-pages@v3.6.1
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./docs
