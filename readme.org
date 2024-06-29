@@ -17,6 +17,8 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 7 - Interoperability and extendability https://youtube.com/live/RumU94MxqN4
 - Video 8 - Searching your notebook https://youtube.com/live/C02FFd520MI
 - Video 9 - Running Arduino devices https://youtube.com/live/Fn7sq8uRsGQ
+- Video 10 - Electronic lab notebook with scimax - ELNs in the literature https://youtube.com/live/icPlZCF6LEw
+- Video 11 - Publishing your ELN to GitHUB Pages https://youtube.com/live/zIgSOiMFBWU
 
 * pycse
 
@@ -57,10 +59,14 @@ DEADLINE: <2024-07-01 Mon>
 
 ordered: https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox/FMfcgzQVwxGRSPSPlBmblnVHLqHkVTTj
 
-* Publishing your ELN to GitHUB Pages
+* Manually publishing your ELN to GitHUB Pages
 
-#+attr_org: :width 600
-[[./screenshots/date-28-06-2024-time-10-59-08.png]]
+[2024-06-29 Sat]
+
+
+#+attr_org: :width 800
+[[./screenshots/date-29-06-2024-time-12-25-30.png]]
+
 
 
 The notebook as I use it daily is local on my computer. I do commit and push changes to GitHUB, and GitHUB does an ok job rendering org-files, but we can take it one step further. You can set up a workflow to publish your notebook as html (or pdf, or other format if you want). We will publish this notebook to html, and then push it to GitHub which will serve the html via GitHUB Pages.
@@ -148,12 +154,9 @@ git push
 After a bit you can find it at https://kitchingroup.cheme.cmu.edu/scimax-eln
 
 
-** GitHUB actions
+** Automatic publishing via GitHUB actions
 
-I added this after I made the video. You need a publish script (see [[./publish.el]]). Then you set up GitHUB actions (see [[./.github/workflows/publish.yml]]). This installs an Emacs, runs a publish script, and publishes the results to the docs directory.
-
-
-Unfortunately, this only works for another branch, so I created a new gh-pages branch, and set up the actions to publish there.
+I added this after I made the video. You need a publish script (see [[./publish.el]]). Then you set up GitHUB actions (see [[./.github/workflows/publish.yml]]). This installs an Emacs, runs a publish script, and publishes the results from the docs directory. Unfortunately, this only works for another branch, so I created a new gh-pages branch, and set up the actions to publish there.
 
 Trying this was a minor disaster. I accidentally seem to have overwritten/deleted the org-files on GitHUB, and then pulled that locally. I was able to do some git-fu to revert changes and reconstruct the files (I also could have relied on Dropbox to rewind). This almost certainly resulted in some loss of work. I am noting it here to remind anyone reading this to have a backup strategy. There are a lot of moving parts that can lead to loss of data in unintended ways. I don't think I lost much data here, but it was a little stressful trying to figure out how to revert the changes, and to see if the content I wanted here was back the way I anticipated.
 
