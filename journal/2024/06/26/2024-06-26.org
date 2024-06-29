@@ -1,0 +1,87 @@
+* Electronic lab notebook with scimax - Remote Raspberry Pi by REST API
+
+[2024-06-26 Wed] I made a video of this, but there were a bunch of technical difficulties, so I want to try making it again.
+
+#+attr_org: :width 800
+[[./screenshots/date-26-06-2024-time-15-15-46.png]]
+
+
+* In a browser
+
+http://arnold.wifi.local.cmu.edu:8080/img
+
+* In a shell
+
+#+BEGIN_SRC sh
+curl http://arnold.wifi.local.cmu.edu:8080/img --output 3.59.jpg
+#+END_SRC
+
+* in a sh src block
+
+#+BEGIN_SRC sh
+curl http://arnold.wifi.local.cmu.edu:8080/img --output 4.01.jpg
+#+END_SRC
+
+#+RESULTS:
+
+[[./4.01.jpg]]
+
+* In Python
+
+#+BEGIN_SRC jupyter-python
+import requests
+import shutil
+
+req = requests.get('http://arnold.wifi.local.cmu.edu:8080/img', stream=True)
+
+img = '4:17.jpg'
+with open(img, 'wb') as f:
+    req.raw.decode_content = True
+    shutil.copyfileobj(req.raw, f)
+#+END_SRC
+
+#+RESULTS:
+
+[[./4:17.jpg]]
+
+
+
+* in elisp
+
+#+BEGIN_SRC emacs-lisp
+(use-package ob-http)
+
+(defun ob-http-file (response filename)
+  (let ((body (ob-http-response-body response)))
+    (with-temp-file filename
+      (insert body)))
+  (format "[[%s]]" (expand-file-name filename default-directory)))
+#+END_SRC
+
+#+RESULTS:
+: ob-http-file
+
+
+#+BEGIN_SRC http :file (format-time-string "%Y-%m-%dT%H:%m:%S.jpg" (current-time)) :results raw
+GET http://arnold.wifi.local.cmu.edu:8080/img
+#+END_SRC
+
+#+RESULTS:
+[[/Users/jkitchin/Dropbox/emacs/projects/scimax-eln/journal/2024/06/26/2024-06-26T16:06:16.jpg]]
+
+*************** DONE there is some font-lock issue
+CLOSED: [2024-06-27 Thu 10:22]
+I don't know what it is, something acts sticky, headlines don't always auto format. Something is weird, I thought I updated org, but it looks like I use an old version. It should be 9.7.5.
+
+It was 9.7-pre. still isn't what I thought, but updating might have fixed it?
+
+
+#+BEGIN_SRC emacs-lisp
+(org-version)
+#+END_SRC
+
+#+RESULTS:
+: 9.7-pre
+
+*************** END
+

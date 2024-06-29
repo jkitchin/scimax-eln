@@ -1,0 +1,91 @@
+* Electronic lab notebook with scimax - ELNs in the literature
+
+
+#+attr_org: :width 800
+[[./screenshots/date-27-06-2024-time-14-28-59.png]]
+
+https://www.nature.com/articles/s41596-021-00645-8
+
+Higgins, S. G., Nogiwa-Valdez, A. A., & Stevens, M. M. (2022). Considerations for implementing electronic laboratory notebooks in an academic research environment. Nature Protocols, 17(2), 179–189. http://dx.doi.org/10.1038/s41596-021-00645-8 cite:&higgins-2022-consid-implem 
+
+Kanza, S., Willoughby, C., Gibbins, N., Whitby, R., Frey, J. G., Erjavec, J., Klemen Zupan\vci\vc, … (2017). Electronic lab notebooks: can they replace paper? Journal of Cheminformatics, 9(1), 31. http://dx.doi.org/10.1186/s13321-017-0221-3
+[[cite:&kanza-2017-elect-lab-noteb]]
+
+
+
+- Buonsanti, R. (2023). Electronic lab notebooks for materials synthesis.
+  Chemistry of Materials, 35(3), 805–806.
+  http://dx.doi.org/10.1021/acs.chemmater.3c00019 [[cite:&buonsanti-2023-elect-lab]]
+
+Scroggie, K. R., Burrell-Sander, K. J., Rutledge, P. J., & Motion, A. (2023). Github as an open electronic laboratory notebook for real-time sharing of knowledge and collaboration. Digital Discovery, 2(4), 1188–1196. http://dx.doi.org/10.1039/d3dd00032j cite:&scroggie-2023-github-as 
+
+*  Bibtex entries
+
+#+BEGIN_SRC bibtex :tangle 2024-06-27.bib
+@article{higgins-2022-consid-implem,
+  author =	 {Stuart G. Higgins and Akemi A. Nogiwa-Valdez and Molly M.
+                  Stevens},
+  title =	 {Considerations for Implementing Electronic Laboratory
+                  Notebooks in an Academic Research Environment},
+  journal =	 {Nature Protocols},
+  volume =	 17,
+  number =	 2,
+  pages =	 {179-189},
+  year =	 2022,
+  doi =		 {10.1038/s41596-021-00645-8},
+  url =		 {http://dx.doi.org/10.1038/s41596-021-00645-8},
+  DATE_ADDED =	 {Thu Jun 27 14:36:49 2024},
+}
+
+
+
+@article{kanza-2017-elect-lab-noteb,
+  author =	 {Samantha Kanza and Cerys Willoughby and Nicholas Gibbins and
+                  Richard Whitby and Jeremy Graham Frey and Jana Erjavec and
+                  Klemen Zupan{\v{c}}i{\v{c}} and Matjaž Hren and Katarina
+                  Kova{\v{c}}},
+  title =	 {Electronic Lab Notebooks: Can They Replace Paper?},
+  journal =	 {Journal of Cheminformatics},
+  volume =	 9,
+  number =	 1,
+  pages =	 31,
+  year =	 2017,
+  doi =		 {10.1186/s13321-017-0221-3},
+  url =		 {http://dx.doi.org/10.1186/s13321-017-0221-3},
+  DATE_ADDED =	 {Thu Jun 27 14:45:18 2024},
+}
+
+
+
+@article{buonsanti-2023-elect-lab,
+  author =	 {Raffaella Buonsanti},
+  title =	 {Electronic Lab Notebooks for Materials Synthesis},
+  journal =	 {Chemistry of Materials},
+  volume =	 35,
+  number =	 3,
+  pages =	 {805-806},
+  year =	 2023,
+  doi =		 {10.1021/acs.chemmater.3c00019},
+  url =		 {http://dx.doi.org/10.1021/acs.chemmater.3c00019},
+  DATE_ADDED =	 {Thu Jun 27 14:47:48 2024},
+}
+
+
+
+@article{scroggie-2023-github-as,
+  author =	 {Kymberley R. Scroggie and Klementine J. Burrell-Sander and
+                  Peter J. Rutledge and Alice Motion},
+  title =	 {Github As an Open Electronic Laboratory Notebook for Real-Time
+                  Sharing of Knowledge and Collaboration},
+  journal =	 {Digital Discovery},
+  volume =	 2,
+  number =	 4,
+  pages =	 {1188-1196},
+  year =	 2023,
+  doi =		 {10.1039/d3dd00032j},
+  url =		 {http://dx.doi.org/10.1039/D3DD00032J},
+  DATE_ADDED =	 {Thu Jun 27 14:50:11 2024},
+}
+
+
+#+END_SRC
