@@ -17,35 +17,29 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 7 - Interoperability and extendability https://youtube.com/live/RumU94MxqN4
 - Video 8 - Searching your notebook https://youtube.com/live/C02FFd520MI
 - Video 9 - Running Arduino devices https://youtube.com/live/Fn7sq8uRsGQ
-- Video 10 - Electronic lab notebook with scimax - ELNs in the literature https://youtube.com/live/icPlZCF6LEw
-- Video 11 - Publish your notebook to a webserver https://youtube.com/live/zIgSOiMFBWU
 
-* ELN for simulations and experiments
-** pycse
+* pycse
 
 [[./pycse/readme.org]]
 
-** Molecular simulation
+* Molecular simulation
 
 [[./molsim/readme.org]]
 
-** Circuit Playground
+* Circuit Playground
 
 Talk about interoperability with software, instruments
 
 [[./journal/2024/06/23/2024-06-23.org]]
 
-** Arduino temperature
+* Arduino temperature
 
 - show video capability with search of audio
 - try image text recognition from a written note in image
 - show scimax-ob-arduino
 - work out how to capture data from it
 
-[[./arduino/readme.org]]
-
-
-** TODO Temperature control lab
+* TODO Temperature control lab
 
 https://apmonitor.com/pdc/index.php/Main/PurchaseLabKit
 
@@ -54,15 +48,16 @@ See [[./tclab/]] and [[./tclab_jupyter/]]
 Notes for setup:
 
 
-** TODO SDL-light - running a remote instrument
+* TODO SDL-light - running a remote instrument
 
 See [[./sdl-light/readme.org]]
 
-*** TODO get SDL-Light instruments
+** TODO get SDL-Light instruments
 DEADLINE: <2024-07-01 Mon>
 
 ordered: https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox/FMfcgzQVwxGRSPSPlBmblnVHLqHkVTTj
 
+<<<<<<< HEAD
 
 * Publishing your ELN to GitHUB Pages
 
