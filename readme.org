@@ -155,6 +155,8 @@ I added this after I made the video. You need a publish script (see [[./publish.
 
 Unfortunately, this only works for another branch, so I created a new gh-pages branch, and set up the actions to publish there.
 
+Trying this was a minor disaster. I accidentally seem to have overwritten/deleted the org-files on GitHUB, and then pulled that locally. I was able to do some git-fu to revert changes and reconstruct the files (I also could have relied on Dropbox to rewind). This almost certainly resulted in some loss of work. I am noting it here to remind anyone reading this to have a backup strategy. There are a lot of moving parts that can lead to loss of data in unintended ways.
+
 
 * Footnotes
 
