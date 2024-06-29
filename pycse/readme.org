@@ -111,21 +111,3 @@ jq '.K' results.json
 | 0.2, |
 | 0.4  |
 | ]    |
-
-* Tasks
-
-** TODO jupyter doesn't seem to work with named results
-
-#+RESULTS: results
-| 0.8187307577762143 | 0.6703201753500971 | 0.4493323314834313 |
-
-#+BEGIN_SRC python :var data=results :results output
-print(data)
-#+END_SRC
-
-#+RESULTS:
-: []
-
-#+BEGIN_SRC sh 
-echo $data
-#+END_SRC
