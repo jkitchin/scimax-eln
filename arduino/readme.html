@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-06-29 Sat 16:22 -->
+<!-- 2024-06-29 Sat 16:27 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Electronic Lab Notebook for Arduino devices with scimax</title>
@@ -200,15 +200,15 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgd59212f">1. Setup the instrument</a></li>
-<li><a href="#orgb9722eb">2. Save an image</a></li>
-<li><a href="#orgddfd47b">3. Save a video</a></li>
-<li><a href="#org2a12604">4. Save some data</a></li>
+<li><a href="#orgd1a3562">1. Setup the instrument</a></li>
+<li><a href="#orge875e8d">2. Save an image</a></li>
+<li><a href="#org033fbd0">3. Save a video</a></li>
+<li><a href="#orgc633c79">4. Save some data</a></li>
 </ul>
 </div>
 </div>
 
-<div id="org49935c6" class="figure">
+<div id="org2e245fd" class="figure">
 <p><img src="./screenshots/date-25-06-2024-time-19-27-20.png" alt="date-25-06-2024-time-19-27-20.png" />
 </p>
 </div>
@@ -225,8 +225,8 @@
 <pre class="src src-emacs-lisp">(load-file "scimax-ob-arduino.el")
 </pre>
 </div>
-<div id="outline-container-orgd59212f" class="outline-2">
-<h2 id="orgd59212f"><span class="section-number-2">1.</span> Setup the instrument</h2>
+<div id="outline-container-orgd1a3562" class="outline-2">
+<h2 id="orgd1a3562"><span class="section-number-2">1.</span> Setup the instrument</h2>
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
 <pre class="src src-arduino">const int sensorPin = A0;
@@ -293,34 +293,34 @@ void loop(){
 </div>
 </div>
 </div>
-<div id="outline-container-orgb9722eb" class="outline-2">
-<h2 id="orgb9722eb"><span class="section-number-2">2.</span> Save an image</h2>
+<div id="outline-container-orge875e8d" class="outline-2">
+<h2 id="orge875e8d"><span class="section-number-2">2.</span> Save an image</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 {a&gt; :file 2024-06-25-19-46-27.aiff &lt;a}
 </p>
 
 
-<div id="orga1bec67" class="figure">
+<div id="org994459d" class="figure">
 <p><img src="./screenshots/date-25-06-2024-time-19-44-07.png" alt="date-25-06-2024-time-19-44-07.png" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgddfd47b" class="outline-2">
-<h2 id="orgddfd47b"><span class="section-number-2">3.</span> Save a video</h2>
+<div id="outline-container-org033fbd0" class="outline-2">
+<h2 id="org033fbd0"><span class="section-number-2">3.</span> Save a video</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 {v&gt; :file 2024-06-25-19-44-44.mov  :note "example of how the device works" &lt;v}
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org82ac9ac"></a><span class="todo TODO">TODO</span> rm tooltip and also placement of sem editmarks is a little buggy<br /></li>
-<li><a id="orgdfc552c"></a>END<br /></li>
+<li><a id="org757b794"></a><span class="todo TODO">TODO</span> rm tooltip and also placement of sem editmarks is a little buggy<br /></li>
+<li><a id="org64b19ad"></a>END<br /></li>
 </ol>
 </div>
-<div id="outline-container-org2a12604" class="outline-2">
-<h2 id="org2a12604"><span class="section-number-2">4.</span> Save some data</h2>
+<div id="outline-container-orgc633c79" class="outline-2">
+<h2 id="orgc633c79"><span class="section-number-2">4.</span> Save some data</h2>
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">(serial-term "/dev/cu.usbmodem143101" 9600)
@@ -371,7 +371,7 @@ df
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2024-06-29 Sat 16:22</p>
+<p class="date">Created: 2024-06-29 Sat 16:27</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
