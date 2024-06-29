@@ -22,9 +22,11 @@ jobs:
     - name: org-publish
       run: |
         emacs -batch -nw -l publish.el
+        pwd
+        ls
         ls docs/*
 
-    # Deploy the book's HTML to gh-pages branch
+    # Deploy the html in docs to gh-pages branch
     - name: GitHub Pages action
       uses: peaceiris/actions-gh-pages@v4
       with:
