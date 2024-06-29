@@ -1,0 +1,1628 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-06-29 Sat 09:29 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>scimax-ELN for molecular simulation</title>
+<meta name="author" content="John Kitchin" />
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">scimax-ELN for molecular simulation</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orged5006b">1. Work out how to run a bunch of volumes</a></li>
+<li><a href="#org7a6f7f9">2. automating the pipeline</a></li>
+</ul>
+</div>
+</div>
+
+<div id="orge25e57b" class="figure">
+<p><img src="./screenshots/date-11-06-2024-time-20-18-42.png" alt="date-11-06-2024-time-20-18-42.png" />
+</p>
+</div>
+
+
+<p>
+Goal: Use ase to compute the lattice constant of Cu.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #0000FF;">from</span> ase.build <span style="color: #0000FF;">import</span> bulk
+<span style="color: #0000FF;">from</span> ase.calculators.emt <span style="color: #0000FF;">import</span> EMT
+
+<span style="color: #BA36A5;">atoms</span> = bulk(<span style="color: #008000;">'Cu'</span>, a=3.6)
+atoms.<span style="color: #BA36A5;">calc</span> = EMT()
+
+atoms.get_potential_energy()
+</pre>
+</div>
+
+<pre class="example">
+-0.006688768685794599
+</pre>
+
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #0000FF;">from</span> pycse.hashcache <span style="color: #0000FF;">import</span> SqlCache
+
+SqlCache.dump(atoms=atoms)
+</pre>
+</div>
+
+<pre class="example" id="org5f1603d">
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+Cell In[11], line 3
+      1 from pycse.hashcache import SqlCache
+----&gt; 3 SqlCache.dump(atoms=atoms)
+
+File ~/Dropbox/python/pycse/pycse/hashcache.py:358, in SqlCache.dump(**kwargs)
+    356 hc = SqlCache(lambda x: x)
+    357 try:
+--&gt; 358     hc.dump_data(hsh, data)
+    359     return hsh
+    360 except sqlite3.IntegrityError:
+
+File ~/Dropbox/python/pycse/pycse/hashcache.py:299, in SqlCache.dump_data(self, hsh, data)
+    294 def dump_data(self, hsh, data):
+    295     """Dump DATA into HSH.
+    296     DATA must be serializable to json.
+    297 
+    298     """
+--&gt; 299     value = orjson.dumps(data, option=orjson.OPT_SERIALIZE_NUMPY)
+    300     with self.con:
+    301         self.con.execute("INSERT INTO cache(hash, value) VALUES(?, ?)", (hsh, value))
+
+TypeError: Type is not JSON serializable: Atoms
+</pre>
+
+<div class="inlinetask">
+<b><span class="todo TODO">TODO</span> extend SqlCache with custom serializing functions</b><br />
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #0000FF;">from</span> pycse.hashcache <span style="color: #0000FF;">import</span> HashCache
+
+HashCache.dump(atoms=atoms)
+</pre>
+</div>
+
+<pre class="example">
+4130737e96a89b0d0315bd328303e298
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">HashCache.load(<span style="color: #008000;">'4130737e96a89b0d0315bd328303e298'</span>)[<span style="color: #008000;">'atoms'</span>].get_potential_energy()
+</pre>
+</div>
+
+<pre class="example">
+-0.006688768685794599
+</pre>
+<div id="outline-container-orged5006b" class="outline-2">
+<h2 id="orged5006b"><span class="section-number-2">1.</span> Work out how to run a bunch of volumes</h2>
+<div class="outline-text-2" id="text-1">
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #6434A3;">@HashCache</span>
+<span style="color: #0000FF;">def</span> <span style="color: #006699;">get_energy</span>(symbol, a):
+    <span style="color: #036A07;">"""symbol is a string for a chemical element, for a metal EMT can use</span>
+<span style="color: #036A07;">    a is a float lattice constant</span>
+<span style="color: #036A07;">    """</span>
+    <span style="color: #BA36A5;">atoms</span> = bulk(symbol, a=a)
+    atoms.<span style="color: #BA36A5;">calc</span> = EMT()
+    <span style="color: #0000FF;">return</span> atoms, atoms.get_potential_energy()
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">get_energy(<span style="color: #008000;">'Cu'</span>, 3.6)
+</pre>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Atoms</td>
+<td class="org-left">(symbols= Cu pbc=True cell= ((0.0 1.8 1.8) (1.8 0.0 1.8) (1.8 1.8 0.0)) calculator=EMT (&#x2026;))</td>
+<td class="org-right">-0.006688768685794599</td>
+</tr>
+</tbody>
+</table>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #0000FF;">import</span> numpy <span style="color: #0000FF;">as</span> np
+
+<span style="color: #BA36A5;">A</span> = np.linspace(3.5, 3.7, 10)
+<span style="color: #BA36A5;">results</span> = [get_energy(<span style="color: #008000;">'Cu'</span>, a) <span style="color: #0000FF;">for</span> a <span style="color: #0000FF;">in</span> A]
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #0000FF;">import</span> matplotlib.pyplot <span style="color: #0000FF;">as</span> plt
+<span style="color: #BA36A5;">volumes</span> = [x[0].get_volume() <span style="color: #0000FF;">for</span> x <span style="color: #0000FF;">in</span> results]
+<span style="color: #BA36A5;">energies</span> = [x[1] <span style="color: #0000FF;">for</span> x <span style="color: #0000FF;">in</span> results]
+
+plt.plot(volumes, energies, <span style="color: #008000;">'bo'</span>)
+plt.xlabel(<span style="color: #008000;">'Volume'</span>)
+plt.ylabel(<span style="color: #008000;">'energy (eV)'</span>)
+</pre>
+</div>
+
+<pre class="example">
+Text(0, 0.5, 'energy (eV)')
+</pre>
+
+
+<div id="org2131616" class="figure">
+<p><img src="./.ob-jupyter/d576a7a4d6c11f873bafd115bf8ae9cca310f210.png" alt="d576a7a4d6c11f873bafd115bf8ae9cca310f210.png" />
+</p>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #0000FF;">from</span> ase.eos <span style="color: #0000FF;">import</span> EquationOfState
+
+<span style="color: #BA36A5;">eos</span> = EquationOfState(volumes, energies, eos=<span style="color: #008000;">'murnaghan'</span>)
+<span style="color: #BA36A5;">v0</span>, <span style="color: #BA36A5;">e0</span>, <span style="color: #BA36A5;">B</span> = eos.fit()
+<span style="color: #BA36A5;">p</span> = eos.plot();
+</pre>
+</div>
+
+
+<div id="org4094a2a" class="figure">
+<p><img src="./.ob-jupyter/e0b1e5bff43b597864673aa5e4a101cc694701cf.png" alt="e0b1e5bff43b597864673aa5e4a101cc694701cf.png" />
+</p>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">HashCache.dump(p=p, energies=energies, volumes=volumes)
+</pre>
+</div>
+
+<pre class="example">
+3513cf5f94b19b0b7d8366977162b793
+</pre>
+
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #0000FF;">from</span> pycse.hashcache <span style="color: #0000FF;">import</span> HashCache
+<span style="color: #0000FF;">import</span> matplotlib.pyplot <span style="color: #0000FF;">as</span> plt
+
+<span style="color: #BA36A5;">data</span> = HashCache.load(<span style="color: #008000;">'3513cf5f94b19b0b7d8366977162b793'</span>)
+data
+</pre>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">p</td>
+<td class="org-left">:</td>
+<td class="org-left">&lt;Axes:</td>
+<td class="org-left">title=</td>
+<td class="org-left">(center : murnaghan: E: -0.007 eV, V: 11.565 Å\(^3\), B: 133.983 GPa)</td>
+<td class="org-left">xlabel=</td>
+<td class="org-left">volume [Å\(^3\)]</td>
+<td class="org-left">ylabel=</td>
+<td class="org-left">energy [eV]</td>
+<td class="org-left">&gt;</td>
+<td class="org-left">energies</td>
+<td class="org-left">:</td>
+<td class="org-left">(0.02258449020150266 0.009418803494646966 0.00023387132042529402 -0.0051803267047105805 -0.007033515329636586 -0.005529646375938668 -0.0008644538297684079 0.00677597166295385 0.017216683862587345 0.03029607714894489)</td>
+<td class="org-left">volumes</td>
+<td class="org-left">:</td>
+<td class="org-left">(10.71875 10.924215706447187 11.132290466392321 11.342990740740742 11.556332990397806 11.772333676268865 11.991009259259261 12.212376200274347 12.436450960219478 12.663250000000003)</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #0000FF;">import</span> matplotlib.pyplot <span style="color: #0000FF;">as</span> plt
+<span style="color: #BA36A5;">fig</span> = plt.figure()
+fig.axes.append(data[<span style="color: #008000;">'p'</span>])
+fig.show()
+</pre>
+</div>
+
+<pre class="example">
+/var/folders/3q/ht_2mtk52hl7ydxrcr87z2gr0000gn/T/ipykernel_69640/3635145725.py:4: UserWarning: Matplotlib is currently using module://matplotlib_inline.backend_inline, which is a non-GUI backend, so cannot show the figure.
+  fig.show()
+&lt;Figure size 640x480 with 0 Axes&gt;
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #006FE0;">dir</span>(data[<span style="color: #008000;">'p'</span>])
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">plt.plot(data[<span style="color: #008000;">'volumes'</span>], data[<span style="color: #008000;">'energies'</span>]);
+</pre>
+</div>
+
+
+<div id="org6391a33" class="figure">
+<p><img src="./.ob-jupyter/8a6a9cd51a7aa7aaf3ca0d7a1198adc77f9380c9.png" alt="8a6a9cd51a7aa7aaf3ca0d7a1198adc77f9380c9.png" />
+</p>
+</div>
+
+<div class="inlinetask">
+<b><span class="todo TODO">TODO</span> look up if there is a way to reload the figure from the cache</b><br />
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">HashCache.dump(fig=plt.gcf())
+</pre>
+</div>
+
+<pre class="example">
+69b4355557538be9e54d4c4f328dd76e
+&lt;Figure size 640x480 with 0 Axes&gt;
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #BA36A5;">d</span> = HashCache.load(<span style="color: #008000;">'69b4355557538be9e54d4c4f328dd76e'</span>)
+d[<span style="color: #008000;">'fig'</span>].savefig(<span style="color: #008000;">'test.png'</span>)
+</pre>
+</div>
+
+
+<div id="org2a1a275" class="figure">
+<p><img src="./test.png" alt="test.png" />
+</p>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #006FE0;">dir</span>(d[<span style="color: #008000;">'fig'</span>])
+</pre>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">_PROPERTIES_EXCLUDED_FROM_SET</td>
+<td class="org-left"><span class="underline"><span class="underline">class</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">delattr</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">dict</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">dir</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">doc</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">eq</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">format</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">ge</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">getattribute</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">getstate</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">gt</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">hash</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">init</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">init_subclass</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">le</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">lt</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">module</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">ne</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">new</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">reduce</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">reduce_ex</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">repr</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">setattr</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">setstate</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">sizeof</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">str</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">subclasshook</span></span></td>
+<td class="org-left"><span class="underline"><span class="underline">weakref</span></span></td>
+<td class="org-left">_add_axes_internal</td>
+<td class="org-left">_agg_filter</td>
+<td class="org-left">_align_label_groups</td>
+<td class="org-left">_alpha</td>
+<td class="org-left">_animated</td>
+<td class="org-left">_axobservers</td>
+<td class="org-left">_axstack</td>
+<td class="org-left">_button_pick_id</td>
+<td class="org-left">_callbacks</td>
+<td class="org-left">_canvas_callbacks</td>
+<td class="org-left">_check_layout_engines_compat</td>
+<td class="org-left">_clipon</td>
+<td class="org-left">_clippath</td>
+<td class="org-left">_cm_set</td>
+<td class="org-left">_default_contains</td>
+<td class="org-left">_dpi</td>
+<td class="org-left">_fig_callbacks</td>
+<td class="org-left">_fully_clipped_to_axes</td>
+<td class="org-left">_gci</td>
+<td class="org-left">_get_dpi</td>
+<td class="org-left">_get_draw_artists</td>
+<td class="org-left">_get_renderer</td>
+<td class="org-left">_gid</td>
+<td class="org-left">_in_layout</td>
+<td class="org-left">_internal_update</td>
+<td class="org-left">_label</td>
+<td class="org-left">_layout_engine</td>
+<td class="org-left">_localaxes</td>
+<td class="org-left">_mouse_key_ids</td>
+<td class="org-left">_mouseover</td>
+<td class="org-left">_norm_per_subplot_kw</td>
+<td class="org-left">_normalize_grid_string</td>
+<td class="org-left">_original_dpi</td>
+<td class="org-left">_path_effects</td>
+<td class="org-left">_picker</td>
+<td class="org-left">_process_projection_requirements</td>
+<td class="org-left">_rasterized</td>
+<td class="org-left">_remove_method</td>
+<td class="org-left"><span class="underline">repr_html</span></td>
+<td class="org-left">_scroll_pick_id</td>
+<td class="org-left">_set_alpha_for_array</td>
+<td class="org-left">_set_artist_props</td>
+<td class="org-left">_set_dpi</td>
+<td class="org-left">_set_gc_clip</td>
+<td class="org-left">_sketch</td>
+<td class="org-left">_snap</td>
+<td class="org-left">_stale</td>
+<td class="org-left">_sticky_edges</td>
+<td class="org-left">_suplabels</td>
+<td class="org-left">_suptitle</td>
+<td class="org-left">_supxlabel</td>
+<td class="org-left">_supylabel</td>
+<td class="org-left">_transform</td>
+<td class="org-left">_transformSet</td>
+<td class="org-left">_update_props</td>
+<td class="org-left">_update_set_signature_and_docstring</td>
+<td class="org-left">_url</td>
+<td class="org-left">_visible</td>
+<td class="org-left">add_artist</td>
+<td class="org-left">add_axes</td>
+<td class="org-left">add_axobserver</td>
+<td class="org-left">add_callback</td>
+<td class="org-left">add_gridspec</td>
+<td class="org-left">add_subfigure</td>
+<td class="org-left">add_subplot</td>
+<td class="org-left">align_labels</td>
+<td class="org-left">align_xlabels</td>
+<td class="org-left">align_ylabels</td>
+<td class="org-left">artists</td>
+<td class="org-left">autofmt_xdate</td>
+<td class="org-left">axes</td>
+<td class="org-left">bbox</td>
+<td class="org-left">bbox_inches</td>
+<td class="org-left">callbacks</td>
+<td class="org-left">canvas</td>
+<td class="org-left">clear</td>
+<td class="org-left">clf</td>
+<td class="org-left">clipbox</td>
+<td class="org-left">colorbar</td>
+<td class="org-left">contains</td>
+<td class="org-left">convert_xunits</td>
+<td class="org-left">convert_yunits</td>
+<td class="org-left">delaxes</td>
+<td class="org-left">dpi</td>
+<td class="org-left">dpi_scale_trans</td>
+<td class="org-left">draw</td>
+<td class="org-left">draw_artist</td>
+<td class="org-left">draw_without_rendering</td>
+<td class="org-left">execute_constrained_layout</td>
+<td class="org-left">figbbox</td>
+<td class="org-left">figimage</td>
+<td class="org-left">figure</td>
+<td class="org-left">findobj</td>
+<td class="org-left">format_cursor_data</td>
+<td class="org-left">frameon</td>
+<td class="org-left">gca</td>
+<td class="org-left">get_agg_filter</td>
+<td class="org-left">get_alpha</td>
+<td class="org-left">get_animated</td>
+<td class="org-left">get_axes</td>
+<td class="org-left">get_children</td>
+<td class="org-left">get_clip_box</td>
+<td class="org-left">get_clip_on</td>
+<td class="org-left">get_clip_path</td>
+<td class="org-left">get_constrained_layout</td>
+<td class="org-left">get_constrained_layout_pads</td>
+<td class="org-left">get_cursor_data</td>
+<td class="org-left">get_default_bbox_extra_artists</td>
+<td class="org-left">get_dpi</td>
+<td class="org-left">get_edgecolor</td>
+<td class="org-left">get_facecolor</td>
+<td class="org-left">get_figheight</td>
+<td class="org-left">get_figure</td>
+<td class="org-left">get_figwidth</td>
+<td class="org-left">get_frameon</td>
+<td class="org-left">get_gid</td>
+<td class="org-left">get_in_layout</td>
+<td class="org-left">get_label</td>
+<td class="org-left">get_layout_engine</td>
+<td class="org-left">get_linewidth</td>
+<td class="org-left">get_mouseover</td>
+<td class="org-left">get_path_effects</td>
+<td class="org-left">get_picker</td>
+<td class="org-left">get_rasterized</td>
+<td class="org-left">get_size_inches</td>
+<td class="org-left">get_sketch_params</td>
+<td class="org-left">get_snap</td>
+<td class="org-left">get_tight_layout</td>
+<td class="org-left">get_tightbbox</td>
+<td class="org-left">get_transform</td>
+<td class="org-left">get_transformed_clip_path_and_affine</td>
+<td class="org-left">get_url</td>
+<td class="org-left">get_visible</td>
+<td class="org-left">get_window_extent</td>
+<td class="org-left">get_zorder</td>
+<td class="org-left">ginput</td>
+<td class="org-left">have_units</td>
+<td class="org-left">images</td>
+<td class="org-left">is_transform_set</td>
+<td class="org-left">legend</td>
+<td class="org-left">legends</td>
+<td class="org-left">lines</td>
+<td class="org-left">mouseover</td>
+<td class="org-left">number</td>
+<td class="org-left">patch</td>
+<td class="org-left">patches</td>
+<td class="org-left">pchanged</td>
+<td class="org-left">pick</td>
+<td class="org-left">pickable</td>
+<td class="org-left">properties</td>
+<td class="org-left">remove</td>
+<td class="org-left">remove_callback</td>
+<td class="org-left">savefig</td>
+<td class="org-left">sca</td>
+<td class="org-left">set</td>
+<td class="org-left">set_agg_filter</td>
+<td class="org-left">set_alpha</td>
+<td class="org-left">set_animated</td>
+<td class="org-left">set_canvas</td>
+<td class="org-left">set_clip_box</td>
+<td class="org-left">set_clip_on</td>
+<td class="org-left">set_clip_path</td>
+<td class="org-left">set_constrained_layout</td>
+<td class="org-left">set_constrained_layout_pads</td>
+<td class="org-left">set_dpi</td>
+<td class="org-left">set_edgecolor</td>
+<td class="org-left">set_facecolor</td>
+<td class="org-left">set_figheight</td>
+<td class="org-left">set_figure</td>
+<td class="org-left">set_figwidth</td>
+<td class="org-left">set_frameon</td>
+<td class="org-left">set_gid</td>
+<td class="org-left">set_in_layout</td>
+<td class="org-left">set_label</td>
+<td class="org-left">set_layout_engine</td>
+<td class="org-left">set_linewidth</td>
+<td class="org-left">set_mouseover</td>
+<td class="org-left">set_path_effects</td>
+<td class="org-left">set_picker</td>
+<td class="org-left">set_rasterized</td>
+<td class="org-left">set_size_inches</td>
+<td class="org-left">set_sketch_params</td>
+<td class="org-left">set_snap</td>
+<td class="org-left">set_tight_layout</td>
+<td class="org-left">set_transform</td>
+<td class="org-left">set_url</td>
+<td class="org-left">set_visible</td>
+<td class="org-left">set_zorder</td>
+<td class="org-left">show</td>
+<td class="org-left">stale</td>
+<td class="org-left">stale_callback</td>
+<td class="org-left">sticky_edges</td>
+<td class="org-left">subfigs</td>
+<td class="org-left">subfigures</td>
+<td class="org-left">subplot_mosaic</td>
+<td class="org-left">subplotpars</td>
+<td class="org-left">subplots</td>
+<td class="org-left">subplots_adjust</td>
+<td class="org-left">suppressComposite</td>
+<td class="org-left">suptitle</td>
+<td class="org-left">supxlabel</td>
+<td class="org-left">supylabel</td>
+<td class="org-left">text</td>
+<td class="org-left">texts</td>
+<td class="org-left">tight_layout</td>
+<td class="org-left">transFigure</td>
+<td class="org-left">transSubfigure</td>
+<td class="org-left">update</td>
+<td class="org-left">update_from</td>
+<td class="org-left">waitforbuttonpress</td>
+<td class="org-left">zorder</td>
+</tr>
+</tbody>
+</table>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">d[<span style="color: #008000;">'fig'</span>].get_axes()
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7a6f7f9" class="outline-2">
+<h2 id="org7a6f7f9"><span class="section-number-2">2.</span> automating the pipeline</h2>
+<div class="outline-text-2" id="text-2">
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #0000FF;">from</span> pycse.hashcache <span style="color: #0000FF;">import</span> HashCache
+<span style="color: #0000FF;">from</span> ase.build <span style="color: #0000FF;">import</span> bulk
+<span style="color: #0000FF;">from</span> ase.calculators.emt <span style="color: #0000FF;">import</span> EMT
+<span style="color: #0000FF;">import</span> numpy <span style="color: #0000FF;">as</span> np
+
+<span style="color: #6434A3;">@HashCache</span>
+<span style="color: #0000FF;">def</span> <span style="color: #006699;">get_volumes_energies</span>(symbol, n=10, lf=0.9, uf=1.1):
+    <span style="color: #036A07;">'''symbol: chemical element</span>
+<span style="color: #036A07;">    n number of points in eos</span>
+<span style="color: #036A07;">    lf, lower fraction</span>
+<span style="color: #036A07;">    uf, upper fraction</span>
+<span style="color: #036A07;">    '''</span>
+    <span style="color: #BA36A5;">a0</span> = bulk(symbol)
+    <span style="color: #BA36A5;">v0</span> = a0.get_volume()
+
+    <span style="color: #8D8D84;"># </span><span style="color: #8D8D84; font-style: italic;">V = 1/4 a**3</span>
+    <span style="color: #BA36A5;">lc0</span> = (4 * v0)**(1/3)
+
+    <span style="color: #BA36A5;">A</span> = np.linspace(lf * lc0, uf * lc0, n)
+
+    <span style="color: #BA36A5;">ATOMS</span> = [bulk(symbol, a=a) <span style="color: #0000FF;">for</span> a <span style="color: #0000FF;">in</span> A]
+    <span style="color: #0000FF;">for</span> atoms <span style="color: #0000FF;">in</span> ATOMS:
+        atoms.<span style="color: #BA36A5;">calc</span> = EMT() 
+
+    <span style="color: #BA36A5;">volumes</span> = [atoms.get_volume() <span style="color: #0000FF;">for</span> atoms <span style="color: #0000FF;">in</span> ATOMS]
+    <span style="color: #BA36A5;">energies</span> = [atoms.get_potential_energy() <span style="color: #0000FF;">for</span> atoms <span style="color: #0000FF;">in</span> ATOMS]
+
+    <span style="color: #0000FF;">return</span> (volumes, energies)
+
+<span style="color: #BA36A5;">V</span>, <span style="color: #BA36A5;">E</span> = get_volumes_energies(<span style="color: #008000;">'Cu'</span>)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #0000FF;">from</span> ase.eos <span style="color: #0000FF;">import</span> EquationOfState
+<span style="color: #BA36A5;">eos0</span> = EquationOfState(*get_volumes_energies(<span style="color: #008000;">'Cu'</span>))
+eos0.fit()
+</pre>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-right">11.557467667402593</td>
+<td class="org-right">-0.00628660155399885</td>
+<td class="org-right">0.8254236101052489</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #BA36A5;">eos1</span> = EquationOfState(*get_volumes_energies(<span style="color: #008000;">'Pd'</span>))
+eos1.fit()
+</pre>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-right">14.58663870401962</td>
+<td class="org-right">-0.0006520550559514504</td>
+<td class="org-right">1.1270538919306885</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #BA36A5;">eos2</span> = EquationOfState(*get_volumes_energies(<span style="color: #008000;">'Au'</span>))
+eos2.fit()
+</pre>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-right">16.68342392210876</td>
+<td class="org-right">-0.0008834936632524659</td>
+<td class="org-right">1.0935567477567227</td>
+</tr>
+</tbody>
+</table>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #BA36A5;">a0</span> = eos0.plot()
+eos1.plot(ax=a0)
+eos2.plot(ax=a0);
+</pre>
+</div>
+
+
+<div id="orged881f6" class="figure">
+<p><img src="./.ob-jupyter/51ca57fb7d0f90b189928d067a685dfdab44bed9.png" alt="51ca57fb7d0f90b189928d067a685dfdab44bed9.png" />
+</p>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #0000FF;">import</span> matplotlib.pyplot <span style="color: #0000FF;">as</span> plt
+
+<span style="color: #0000FF;">for</span> sym <span style="color: #0000FF;">in</span> [<span style="color: #008000;">'Cu'</span>, <span style="color: #008000;">'Pd'</span>, <span style="color: #008000;">'Au'</span>]:
+    plt.plot(*get_volumes_energies(sym), label=sym)
+plt.xlabel(<span style="color: #008000;">'V'</span>)
+plt.ylabel(<span style="color: #008000;">'E'</span>)
+plt.legend();    
+</pre>
+</div>
+
+
+<div id="org42afbb3" class="figure">
+<p><img src="./.ob-jupyter/eec56b93f2809b313b8d9765cca191a7fccb636e.png" alt="eec56b93f2809b313b8d9765cca191a7fccb636e.png" />
+</p>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">HashCache.dump(Cu=get_volumes_energies(<span style="color: #008000;">'Cu'</span>),
+               Pd=get_volumes_energies(<span style="color: #008000;">'Pd'</span>),
+               Au=get_volumes_energies(<span style="color: #008000;">'Au'</span>))
+</pre>
+</div>
+
+<pre class="example">
+a1cb8cb213c239d6ca6a70bc3daf9e55
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #BA36A5;">data</span> = HashCache.load(<span style="color: #008000;">'a1cb8cb213c239d6ca6a70bc3daf9e55'</span>)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><span style="color: #0000FF;">from</span> ase.eos <span style="color: #0000FF;">import</span> EquationOfState
+
+<span style="color: #BA36A5;">table</span> = []
+<span style="color: #BA36A5;">syms</span> = [<span style="color: #008000;">'Cu'</span>, <span style="color: #008000;">'Pd'</span>, <span style="color: #008000;">'Au'</span>]
+<span style="color: #0000FF;">for</span> sym <span style="color: #0000FF;">in</span> syms:
+    <span style="color: #BA36A5;">v</span>, <span style="color: #BA36A5;">e</span> = data[sym]
+    <span style="color: #BA36A5;">eos</span> = EquationOfState(v, e)
+    <span style="color: #BA36A5;">V0</span>, <span style="color: #BA36A5;">E0</span>, <span style="color: #BA36A5;">_</span> = eos.fit()
+    <span style="color: #BA36A5;">table</span> += [[sym, np.<span style="color: #006FE0;">round</span>(V0, 2), np.<span style="color: #006FE0;">round</span>(E0, 5)]]
+
+table    
+</pre>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Cu</td>
+<td class="org-right">11.56</td>
+<td class="org-right">-0.00629</td>
+</tr>
+
+<tr>
+<td class="org-left">Pd</td>
+<td class="org-right">14.59</td>
+<td class="org-right">-0.00065</td>
+</tr>
+
+<tr>
+<td class="org-left">Au</td>
+<td class="org-right">16.68</td>
+<td class="org-right">-0.00088</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python" id="orgdac4132"><span style="color: #0000FF;">from</span> pycse.orgmode <span style="color: #0000FF;">import</span> Table
+
+Table(table, headers=[<span style="color: #008000;">'symbol'</span>, <span style="color: #008000;">'V0'</span>, <span style="color: #008000;">'E0'</span>],
+      caption=<span style="color: #008000;">'Equation of state data'</span>,
+      name=<span style="color: #008000;">'tab:eos'</span>)
+</pre>
+</div>
+
+<table id="orgba58351" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 1:</span> Equation of state data</caption>
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">symbol</th>
+<th scope="col" class="org-right">V0</th>
+<th scope="col" class="org-right">E0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Cu</td>
+<td class="org-right">11.56</td>
+<td class="org-right">-0.00629</td>
+</tr>
+
+<tr>
+<td class="org-left">Pd</td>
+<td class="org-right">14.59</td>
+<td class="org-right">-0.00065</td>
+</tr>
+
+<tr>
+<td class="org-left">Au</td>
+<td class="org-right">16.68</td>
+<td class="org-right">-0.00088</td>
+</tr>
+</tbody>
+</table>
+
+<table id="org9141d6d" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 2:</span> Equation of state data</caption>
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">symbol</th>
+<th scope="col" class="org-right">V0</th>
+<th scope="col" class="org-right">E0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Cu</td>
+<td class="org-right">11.56</td>
+<td class="org-right">-0.00629</td>
+</tr>
+
+<tr>
+<td class="org-left">Pd</td>
+<td class="org-right">14.59</td>
+<td class="org-right">-0.00065</td>
+</tr>
+
+<tr>
+<td class="org-left">Au</td>
+<td class="org-right">16.68</td>
+<td class="org-right">-0.00088</td>
+</tr>
+</tbody>
+</table>
+
+<table id="org9ba5b5e" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 3:</span> Equation of state data</caption>
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">symbol</th>
+<th scope="col" class="org-right">V0</th>
+<th scope="col" class="org-right">E0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Cu</td>
+<td class="org-right">11.56</td>
+<td class="org-right">-0.00629</td>
+</tr>
+
+<tr>
+<td class="org-left">Pd</td>
+<td class="org-right">14.59</td>
+<td class="org-right">-0.00065</td>
+</tr>
+
+<tr>
+<td class="org-left">Au</td>
+<td class="org-right">16.68</td>
+<td class="org-right">-0.00088</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: John Kitchin</p>
+<p class="date">Created: 2024-06-29 Sat 09:29</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

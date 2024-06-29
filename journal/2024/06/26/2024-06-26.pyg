@@ -1,43 +1,0 @@
-import requests
-import shutil
-
-req = requests.get('http://arnold.wifi.local.cmu.edu:8080/img', stream=True)
-
-img = '4:17.jpg'
-with open(img, 'wb') as f:
-    req.raw.decode_content = True
-    shutil.copyfileobj(req.raw, f)
-\end {minted}
-
-\begin {center}
-\includegraphics [width=.9\linewidth ]{./4:17.jpg}
-\end {center}
-\section {in elisp}
-\label {sec:org46ef293}
-
-\begin {minted}[frame=lines,fontsize=\scriptsize ,linenos=]{common-lisp}
-(use-package ob-http)
-
-(defun ob-http-file (response filename)
-  (let ((body (ob-http-response-body response)))
-    (with-temp-file filename
-      (insert body)))
-  (format "[[%s]]" (expand-file-name filename default-directory)))
-\end {minted}
-
-\phantomsection 
-\label {}
-\begin {verbatim}
-ob-http-file
-\end {verbatim}
-
-
-
-\begin {minted}[frame=lines,fontsize=\scriptsize ,linenos=]{http}
-GET http://arnold.wifi.local.cmu.edu:8080/img
-\end {minted}
-
-\begin {center}
-\fbox {\begin {minipage}[c]{.6\linewidth }\textbf {\textsf {\textsc {DONE}}} there is some font-lock issue\rule [.8em]{\linewidth }{2pt}I don't know what it is, something acts sticky, headlines don't always auto format. Something is weird, I thought I updated org, but it looks like I use an old version. It should be 9.7.5.It was 9.7-pre. still isn't what I thought, but updating might have fixed it?\begin {minted}[frame=lines,fontsize=\scriptsize ,linenos=]{common-lisp}(org-version)\end {minted}\phantomsection \label {}\begin {verbatim}9.7-pre\end {verbatim}\end {minipage}}
-\end {center}
-\end {document}

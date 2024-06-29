@@ -1,0 +1,21 @@
+* test if results.json is readable
+
+#+BEGIN_SRC jupyter-python
+import json
+
+with open('../../../../pycse/results.json', 'r') as f:
+    data = json.loads(f.read())
+
+print(data)
+
+import matplotlib.pyplot as plt
+plt.plot(data['K'], data['Fa'])
+plt.xlabel('K')
+plt.ylabel('Fa_exit');
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: {'K': [0.1, 0.2, 0.4], 'Fa': [0.8187307577762143, 0.6703201753500971, 0.4493323314834313]}
+[[./.ob-jupyter/02c235420bcb6668341d5c8b8fdc24a8572dd911.png]]
+:END:

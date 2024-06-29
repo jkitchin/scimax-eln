@@ -22,10 +22,8 @@ jobs:
       
     - uses: actions/checkout@v2
     - name: Run tests
-      run: |
-        pwd
-        ls
-        emacs -batch -nw -l ./publish.el
+      run: |        
+        emacs -batch -nw -l publish.el
 
     # Deploy the book's HTML to gh-pages branch
     - name: GitHub Pages action

@@ -1,0 +1,15 @@
+#+TITLE: Sitemap for project pdf
+
+- [[file:readme.org][Scimax electronic laboratory notebook]]
+- [[file:index.org][index]]
+- arduino
+  - [[file:arduino/readme.org][Electronic Lab Notebook for Arduino devices with scimax]]
+- bugs
+  - [[file:bugs/scimax-org-return.org][scimax-org-return]]
+  - [[file:bugs/var-reuse.org][var-reuse]]
+- molsim
+  - [[file:molsim/readme.org][scimax-ELN for molecular simulation]]
+- pycse
+  - [[file:pycse/readme.org][A parametric study]]
+- sdl-light
+  - [[file:sdl-light/readme.org][readme]]

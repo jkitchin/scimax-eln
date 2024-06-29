@@ -1,0 +1,87 @@
+#+title: Electronic lab notebook with scimax #7 - Interoperability and extendability
+
+
+
+
+#+attr_org: :width 800
+[[./screenshots/date-23-06-2024-time-11-05-03.png]]
+
+* LED example
+
+#+BEGIN_SRC python :tangle /Volumes/CIRCUITPY/code.py
+"""This example lights up the third NeoPixel while button A is being pressed, and lights up the
+eighth NeoPixel while button B is being pressed."""
+from adafruit_circuitplayground import cp
+
+cp.pixels.brightness = 0.3
+cp.pixels.fill((0, 0, 0))  # Turn off the NeoPixels if they're on!
+
+while True:
+    if cp.button_b:
+        cp.pixels[2] = (0, 255, 0)
+    else:
+        cp.pixels[2] = (0, 0, 0)
+
+    if cp.button_a:
+        cp.pixels[7] = (0, 0, 255)
+    else:
+        cp.pixels[7] = (0, 0, 0)
+
+#+END_SRC
+
+** No buttons pressed
+
+
+
+#+attr_org: :width 800
+[[./screenshots/date-23-06-2024-time-11-21-51.png]]
+
+
+
+** Button A pressed
+
+
+
+#+attr_org: :width 800
+[[./screenshots/date-23-06-2024-time-11-22-20.png]]
+
+
+** Button B pressed
+
+
+
+#+attr_org: :width 800
+[[./screenshots/date-23-06-2024-time-11-22-40.png]]
+
+* Sound example
+
+#+BEGIN_SRC python :tangle /Volumes/CIRCUITPY/code.py
+"""This example plays a different tone for a duration of 1 second for each button pressed."""
+from adafruit_circuitplayground import cp
+
+while True:
+    if cp.button_a:
+        cp.play_tone(262, 1)
+    if cp.button_b:
+        cp.play_tone(294, 1)
+#+END_SRC
+
+
+Example of an audio editmark
+{a> :file 2024-06-23-11-26-13.mp3 <a}
+
+** Press button A
+
+{a> :file 2024-06-23-11-27-03.mp3 <a}
+
+** Press button B
+
+{a> :file 2024-06-23-11-27-35.mp3 <a}
+
+** Video 
+[[./video.mov]]
+
+
+# Local Variables:
+# eval: (sem-mode)
+# End:

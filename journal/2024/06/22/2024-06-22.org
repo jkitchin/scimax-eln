@@ -1,0 +1,71 @@
+#+title: Report on equations of state
+#+options: toc:nil
+
+\maketitle
+\tableofcontents
+
+*Abstract* Brief report on equations of state for Cu, Pd and Au.
+
+
+* Introduction
+
+We use an EOS [[cite:&rose-1984-univer-featur]].
+
+The results are summarized in Table ref:tab:eos.
+#+call: ../../../../molsim/readme.org:tab_eos()
+
+#+RESULTS:
+#+name: tab:eos
+#+caption: Equation of state data
+| symbol |    V0 |       E0 |
+|--------+-------+----------|
+| Cu     | 11.56 | -0.00629 |
+| Pd     | 14.59 | -0.00065 |
+| Au     | 16.68 | -0.00088 |
+
+#+name: fig-eos
+#+attr_latex: :placement [H] :width 3in
+#+caption: The equations of state we computed.
+[[./../../../../molsim/.ob-jupyter/eec56b93f2809b313b8d9765cca191a7fccb636e.png]]
+
+* conclusions
+
+it worked.
+
+bibliographystyle:unsrtnat
+[[bibliography:/Users/jkitchin/Dropbox/emacs/bibliography/master.bib]]
+* Code                                                             :noexport:
+
+#+BEGIN_SRC jupyter-python :restart
+from pycse.hashcache import HashCache
+
+data = HashCache.load('a1cb8cb213c239d6ca6a70bc3daf9e55',
+                      cache='../../../../molsim/cache')
+print(data)
+#+END_SRC
+
+#+RESULTS:
+: {'Cu': ([8.574111812250003, 9.225042235715708, 9.908110997642318, 10.624092515824074, 11.373761208055212, 12.157891492129975, 12.97725778584259, 13.83263450698731, 14.72479607335837, 15.654516902749995], [0.5222237640257958, 0.2790445018452026, 0.12105597647552102, 0.030118881221117277, -0.005664872936378629, 0.004638566032278746, 0.05214784974183395, 0.12972507198907834, 0.2290854078274016, 0.34473433493885164]), 'Pd': ([10.727940125249999, 11.54238513851269, 12.39704168368484, 13.292878713342594, 14.230865180062064, 15.211970036419412, 16.237162234990745, 17.307410728352192, 18.423684469079905, 19.586952409749994], [1.05221070972204, 0.5685045079749287, 0.2552224784873012, 0.0770918321698062, 0.004876801872743641, 0.013457359898632504, 0.08383977599552317, 0.20019208855574, 0.34959941545734097, 0.5217999711424435]), 'Au': ([12.377930112, 13.31763925807408, 14.303744592592599, 15.337364096000002, 16.419615748740743, 17.55161753125927, 18.734487423999997, 19.969343407407408, 21.25730346192594, 22.599485568000006], [1.113448413149925, 0.5865075597314053, 0.2537963451111409, 0.0702160703398107, 0.002207014999049406, 0.021859999770454053, 0.10658987308620205, 0.23877865714566227, 0.4057510808692264, 0.5922962680846116])}
+
+#+BEGIN_SRC jupyter-python
+HashCache.dump(a=5, cache='../../../../molsim/cache')
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: ../../../../molsim/cache
+: b44b9ec79e6a0f848779522f0acd5545
+:END:
+
+
+#+BEGIN_SRC jupyter-python  
+HashCache.load('b44b9ec79e6a0f848779522f0acd5545', cache='../../../../molsim/cache')
+#+END_SRC
+
+#+RESULTS:
+| a | : | 5 |
+
+
+*************** DONE fix cache location in load
+CLOSED: [2024-06-22 Sat 10:17]
+*************** END
