@@ -158,8 +158,8 @@ After a bit you can find it at https://kitchingroup.cheme.cmu.edu/scimax-eln
 
 I added this after I made the video. You need a publish script (see [[./publish.el]]). Then you set up GitHUB actions (see [[./.github/workflows/publish.yml]]). This installs an Emacs, runs a publish script, and publishes the results to the docs directory.
 
-Unfortunately, this only works for another branch, so I created a new gh-pages branch
 
+Unfortunately, this only works for another branch, so I created a new gh-pages branch.
 
 * Footnotes
 
