@@ -1,3 +1,5 @@
+(use-package htmlize)
+
 (require 'ox-publish)
 
 (let* ((base-directory ".")
