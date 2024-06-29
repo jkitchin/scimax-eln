@@ -2,7 +2,7 @@
 
 (require 'ox-publish)
 
-(let* ((base-directory ".")
+(let* ((base-directory "./")
        (org-export-with-broken-links t)
        (org-publish-project-alist `(("html"
 				     :base-directory ,base-directory
