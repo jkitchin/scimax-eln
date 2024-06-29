@@ -57,8 +57,6 @@ DEADLINE: <2024-07-01 Mon>
 
 ordered: https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox/FMfcgzQVwxGRSPSPlBmblnVHLqHkVTTj
 
-<<<<<<< HEAD
-
 * Publishing your ELN to GitHUB Pages
 
 #+attr_org: :width 600

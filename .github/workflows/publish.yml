@@ -21,8 +21,10 @@ jobs:
       run: sudo apt-get install -y aspell
       
     - uses: actions/checkout@v2
-    - name: Run tests
-      run: |        
+    - name: org-publish
+      run: |
+        pwd
+        ls
         emacs -batch -nw -l publish.el
 
     # Deploy the book's HTML to gh-pages branch
