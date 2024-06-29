@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-06-29 Sat 09:29 -->
+<!-- 2024-06-29 Sat 09:23 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Scimax electronic laboratory notebook</title>
@@ -227,7 +227,7 @@
 </div>
 </div>
 
-<div id="org702f750" class="figure">
+<div id="org43a73d4" class="figure">
 <p><img src="./screenshots/date-13-06-2024-time-08-08-29.png" alt="date-13-06-2024-time-08-08-29.png" />
 </p>
 </div>
@@ -337,7 +337,7 @@ ordered: <a href="https://mail.google.com/mail/u/0/?tab=rm&amp;ogbl#inbox/FMfcgz
 <h2 id="org853138b"><span class="section-number-2">2.</span> Publishing your ELN to GitHUB Pages</h2>
 <div class="outline-text-2" id="text-2">
 
-<div id="orga44586c" class="figure">
+<div id="orgf6d3b45" class="figure">
 <p><img src="./screenshots/date-28-06-2024-time-10-59-08.png" alt="date-28-06-2024-time-10-59-08.png" />
 </p>
 </div>
@@ -388,15 +388,6 @@ We need a small elisp script to setup and publish  it.
                                      <span style="color: #006FE0;">:publishing-function</span> org-html-publish-to-html
                                      <span style="color: #006FE0;">:auto-preamble</span> t
                                      <span style="color: #006FE0;">:auto-sitemap</span> t)
-                                    (<span style="color: #008000;">"pdf"</span>
-                                     <span style="color: #006FE0;">:base-directory</span> ,base-directory
-                                     <span style="color: #006FE0;">:base-extension</span> <span style="color: #008000;">"org"</span>
-                                     <span style="color: #006FE0;">:publishing-directory</span> ,(concat base-directory <span style="color: #008000;">"docs/pdfs"</span>)
-                                     <span style="color: #006FE0;">:exclude</span> <span style="color: #008000;">"docs"</span>
-                                     <span style="color: #006FE0;">:recursive</span> t
-                                     <span style="color: #006FE0;">:publishing-function</span> org-latex-publish-to-pdf
-                                     <span style="color: #006FE0;">:auto-preamble</span> t
-                                     <span style="color: #006FE0;">:auto-sitemap</span> t)
                                     
                                     (<span style="color: #008000;">"static-html"</span>
                                      <span style="color: #006FE0;">:base-directory</span> ,base-directory
@@ -407,7 +398,7 @@ We need a small elisp script to setup and publish  it.
                                      <span style="color: #006FE0;">:publishing-function</span> org-publish-attachment)
 
                                     <span style="color: #8D8D84;">;; </span><span style="color: #8D8D84; font-style: italic;">... all the components ...</span>
-                                    (<span style="color: #008000;">"scimax-eln"</span> <span style="color: #006FE0;">:components</span> (<span style="color: #008000;">"html"</span> <span style="color: #008000;">"static-html"</span> <span style="color: #008000;">"pdf"</span>)))))
+                                    (<span style="color: #008000;">"scimax-eln"</span> <span style="color: #006FE0;">:components</span> (<span style="color: #008000;">"html"</span> <span style="color: #008000;">"static-html"</span>)))))
 
   (org-publish <span style="color: #008000;">"scimax-eln"</span> t))
 </pre>
@@ -461,7 +452,7 @@ After a bit you can find it at <a href="https://kitchingroup.cheme.cmu.edu/scima
 </div></div>
 <div id="postamble" class="status">
 <p class="author">Author: John Kitchin</p>
-<p class="date">Created: 2024-06-29 Sat 09:29</p>
+<p class="date">Created: 2024-06-29 Sat 09:23</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

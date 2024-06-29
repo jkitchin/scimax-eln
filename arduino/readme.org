@@ -4,6 +4,8 @@
 [[./screenshots/date-25-06-2024-time-19-27-20.png]]
 
 
+
+
 #+BEGIN_SRC sh
 arduino-cli board list
 #+END_SRC
@@ -99,7 +101,7 @@ void loop(){
 
 * Save a video
 
-{v> :file 2024-06-25-19-44-44.mov  :note "example of how the device works" <v} 
+{v> :file 2024-06-25-19-44-44.mov  :note "example of how the device works" <v}
 
 *************** TODO rm tooltip and also placement of sem editmarks is a little buggy
 *************** END
@@ -207,6 +209,4 @@ df.plot(x='time', y='degC')
 :END:
 
 
-# Local Variables:
-# eval: (sem-mode)
-# End:
+

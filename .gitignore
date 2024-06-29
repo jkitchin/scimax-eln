@@ -4,4 +4,7 @@ cache
 cache.sqlite
 /.dir-locals.el
 .DS_Store
+<<<<<<< HEAD
 html
+=======
+>>>>>>> parent of bc0f33e (video 11 and work on actions)
