@@ -303,6 +303,124 @@ orjson.dumps(d, option=orjson.OPT_SERIALIZE_NUMPY)
 #+RESULTS:
 : b'{"a":1,"b":"a string","c":[1,3],"d":[1,"2"],"e":{"t":[0.0,0.10001999200479661,1.0],"y":[[1.0,1.1051930131367926,2.7183269995016897]],"sol":null,"t_events":null,"y_events":null,"nfev":14,"njev":0,"nlu":0,"status":0,"message":"The solver successfully reached the end of the integration interval.","success":true},"atoms":{"numbers":[29],"positions":[[0.0,0.0,0.0]],"cell":[[0.0,1.805,1.805],[1.805,0.0,1.805],[1.805,1.805,0.0]],"pbc":[true,true,true]},"2":{"1":"tree"}}'
 
-*************** TODO next time
+*************** DONE next time
+CLOSED: [2024-06-27 Thu 11:18]
 Integrate orjson for serialization into hashcache with storage in sqlite, and searching from json.
+
+I think I made some progress fixing this issue, but I have not tested it exhaustively yet.
 *************** END
+
+We cannot dump an Atoms directly.
+
+#+BEGIN_SRC jupyter-python
+import orjson
+from ase.build import bulk
+
+atoms = bulk('Cu')
+orjson.dumps(atoms)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# [goto error]
+: ---------------------------------------------------------------------------
+: TypeError                                 Traceback (most recent call last)
+: Cell In[1], line 5
+:       2 from ase.build import bulk
+:       4 atoms = bulk('Cu')
+: ----> 5 orjson.dumps(atoms)
+: 
+: TypeError: Type is not JSON serializable: Atoms
+:END:
+
+#+BEGIN_SRC jupyter-python
+orjson.dumps(atoms.todict(), option=orjson.OPT_SERIALIZE_NUMPY)
+#+END_SRC
+
+#+RESULTS:
+: b'{"numbers":[29],"positions":[[0.0,0.0,0.0]],"cell":[[0.0,1.805,1.805],[1.805,0.0,1.805],[1.805,1.805,0.0]],"pbc":[true,true,true]}'
+
+This works.
+
+#+BEGIN_SRC jupyter-python
+import ase
+
+def serialize_atoms(obj):
+    if isinstance(obj, ase.atoms.Atoms):
+        return obj.todict()
+    else:
+        raise TypeError
+
+
+orjson.dumps(atoms, default=serialize_atoms, option=orjson.OPT_SERIALIZE_NUMPY)    
+#+END_SRC
+
+#+RESULTS:
+: b'{"numbers":[29],"positions":[[0.0,0.0,0.0]],"cell":[[0.0,1.805,1.805],[1.805,0.0,1.805],[1.805,1.805,0.0]],"pbc":[true,true,true]}'
+
+And this seems ok where we have a mix of items.
+
+#+BEGIN_SRC jupyter-python
+orjson.dumps([2, {'a': atoms, 'b': 4}], default=serialize_atoms, option=orjson.OPT_SERIALIZE_NUMPY)  
+#+END_SRC
+
+#+RESULTS:
+: b'[2,{"a":{"numbers":[29],"positions":[[0.0,0.0,0.0]],"cell":[[0.0,1.805,1.805],[1.805,0.0,1.805],[1.805,1.805,0.0]],"pbc":[true,true,true]},"b":4}]'
+
+#+BEGIN_SRC jupyter-python :restart
+from pycse.hashcache import SqlCache
+
+def serialize_atoms(self, obj):
+    if isinstance(obj, ase.atoms.Atoms):
+        return obj.todict()
+    else:
+        raise TypeError
+    
+SqlCache.default = serialize_atoms
+
+import ase
+from ase.build import bulk
+
+atoms = bulk('Cu')
+    
+SqlCache.dump(data={'atoms': atoms, 'b': 4})
+#+END_SRC
+
+#+RESULTS:
+: c4e84075561b3db35d8983605f6a0014
+
+#+BEGIN_SRC jupyter-python
+SqlCache.load('c4e84075561b3db35d8983605f6a0014')
+#+END_SRC
+
+#+RESULTS:
+| data | : | (atoms : (numbers : (29) positions : ((0.0 0.0 0.0)) cell : ((0.0 1.805 1.805) (1.805 0.0 1.805) (1.805 1.805 0.0)) pbc : (True True True)) b : 4) |
+
+#+BEGIN_SRC jupyter-python :restart
+from pycse.hashcache import JsonCache
+
+def serialize_atoms(self, obj):
+    if isinstance(obj, ase.atoms.Atoms):
+        return obj.todict()
+    else:
+        raise TypeError
+    
+JsonCache.default = serialize_atoms
+
+import ase
+from ase.build import bulk
+
+atoms = bulk('Cu')
+    
+JsonCache.dump(data={'atoms': atoms, 'b': 4})
+#+END_SRC
+
+#+RESULTS:
+: c4e84075561b3db35d8983605f6a0014
+
+#+BEGIN_SRC jupyter-python
+JsonCache.load('c4e84075561b3db35d8983605f6a0014')
+#+END_SRC
+
+#+RESULTS:
+| data | : | (atoms : (numbers : (29) positions : ((0.0 0.0 0.0)) cell : ((0.0 1.805 1.805) (1.805 0.0 1.805) (1.805 1.805 0.0)) pbc : (True True True)) b : 4) |

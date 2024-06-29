@@ -4,3 +4,4 @@ cache
 cache.sqlite
 /.dir-locals.el
 .DS_Store
+html
