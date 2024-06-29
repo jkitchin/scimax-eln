@@ -22,6 +22,7 @@ jobs:
     - name: org-publish
       run: |
         emacs -batch -nw -l publish.el
+        ls docs/*
 
     # Deploy the book's HTML to gh-pages branch
     - name: GitHub Pages action
