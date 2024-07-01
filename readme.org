@@ -19,7 +19,7 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 9 - Running Arduino devices https://youtube.com/live/Fn7sq8uRsGQ
 - Video 10 - Electronic lab notebook with scimax - ELNs in the literature https://youtube.com/live/icPlZCF6LEw
 - Video 11 - Publishing your ELN to GitHUB Pages https://youtube.com/live/zIgSOiMFBWU
-
+- Video 12 - Tracking reagents in an ELN with scimax, completion and QR codes https://youtube.com/live/bLyhOCXn-Hg
 * pycse
 
 [[./pycse/readme.org]]
@@ -40,6 +40,10 @@ Talk about interoperability with software, instruments
 - try image text recognition from a written note in image
 - show scimax-ob-arduino
 - work out how to capture data from it
+
+* TODO QR codes, reagents, and tracking samples
+
+[[./qr/readme.org]]
 
 * TODO Temperature control lab
 

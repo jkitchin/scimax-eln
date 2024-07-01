@@ -1,0 +1,28 @@
+#+title: Tracking reagents in an ELN with scimax, completion and QR codes
+
+
+#+attr_org: :width 800
+[[./screenshots/date-30-06-2024-time-09-20-44.png]]
+
+* Using a chemical inventory to track your reagents
+
+#+BEGIN_SRC emacs-lisp
+(load-file "reagents.el")
+#+END_SRC
+
+#+RESULTS:
+: t
+
+Some tricky things in a notebook are recording what reagents you used in an experiment. Ideally, you would record things like the batch number of a chemical, in case you later discover it was contaminated, so you can identify affected experiments.
+
+Some reagents are made, e.g. stock solutions. You might label that solution, and reference the label. Naming things is hard though, and an ELN does not have "page numbers" exactly.
+
+Here we explore using completion, an inventory, UUIDs and QR codes to make tracking this information easier.
+
+[[reagent:A012CDAF-671F-44BF-B60F-A86B3AF56ED5][toluene]]
+
+[[reagent:AF69535A-2236-4BAC-BB09-A8D866FC27C2][benzene (99%)]]
+
+[[reagent:1FF5ACAF-6F85-42A8-95C4-45287A558C86][stock solution 1]]
+
+[[qr:1FF5ACAF-6F85-42A8-95C4-45287A558C86]]

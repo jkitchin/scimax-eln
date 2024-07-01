@@ -1,0 +1,35 @@
+* Chemical Inventory                                                :reagent:
+
+** benzene (99%)                                                        :phs:
+:PROPERTIES:
+:CAS:      71-43-2
+:ID:       AF69535A-2236-4BAC-BB09-A8D866FC27C2
+:END:
+
+[[qr:AF69535A-2236-4BAC-BB09-A8D866FC27C2]]
+
+** benzene 99.9995%                                                     :phs:
+:PROPERTIES:
+:CAS:      71-43-2
+:ID:       CE6B373C-437B-43D2-B4C1-8B74D2926A3F
+:END:
+
+
+[[qr:CE6B373C-437B-43D2-B4C1-8B74D2926A3F]]
+
+** toluene
+:PROPERTIES:
+:CAS:      108-88-3
+:ID:       A012CDAF-671F-44BF-B60F-A86B3AF56ED5
+:END:
+
+[[qr:A012CDAF-671F-44BF-B60F-A86B3AF56ED5]]
+
+** stock solution 1
+:PROPERTIES:
+:ID:       1FF5ACAF-6F85-42A8-95C4-45287A558C86
+:END:
+
+Made of 30% by volume [[reagent:AF69535A-2236-4BAC-BB09-A8D866FC27C2][benzene]] and the balance is [[reagent:A012CDAF-671F-44BF-B60F-A86B3AF56ED5][toluene]].   
+
+[[qr:1FF5ACAF-6F85-42A8-95C4-45287A558C86]]
