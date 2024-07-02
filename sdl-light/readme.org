@@ -11,8 +11,6 @@
 
 Check out their YouTube video [[https://www.youtube.com/watch?v=D54yfxRSY6s][here]] on making the instrument. They have a GitHUB repo at https://github.com/sparks-baird/self-driving-lab-demo, and an example [[https://colab.research.google.com/github/sparks-baird/self-driving-lab-demo/blob/main/notebooks/4.2-paho-mqtt-colab-sdl-demo-test.ipynb][Colab notebook]] for running the instrument. The notebook shows how to control the instrument (which is located in Salt Lake City).
 
-
-
 Here we look at the barest code required to run a remote "experiment" in our ELN. The gist of this experiment is we have three "knobs" to set, the R, G and B settings of the RGB LED, and we get 8 measurements back, one for each channel of the light sensor. We are going to do a set of experiments that will allow us to choose an RGB setting that results in the ch470 measurement having a value of 10000.
 
 

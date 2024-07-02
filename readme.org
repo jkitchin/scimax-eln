@@ -20,9 +20,11 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 10 - Electronic lab notebook with scimax - ELNs in the literature https://youtube.com/live/icPlZCF6LEw
 - Video 11 - Publishing your ELN to GitHUB Pages https://youtube.com/live/zIgSOiMFBWU
 - Video 12 - Tracking reagents in an ELN with scimax, completion and QR codes https://youtube.com/live/bLyhOCXn-Hg
+- Video 13 - Controlling a remote instrument from an ELN - the SDL-light https://youtube.com/live/qbqxSKJ1F60
+
 * pycse
 
-[[./pycse/readme.org]]
+Python computations in science and engineering. [[./pycse/readme.org]]
 
 * Molecular simulation
 
@@ -41,7 +43,7 @@ Talk about interoperability with software, instruments
 - show scimax-ob-arduino
 - work out how to capture data from it
 
-* TODO QR codes, reagents, and tracking samples
+* QR codes, reagents, and tracking samples
 
 [[./qr/readme.org]]
 
@@ -54,7 +56,7 @@ See [[./tclab/]] and [[./tclab_jupyter/]]
 Notes for setup:
 
 
-* TODO SDL-light - running a remote instrument
+* SDL-light - running a remote instrument
 
 See [[./sdl-light/readme.org]]
 
