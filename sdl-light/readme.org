@@ -1,0 +1,135 @@
+#+title: Controlling a remote instrument from an ELN - the SDL-light
+
+[[./screenshots/date-02-07-2024-time-08-50-06.png]]
+
+- Baird, S. G., & Sparks, T. D. (2022). What is a minimal working example for a
+  self-driving laboratory? Matter, 5(12), 4170–4178.
+  http://dx.doi.org/10.1016/j.matt.2022.11.007
+- Baird, S. G., & Sparks, T. D. (2023). Building a "hello world" for
+  self-driving labs: the closed-loop spectroscopy lab light-mixing demo. STAR
+  Protocols, 4(2), 102329. http://dx.doi.org/10.1016/j.xpro.2023.102329
+
+Check out their YouTube video [[https://www.youtube.com/watch?v=D54yfxRSY6s][here]] on making the instrument. They have a GitHUB repo at https://github.com/sparks-baird/self-driving-lab-demo, and an example [[https://colab.research.google.com/github/sparks-baird/self-driving-lab-demo/blob/main/notebooks/4.2-paho-mqtt-colab-sdl-demo-test.ipynb][Colab notebook]] for running the instrument. The notebook shows how to control the instrument (which is located in Salt Lake City).
+
+
+
+Here we look at the barest code required to run a remote "experiment" in our ELN. The gist of this experiment is we have three "knobs" to set, the R, G and B settings of the RGB LED, and we get 8 measurements back, one for each channel of the light sensor. We are going to do a set of experiments that will allow us to choose an RGB setting that results in the ch470 measurement having a value of 10000.
+
+
+First, we look at the simplest bit of code required to run a single experiment. Note you need to have installed the ~self_driving_lab_demo~ package as described [[https://github.com/sparks-baird/self-driving-lab-demo?tab=readme-ov-file#basic-usage][here]]. This package provides a more sophisticated interface to the SDL, but I want a simple code here.
+
+#+BEGIN_SRC jupyter-python :results output
+from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
+
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
+
+R, G, B = (0, 0, 100)
+results = mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+print(results)
+#+END_SRC
+
+#+RESULTS:
+: {'utc_time_str': '2024-7-2 13:48:09', 'utc_timestamp': 1719928089, 'ch470': 20074, 'ch550': 1086, 'ch670': 1563, 'ch410': 806, 'logged_to_mongodb': True, 'background': {'ch583': 341, 'ch670': 460, 'ch510': 458, 'ch410': 139, 'ch620': 383, 'ch470': 1637, 'ch550': 497, 'ch440': 276}, 'ch620': 1127, 'sd_card_ready': True, 'ch510': 1639, 'warning': 'Failed to write to SD card: Traceback (most recent call last):\n  File "/lib/sdl_demo_utils.py", line 210, in write_to_sd_card\n  File "/lib/data_logging.py", line 72, in write_payload_backup\nOSError: [Errno 13] EACCES\n', 'ch583': 866, 'device_nickname': 'For MongoDB, enter whatever name you want here (optional)', 'ch440': 22600, 'onboard_temperature_K': 305.8121, 'encrypted_device_id_truncated': 'test'}
+
+#+BEGIN_SRC jupyter-python
+from pycse.hashcache import HashCache
+
+@HashCache
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+
+get_results(0, 0, 100, label=1)['ch470']
+#+END_SRC
+
+#+RESULTS:
+: 20074
+
+#+BEGIN_SRC jupyter-python :async yes
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+B = [0, 25, 50, 75, 100]
+
+
+results = []
+for b in tqdm(B):
+    results += [get_results(0, 0, b)]
+    
+ch470 = [result['ch470'] for result in results]
+#+END_SRC
+
+#+RESULTS:
+: 100% 5/5 [00:30<00:00,  6.10s/it]
+
+#+BEGIN_SRC jupyter-python
+print(ch470)
+#+END_SRC
+
+#+RESULTS:
+: [1647, 4222, 9496, 14790, 20039]
+
+#+BEGIN_SRC jupyter-python
+plt.plot(B, ch470, 'bo-')
+plt.xlabel('B')
+plt.ylabel('ch470');
+#+END_SRC
+
+#+RESULTS:
+[[./.ob-jupyter/248a6e05b0eca3459740863839e3055e2d03dea0.png]]
+#+BEGIN_SRC jupyter-python
+from scipy.interpolate import interp1d
+I = interp1d(ch470, B)
+I(10000)
+#+END_SRC
+
+#+RESULTS:
+: array(52.38005289)
+
+#+BEGIN_SRC jupyter-python :async yes
+for i in tqdm(range(5)):
+    print(get_results(0, 0, int(I(10000)), label=i)['ch470'])
+#+END_SRC
+
+#+RESULTS:
+:  20% 1/5 [00:08<00:35,  8.86s/it]9918
+:  40% 2/5 [00:16<00:23,  7.87s/it]9927
+:  60% 3/5 [00:23<00:15,  7.54s/it]9913
+:  80% 4/5 [00:30<00:07,  7.30s/it]9929
+: 100% 5/5 [00:37<00:00,  7.43s/it]9932
+:
+
+#+BEGIN_SRC jupyter-python
+import numpy as np
+r52 = [get_results(0, 0, int(I(10000)), label=i)['ch470'] for i in range(5)]
+print(np.mean(r52), np.std(r52))
+#+END_SRC
+
+#+RESULTS:
+: 9923.8 7.138627319029899
+
+
+#+BEGIN_SRC jupyter-python :async yes
+for i in tqdm(range(5)):
+    print(get_results(0, 0, 53, label=i)['ch470'])
+#+END_SRC
+
+#+RESULTS:
+:  20% 1/5 [00:07<00:28,  7.05s/it]10137
+:  40% 2/5 [00:14<00:21,  7.00s/it]10122
+:  60% 3/5 [00:20<00:13,  6.97s/it]10133
+:  80% 4/5 [00:27<00:06,  6.98s/it]10139
+: 100% 5/5 [00:34<00:00,  6.99s/it]10134
+:
+
+#+BEGIN_SRC jupyter-python
+r53 = [get_results(0, 0, 53, label=i)['ch470'] for i in range(5)]
+print(np.mean(r53), np.std(r53))
+#+END_SRC
+
+#+RESULTS:
+: 10133.0 5.89915248150105
+
+#+BEGIN_SRC jupyter-python
+get_results(0, 0, 52.2)
+#+END_SRC
+
