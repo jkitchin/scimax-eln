@@ -6,7 +6,7 @@
 <!-- 2024-07-02 Tue 14:16 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>A parametric study</title>
+<title>Controlling a remote instrument from an ELN - the SDL-light</title>
 <meta name="generator" content="Org Mode" />
 <style type="text/css">
   #content { max-width: 60em; margin: auto; }
@@ -195,119 +195,119 @@
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">A parametric study</h1>
-<div id="table-of-contents" role="doc-toc">
-<h2>Table of Contents</h2>
-<div id="text-table-of-contents" role="doc-toc">
-<ul>
-<li><a href="#orgdb606bf">1. Solve the PFR several times</a>
-<ul>
-<li><a href="#orgef952fb">1.1. small rate constant</a></li>
-<li><a href="#org5228693">1.2. a medium rate constant</a></li>
-<li><a href="#org7b5103f">1.3. a larger rate constant</a></li>
-<li><a href="#orgee3764b">1.4. run it in a loop</a></li>
+<h1 class="title">Controlling a remote instrument from an ELN - the SDL-light</h1>
+
+<div id="org2154e96" class="figure">
+<p><img src="./screenshots/date-02-07-2024-time-08-50-06.png" alt="date-02-07-2024-time-08-50-06.png" />
+</p>
+</div>
+
+<ul class="org-ul">
+<li>Baird, S. G., &amp; Sparks, T. D. (2022). What is a minimal working example for a
+self-driving laboratory? Matter, 5(12), 4170–4178.
+<a href="http://dx.doi.org/10.1016/j.matt.2022.11.007">http://dx.doi.org/10.1016/j.matt.2022.11.007</a></li>
+<li>Baird, S. G., &amp; Sparks, T. D. (2023). Building a "hello world" for
+self-driving labs: the closed-loop spectroscopy lab light-mixing demo. STAR
+Protocols, 4(2), 102329. <a href="http://dx.doi.org/10.1016/j.xpro.2023.102329">http://dx.doi.org/10.1016/j.xpro.2023.102329</a></li>
 </ul>
-</li>
-</ul>
-</div>
-</div>
 
-<div id="org5f44cd6" class="figure">
-<p><img src="./screenshots/date-13-06-2024-time-08-18-40.png" alt="date-13-06-2024-time-08-18-40.png" />
-</p>
-</div>
-
-
-
-
-<div id="org5b1066a" class="figure">
-<p><img src="./screenshots/date-13-06-2024-time-09-02-38.png" alt="date-13-06-2024-time-09-02-38.png" />
-</p>
-</div>
-<div id="outline-container-orgdb606bf" class="outline-2">
-<h2 id="orgdb606bf"><span class="section-number-2">1.</span> Solve the PFR several times</h2>
-<div class="outline-text-2" id="text-1">
-</div>
-<div id="outline-container-orgef952fb" class="outline-3">
-<h3 id="orgef952fb"><span class="section-number-3">1.1.</span> small rate constant</h3>
-<div class="outline-text-3" id="text-1-1">
-<div class="org-src-container">
-<pre class="src src-jupyter-python">from scipy.integrate import solve_ivp
-
-k = 0.1
-nu = 1
-Vspan = (0, 2)
-Fa0 = 1
-
-def ode(V, Fa, k):
-    return -k * Fa / nu
-
-sol = solve_ivp(ode, Vspan, (Fa0,), args=(k,))
-sol.y[0][-1]
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">sol
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-org5228693" class="outline-3">
-<h3 id="org5228693"><span class="section-number-3">1.2.</span> a medium rate constant</h3>
-<div class="outline-text-3" id="text-1-2">
 <p>
-Solve for a larger k.
+Check out their YouTube video <a href="https://www.youtube.com/watch?v=D54yfxRSY6s">here</a> on making the instrument. They have a GitHUB repo at <a href="https://github.com/sparks-baird/self-driving-lab-demo">https://github.com/sparks-baird/self-driving-lab-demo</a>, and an example <a href="https://colab.research.google.com/github/sparks-baird/self-driving-lab-demo/blob/main/notebooks/4.2-paho-mqtt-colab-sdl-demo-test.ipynb">Colab notebook</a> for running the instrument. The notebook shows how to control the instrument (which is located in Salt Lake City).
 </p>
 
-<div class="org-src-container">
-<pre class="src src-jupyter-python">sol = solve_ivp(ode, Vspan, (Fa0,), args=(2 * k,))
-sol.y[0][-1]
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-org7b5103f" class="outline-3">
-<h3 id="org7b5103f"><span class="section-number-3">1.3.</span> a larger rate constant</h3>
-<div class="outline-text-3" id="text-1-3">
 <p>
-And one more even bigger rate constant.
+Here we look at the barest code required to run a remote "experiment" in our ELN. The gist of this experiment is we have three "knobs" to set, the R, G and B settings of the RGB LED, and we get 8 measurements back, one for each channel of the light sensor. We are going to do a set of experiments that will allow us to choose an RGB setting that results in the ch470 measurement having a value of 10000.
+</p>
+
+
+<p>
+First, we look at the simplest bit of code required to run a single experiment. Note you need to have installed the <code>self_driving_lab_demo</code> package as described <a href="https://github.com/sparks-baird/self-driving-lab-demo?tab=readme-ov-file#basic-usage">here</a>. This package provides a more sophisticated interface to the SDL, but I want a simple code here.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python">sol = solve_ivp(ode, Vspan, (Fa0,), args=(4 * k,))
-sol.y[0][-1]
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-orgee3764b" class="outline-3">
-<h3 id="orgee3764b"><span class="section-number-3">1.4.</span> run it in a loop</h3>
-<div class="outline-text-3" id="text-1-4">
-<div class="org-src-container">
-<pre class="src src-jupyter-python">K = [k, 2*k, 4*k]
+<pre class="src src-jupyter-python">from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
 
-Fa = [solve_ivp(ode, Vspan, (Fa0,), args=(_k,)).y[0][-1] for _k in K]
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
 
-K, Fa
+R, G, B = (0, 0, 100)
+results = mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+print(results)
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python">import json
+<pre class="src src-jupyter-python">from pycse.hashcache import HashCache
 
-with open('results.json', 'w') as f:
-    f.write(json.dumps({'K': K, 'Fa': Fa}))
+@HashCache
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+
+get_results(0, 0, 100, label=1)['ch470']
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">import matplotlib.pyplot as plt
+from tqdm import tqdm
+B = [0, 25, 50, 75, 100]
+
+
+results = []
+for b in tqdm(B):
+    results += [get_results(0, 0, b)]
+
+ch470 = [result['ch470'] for result in results]
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">print(ch470)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">plt.plot(B, ch470, 'bo-')
+plt.xlabel('B')
+plt.ylabel('ch470');
+</pre>
+</div>
+<div class="org-src-container">
+<pre class="src src-jupyter-python">from scipy.interpolate import interp1d
+I = interp1d(ch470, B)
+I(10000)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">for i in tqdm(range(5)):
+    print(get_results(0, 0, int(I(10000)), label=i)['ch470'])
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">import numpy as np
+r52 = [get_results(0, 0, int(I(10000)), label=i)['ch470'] for i in range(5)]
+print(np.mean(r52), np.std(r52))
 </pre>
 </div>
 
 
 <div class="org-src-container">
-<pre class="src src-sh">jq '.K' results.json 
+<pre class="src src-jupyter-python">for i in tqdm(range(5)):
+    print(get_results(0, 0, 53, label=i)['ch470'])
 </pre>
 </div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">r53 = [get_results(0, 0, 53, label=i)['ch470'] for i in range(5)]
+print(np.mean(r53), np.std(r53))
+</pre>
 </div>
-</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">get_results(0, 0, 52.2)
+</pre>
 </div>
 </div>
 <div id="postamble" class="status">
