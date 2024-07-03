@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-02 Tue 14:16 -->
+<!-- 2024-07-03 Wed 19:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>A parametric study</title>
@@ -200,19 +200,19 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgdb606bf">1. Solve the PFR several times</a>
+<li><a href="#orgee6fa9f">1. Solve the PFR several times</a>
 <ul>
-<li><a href="#orgef952fb">1.1. small rate constant</a></li>
-<li><a href="#org5228693">1.2. a medium rate constant</a></li>
-<li><a href="#org7b5103f">1.3. a larger rate constant</a></li>
-<li><a href="#orgee3764b">1.4. run it in a loop</a></li>
+<li><a href="#orgcc77afb">1.1. small rate constant</a></li>
+<li><a href="#org171274d">1.2. a medium rate constant</a></li>
+<li><a href="#org3d65166">1.3. a larger rate constant</a></li>
+<li><a href="#org527aedd">1.4. run it in a loop</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="org5f44cd6" class="figure">
+<div id="org78587b0" class="figure">
 <p><img src="./screenshots/date-13-06-2024-time-08-18-40.png" alt="date-13-06-2024-time-08-18-40.png" />
 </p>
 </div>
@@ -220,16 +220,16 @@
 
 
 
-<div id="org5b1066a" class="figure">
+<div id="org546d080" class="figure">
 <p><img src="./screenshots/date-13-06-2024-time-09-02-38.png" alt="date-13-06-2024-time-09-02-38.png" />
 </p>
 </div>
-<div id="outline-container-orgdb606bf" class="outline-2">
-<h2 id="orgdb606bf"><span class="section-number-2">1.</span> Solve the PFR several times</h2>
+<div id="outline-container-orgee6fa9f" class="outline-2">
+<h2 id="orgee6fa9f"><span class="section-number-2">1.</span> Solve the PFR several times</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgef952fb" class="outline-3">
-<h3 id="orgef952fb"><span class="section-number-3">1.1.</span> small rate constant</h3>
+<div id="outline-container-orgcc77afb" class="outline-3">
+<h3 id="orgcc77afb"><span class="section-number-3">1.1.</span> small rate constant</h3>
 <div class="outline-text-3" id="text-1-1">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">from scipy.integrate import solve_ivp
@@ -253,8 +253,8 @@ sol.y[0][-1]
 </div>
 </div>
 </div>
-<div id="outline-container-org5228693" class="outline-3">
-<h3 id="org5228693"><span class="section-number-3">1.2.</span> a medium rate constant</h3>
+<div id="outline-container-org171274d" class="outline-3">
+<h3 id="org171274d"><span class="section-number-3">1.2.</span> a medium rate constant</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Solve for a larger k.
@@ -267,8 +267,8 @@ sol.y[0][-1]
 </div>
 </div>
 </div>
-<div id="outline-container-org7b5103f" class="outline-3">
-<h3 id="org7b5103f"><span class="section-number-3">1.3.</span> a larger rate constant</h3>
+<div id="outline-container-org3d65166" class="outline-3">
+<h3 id="org3d65166"><span class="section-number-3">1.3.</span> a larger rate constant</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 And one more even bigger rate constant.
@@ -281,8 +281,8 @@ sol.y[0][-1]
 </div>
 </div>
 </div>
-<div id="outline-container-orgee3764b" class="outline-3">
-<h3 id="orgee3764b"><span class="section-number-3">1.4.</span> run it in a loop</h3>
+<div id="outline-container-org527aedd" class="outline-3">
+<h3 id="org527aedd"><span class="section-number-3">1.4.</span> run it in a loop</h3>
 <div class="outline-text-3" id="text-1-4">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">K = [k, 2*k, 4*k]
@@ -311,7 +311,7 @@ with open('results.json', 'w') as f:
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2024-07-02 Tue 14:16</p>
+<p class="date">Created: 2024-07-03 Wed 19:30</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

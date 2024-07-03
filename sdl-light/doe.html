@@ -6,7 +6,7 @@
 <!-- 2024-07-03 Wed 19:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>&lrm;</title>
+<title>SDL-Light with a design of experiment approach</title>
 <meta name="generator" content="Org Mode" />
 <style type="text/css">
   #content { max-width: 60em; margin: auto; }
@@ -192,165 +192,331 @@
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   .org-svg { }
 </style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
 </head>
 <body>
 <div id="content" class="content">
+<h1 class="title">SDL-Light with a design of experiment approach</h1>
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgafc6b24">1. Using SqlCache</a>
-<ul>
-<li><a href="#org95b7f6e">1.1. Putting this together</a></li>
-</ul>
-</li>
+<li><a href="#org143f87e">1. A design of experiment</a></li>
+<li><a href="#orged9ea6c">2. Run the experiments</a></li>
+<li><a href="#orga3022ca">3. A simple linear model</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgafc6b24" class="outline-2">
-<h2 id="orgafc6b24"><span class="section-number-2">1.</span> Using SqlCache</h2>
-<div class="outline-text-2" id="text-1">
 
-<div id="org4ec5a46" class="figure">
-<p><img src="./screenshots/date-18-06-2024-time-20-24-46.png" alt="date-18-06-2024-time-20-24-46.png" />
+<div id="org87c8d2e" class="figure">
+<p><img src="./screenshots/date-03-07-2024-time-14-19-43.png" alt="date-03-07-2024-time-14-19-43.png" />
 </p>
 </div>
 
+
+
+<p>
+There are three "knobs" you can vary in the SDL-Light demo: the R, G and B intensities. There are 8 sensors at different wavelengths that detect the light that is emitted. Here we explore how to find a set of RGB values that will result in a specific reading on the sensors. Specifically we want an RGB setting that results in a reading of 10,000 on the ch620, ch510, and ch470 channels, which are approximately red, green and blue wavelengths.
+</p>
+
+<p>
+We previously saw that at least the blue channel is slightly nonlinear in the B setting, and we can assume that is true here too. Rather than randomly sample the RGB space, we will use a design of experiment (DOE) approach.
+</p>
+<div id="outline-container-org143f87e" class="outline-2">
+<h2 id="org143f87e"><span class="section-number-2">1.</span> A design of experiment</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+We will use <a href="https://pydoe3.readthedocs.io/en/latest/">https://pydoe3.readthedocs.io/en/latest/</a> to set up our DOE.
+</p>
+
+<p>
+We need an experimental design, which is a set of experiments to run. We have three variables here, and we test them at three levels, low, middle and high. The design comes out in "coded" levels. The design creates 15 experiments, with some replicates at the center point.
+</p>
+
 <div class="org-src-container">
-<pre class="src src-jupyter-python">from pycse.hashcache import SqlCache
+<pre class="src src-jupyter-python">from pyDOE3 import bbdesign
+import numpy as np
+import pandas as pd
 
-@SqlCache
-def f(x):
-    return x
-
-f(1), f([2, 3]), f('tree')
+design = bbdesign(n=3)
+D = pd.DataFrame(design, columns=['Rc', 'Gc', 'Bc'])
+D
 </pre>
 </div>
 
+<p>
+We have to convert the coded levels to actual values. We use a little knowledge from before where we expect an answer around 50, so we make that the center of the range.
+</p>
 
 <div class="org-src-container">
-<pre class="src src-sh">sqlite3 cache.sqlite "select * from cache"
+<pre class="src src-jupyter-python">a, b = -1, 1
+Rmin, Rmax = 25, 75
+Gmin, Gmax = 25, 75
+Bmin, Bmax = 25, 75
+
+D['Rint'] = ((D['Rc'] - a) * (Rmax - Rmin) / (b - a) + Rmin).astype(int)
+D['Gint'] = ((D['Gc'] - a) * (Rmax - Rmin) / (b - a) + Gmin).astype(int)
+D['Bint'] = ((D['Bc'] - a) * (Rmax - Rmin) / (b - a) + Bmin).astype(int)
+
+D
 </pre>
 </div>
 
+<p>
+We setup some functions to help drive our experiments. I use HashCache again, with an optional label so we can run these again if we want to.
+</p>
 
 <div class="org-src-container">
-<pre class="src src-sh">
+<pre class="src src-jupyter-python">from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
+
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
+
+from pycse.hashcache import HashCache
+
+@HashCache
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+
+def measure(R, G, B, label=None):
+    results = get_results(R, G, B, label)
+    return results['ch620'], results['ch510'], results['ch470']
+</pre>
+</div>
+
+<p>
+Test that it works.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">print(measure(44, 59, 36))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orged9ea6c" class="outline-2">
+<h2 id="orged9ea6c"><span class="section-number-2">2.</span> Run the experiments</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+We should run the experiments in a randomized order. This is important to remove run-order artifacts. For example, suppose the output of the LED is sensitive to temperature, and the LED heats up during the experiment. That would result in a systematic increase in temperature over the runs. By randomizing the run order, this still happens, but the effect is not systematic in the order of the experiments, it is randomized.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">input = D[['Rint', 'Gint', 'Bint']].sample(frac=1)
+input
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python">@SqlCache
-def g(x):
-    return 2 * x
+<pre class="src src-jupyter-python">from tqdm import tqdm
+index = []
+output = []
+for i, RGB in tqdm(input.iterrows()):
+    result = measure(*RGB, f'jul-3-{i}')    
+    index += [i]
+    output += [result]
 
-g(1), g([2, 3])
+output = pd.DataFrame(output, index=index)
+output
 </pre>
 </div>
 
+<p>
+We should explore the data a little. First we look at the replicates. Since we shuffled the data, we need to select them.
+</p>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python">g(1), g([2, 3])
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-python">import sqlite3
-
-con = sqlite3.connect('cache.sqlite')
-cur = con.execute("select * from cache where json_extract(value, '$.func')=\"g\"")
-
-print(cur.fetchall())
+<pre class="src src-jupyter-python">input.query('Rint==50 &amp; Bint==50 &amp; Gint==50').index
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python">def ode(x, y):
-    return -y
-
-from scipy.integrate import solve_ivp
-
-sol = solve_ivp(ode, (0, 1), (1, ))
-sol
+<pre class="src src-jupyter-python">output.loc[input.query('Rint==50 &amp; Bint==50 &amp; Gint==50').index]
 </pre>
 </div>
+</div>
+</div>
+<div id="outline-container-orga3022ca" class="outline-2">
+<h2 id="orga3022ca"><span class="section-number-2">3.</span> A simple linear model</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Now we need to build a model. A simple model is \(out = in @ pars\), in other words, a simple linear model.
+</p>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python">SqlCache.dump(sol=sol)
+<pre class="src src-jupyter-python">pars, resid, rank, s = np.linalg.lstsq(input, output, rcond=None)
+
+with np.printoptions(precision=1):
+    print(pars)
 </pre>
 </div>
 
+<p>
+The structure of that array supports the largely linear model; the diagonal is large, and the off-diagonals are small. 
+</p>
 
 <div class="org-src-container">
 <pre class="src src-jupyter-python">import matplotlib.pyplot as plt
-sol_ = SqlCache.load('3c823d3126aba383ba4fe004cb44a212')['sol']
-plt.plot(sol_['t'], sol_['y'][0]);
-type(sol_['t'])
-</pre>
-</div>
-</div>
-<div id="outline-container-org95b7f6e" class="outline-3">
-<h3 id="org95b7f6e"><span class="section-number-3">1.1.</span> Putting this together</h3>
-<div class="outline-text-3" id="text-1-1">
-<div class="org-src-container">
-<pre class="src src-jupyter-python">from scipy.integrate import solve_ivp
-import nava
 
-@SqlCache
-def solution(k):
-    '''Get solution for k.'''
-    nu = 1
-    Vspan = (0, 2)
-    Fa0 = 1
+p = plt.plot(output, input@pars, '.')
 
-    # define the ODE
-    def ode(V, Fa, k):
-        return -k * Fa / nu
+p[0].set_color('r')
+p[1].set_color('g')
+p[2].set_color('b')
 
-    sol = solve_ivp(ode, Vspan, (Fa0,), args=(k,))
-    nava.play('../../../../cash-register-fake-88639.mp3')
-    return sol
+plt.legend(['R', 'G', 'B']);
 </pre>
 </div>
 
-<div class="org-src-container">
-<pre class="src src-jupyter-python">K = [0.1, 0.2, 0.4]
-SOL = [solution(k) for k in K]
-</pre>
-</div>
-
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">SOL[0]
-</pre>
-</div>
-
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">import numpy as np
-
-for k, sol in zip(K, SOL):
-    plt.plot(sol['t'], np.array(sol['y']).T, label=f'{k}')
-
-plt.legend();    
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">SqlCache.dump(K=K, SOL=SOL)
-</pre>
-</div>
-</div>
-<ol class="org-ol">
-<li><a id="org4c4a918"></a><span class="todo TODO">TODO</span> See if we can read the hash above from another location<br />
-<div class="outline-text-16" id="text-1-1-0-0-0-0-0-0-0-0-0-0-0-0-1">
 <p>
-Remember to specify where the cache attribute points to.
+Solve for input that yields (10K, 10K, 10K)
 </p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">s = np.round([10000, 10000, 10000] @ np.linalg.inv(pars), 0)
+s
+</pre>
 </div>
-</li>
-<li><a id="org3056f0a"></a>END<br /></li>
-</ol>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">print(measure(*s))
+</pre>
+</div>
+
+<p>
+That seems close. We can try a more sophisticated model like a quadratic polynomial.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">from sklearn.preprocessing import PolynomialFeatures
+pf = PolynomialFeatures(degree=2, interaction_only=False, include_bias=False)
+Xp = pf.fit_transform(input)
+print(Xp.shape)
+pars, resid, rank, s = np.linalg.lstsq(Xp, output, rcond=None)
+pars
+</pre>
+</div>
+
+<p>
+Not surprisingly, the fit is better.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">p = plt.plot(output, Xp@pars, '.')
+
+p[0].set_color('r')
+p[1].set_color('g')
+p[2].set_color('b')
+
+plt.legend(['R', 'G', 'B']);
+</pre>
+</div>
+
+<p>
+It is a little trickier finding the best solution here. I use a minimize function to find the best solution.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">def objective(RGB):
+    Xp = pf.fit_transform(np.atleast_2d(np.array(RGB)))
+    out = (Xp @ pars) - (10000, 10000, 10000)
+    return np.sum(out**2)
+
+print(objective([50, 50, 50]))
+
+from scipy.optimize import minimize
+sol = minimize(objective, (50, 50, 50))
+print(sol.x.astype(int))
+</pre>
+</div>
+
+<p>
+We find a slightly better solution.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">print(measure(*sol.x.astype(int)))
+</pre>
+</div>
+
+<p>
+We should test this solution a few times.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">m = np.array([measure(*sol.x.astype(int), i) for i in range(10)])
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">_, _, p = plt.hist(m)
+
+c = 'rgb'
+for i, group in enumerate(p):
+    for patch in group:
+        patch.set_color(c[i])
+plt.legend(['R', 'G', 'B']);
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">np.mean(m, axis=0)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">np.std(m, axis=0)
+</pre>
+</div>
+
+<p>
+The target we want is just barely at the outside edge of the upper ~95% confidence range.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">np.mean(m, axis=0) + 2 * np.std(m, axis=0)
+</pre>
+</div>
+
+<p>
+The next step might be to refine the design with a second round of experiments that is more focused around the solution.
+</p>
+
+<p>
+Overall, this is a pretty bare-bones DOE approach. One should do a whole analysis of variance (ANOVA), and incorporate sensitivity analysis and uncertainty quantification. We may also need to do additional refining experiments that should make the average result closer to the goal we set.
+</p>
 </div>
 </div>
 </div>
