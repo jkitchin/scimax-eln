@@ -21,7 +21,7 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 11 - Publishing your ELN to GitHUB Pages https://youtube.com/live/zIgSOiMFBWU
 - Video 12 - Tracking reagents in an ELN with scimax, completion and QR codes https://youtube.com/live/bLyhOCXn-Hg
 - Video 13 - Controlling a remote instrument from an ELN - the SDL-light https://youtube.com/live/qbqxSKJ1F60
-
+- Video 14 - SDL-Light with a design of experiment approach https://youtube.com/live/g1DEVScu6NE
 * pycse
 
 Python computations in science and engineering. [[./pycse/readme.org]]
@@ -59,6 +59,9 @@ Notes for setup:
 * SDL-light - running a remote instrument
 
 See [[./sdl-light/readme.org]]
+
+A DOE approach: [[./sdl-light/doe.org]]
+
 
 ** TODO get SDL-Light instruments
 DEADLINE: <2024-07-01 Mon>

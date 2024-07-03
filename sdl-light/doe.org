@@ -1,0 +1,367 @@
+#+title: SDL-Light with a design of experiment approach
+
+#+attr_org: :width 800
+[[./screenshots/date-03-07-2024-time-14-19-43.png]]
+
+
+
+There are three "knobs" you can vary in the SDL-Light demo: the R, G and B intensities. There are 8 sensors at different wavelengths that detect the light that is emitted. Here we explore how to find a set of RGB values that will result in a specific reading on the sensors. Specifically we want an RGB setting that results in a reading of 10,000 on the ch620, ch510, and ch470 channels, which are approximately red, green and blue wavelengths.
+
+We previously saw that at least the blue channel is slightly nonlinear in the B setting, and we can assume that is true here too. Rather than randomly sample the RGB space, we will use a design of experiment (DOE) approach.
+
+** A design of experiment
+
+We will use https://pydoe3.readthedocs.io/en/latest/ to set up our DOE.
+
+We need an experimental design, which is a set of experiments to run. We have three variables here, and we test them at three levels, low, middle and high. The design comes out in "coded" levels. The design creates 15 experiments, with some replicates at the center point.
+
+#+BEGIN_SRC jupyter-python
+from pyDOE3 import bbdesign
+import numpy as np
+import pandas as pd
+
+design = bbdesign(n=3)
+D = pd.DataFrame(design, columns=['Rc', 'Gc', 'Bc'])
+D
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|    |   Rc |   Gc |   Bc |
+|----+------+------+------|
+|  0 | -1.0 | -1.0 |  0.0 |
+|  1 |  1.0 | -1.0 |  0.0 |
+|  2 | -1.0 |  1.0 |  0.0 |
+|  3 |  1.0 |  1.0 |  0.0 |
+|  4 | -1.0 |  0.0 | -1.0 |
+|  5 |  1.0 |  0.0 | -1.0 |
+|  6 | -1.0 |  0.0 |  1.0 |
+|  7 |  1.0 |  0.0 |  1.0 |
+|  8 |  0.0 | -1.0 | -1.0 |
+|  9 |  0.0 |  1.0 | -1.0 |
+| 10 |  0.0 | -1.0 |  1.0 |
+| 11 |  0.0 |  1.0 |  1.0 |
+| 12 |  0.0 |  0.0 |  0.0 |
+| 13 |  0.0 |  0.0 |  0.0 |
+| 14 |  0.0 |  0.0 |  0.0 |
+:END:
+
+We have to convert the coded levels to actual values. We use a little knowledge from before where we expect an answer around 50, so we make that the center of the range.
+
+#+BEGIN_SRC jupyter-python
+a, b = -1, 1
+Rmin, Rmax = 25, 75
+Gmin, Gmax = 25, 75
+Bmin, Bmax = 25, 75
+
+D['Rint'] = ((D['Rc'] - a) * (Rmax - Rmin) / (b - a) + Rmin).astype(int)
+D['Gint'] = ((D['Gc'] - a) * (Rmax - Rmin) / (b - a) + Gmin).astype(int)
+D['Bint'] = ((D['Bc'] - a) * (Rmax - Rmin) / (b - a) + Bmin).astype(int)
+
+D
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|    |   Rc |   Gc |   Bc | Rint | Gint | Bint |
+|----+------+------+------+------+------+------|
+|  0 | -1.0 | -1.0 |  0.0 |   25 |   25 |   50 |
+|  1 |  1.0 | -1.0 |  0.0 |   75 |   25 |   50 |
+|  2 | -1.0 |  1.0 |  0.0 |   25 |   75 |   50 |
+|  3 |  1.0 |  1.0 |  0.0 |   75 |   75 |   50 |
+|  4 | -1.0 |  0.0 | -1.0 |   25 |   50 |   25 |
+|  5 |  1.0 |  0.0 | -1.0 |   75 |   50 |   25 |
+|  6 | -1.0 |  0.0 |  1.0 |   25 |   50 |   75 |
+|  7 |  1.0 |  0.0 |  1.0 |   75 |   50 |   75 |
+|  8 |  0.0 | -1.0 | -1.0 |   50 |   25 |   25 |
+|  9 |  0.0 |  1.0 | -1.0 |   50 |   75 |   25 |
+| 10 |  0.0 | -1.0 |  1.0 |   50 |   25 |   75 |
+| 11 |  0.0 |  1.0 |  1.0 |   50 |   75 |   75 |
+| 12 |  0.0 |  0.0 |  0.0 |   50 |   50 |   50 |
+| 13 |  0.0 |  0.0 |  0.0 |   50 |   50 |   50 |
+| 14 |  0.0 |  0.0 |  0.0 |   50 |   50 |   50 |
+:END:
+
+We setup some functions to help drive our experiments. I use HashCache again, with an optional label so we can run these again if we want to.
+
+#+BEGIN_SRC jupyter-python
+from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
+
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
+
+from pycse.hashcache import HashCache
+
+@HashCache
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+
+def measure(R, G, B, label=None):
+    results = get_results(R, G, B, label)
+    return results['ch620'], results['ch510'], results['ch470']
+#+END_SRC
+
+#+RESULTS:
+
+Test that it works.
+
+#+BEGIN_SRC jupyter-python  
+print(measure(44, 59, 36))
+#+END_SRC
+
+#+RESULTS:
+: (10211, 9951, 10156)
+
+** Run the experiments
+
+We should run the experiments in a randomized order. This is important to remove run-order artifacts. For example, suppose the output of the LED is sensitive to temperature, and the LED heats up during the experiment. That would result in a systematic increase in temperature over the runs. By randomizing the run order, this still happens, but the effect is not systematic in the order of the experiments, it is randomized.
+
+#+BEGIN_SRC jupyter-python
+input = D[['Rint', 'Gint', 'Bint']].sample(frac=1)
+input
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|    | Rint | Gint | Bint |
+|----+------+------+------|
+|  3 |   75 |   75 |   50 |
+|  6 |   25 |   50 |   75 |
+|  8 |   50 |   25 |   25 |
+|  4 |   25 |   50 |   25 |
+|  0 |   25 |   25 |   50 |
+|  5 |   75 |   50 |   25 |
+| 14 |   50 |   50 |   50 |
+|  9 |   50 |   75 |   25 |
+| 13 |   50 |   50 |   50 |
+| 10 |   50 |   25 |   75 |
+|  1 |   75 |   25 |   50 |
+|  2 |   25 |   75 |   50 |
+| 11 |   50 |   75 |   75 |
+| 12 |   50 |   50 |   50 |
+|  7 |   75 |   50 |   75 |
+:END:
+
+#+BEGIN_SRC jupyter-python :async yes
+from tqdm import tqdm
+index = []
+output = []
+for i, RGB in tqdm(input.iterrows()):
+    result = measure(*RGB, f'jul-3-{i}')    
+    index += [i]
+    output += [result]
+
+output = pd.DataFrame(output, index=index)
+output
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: 15it [00:00, 1759.50it/s]
+|    |     0 |     1 |     2 |
+|----+-------+-------+-------|
+|  3 | 19897 | 13408 | 14447 |
+|  6 |  4668 |  8661 | 17702 |
+|  8 | 11995 |  3074 |  5177 |
+|  4 |  4244 |  7996 |  7140 |
+|  0 |  4327 |  3319 | 10405 |
+|  5 | 19893 |  8132 |  7246 |
+| 14 | 11980 |  8310 | 12345 |
+|  9 | 12104 | 13050 |  9205 |
+| 13 | 12050 |  8355 | 12386 |
+| 10 | 12360 |  3801 | 15777 |
+|  1 | 20044 |  3575 | 10555 |
+|  2 |  4578 | 13312 | 14402 |
+| 11 | 12368 | 13666 | 19650 |
+| 12 | 12051 |  8360 | 12393 |
+|  7 | 20065 |  8831 | 17747 |
+:END:
+
+We should explore the data a little. First we look at the replicates. Since we shuffled the data, we need to select them.
+
+#+BEGIN_SRC jupyter-python
+input.query('Rint==50 & Bint==50 & Gint==50').index
+#+END_SRC
+
+#+RESULTS:
+: Int64Index([14, 13, 12], dtype='int64')
+
+#+BEGIN_SRC jupyter-python
+output.loc[input.query('Rint==50 & Bint==50 & Gint==50').index]
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|    | 0     | 1    | 2     |
+|----+-------+------+-------|
+| 14 | 11980 | 8310 | 12345 |
+| 13 | 12050 | 8355 | 12386 |
+| 12 | 12051 | 8360 | 12393 |
+:END:
+
+** A simple linear model
+
+Now we need to build a model. A simple model is $out = in @ pars$, in other words, a simple linear model.
+
+#+BEGIN_SRC jupyter-python
+pars, resid, rank, s = np.linalg.lstsq(input, output, rcond=None)
+
+with np.printoptions(precision=1):
+    print(pars)
+#+END_SRC
+
+#+RESULTS:
+: [[286.7 -11.8 -11.8]
+:  [-22.6 183.2  65.4]
+:  [-17.5  -1.6 197. ]]
+
+The structure of that array supports the largely linear model; the diagonal is large, and the off-diagonals are small. 
+
+#+BEGIN_SRC jupyter-python  
+import matplotlib.pyplot as plt
+
+p = plt.plot(output, input@pars, '.')
+
+p[0].set_color('r')
+p[1].set_color('g')
+p[2].set_color('b')
+
+plt.legend(['R', 'G', 'B']);
+#+END_SRC
+
+#+RESULTS:
+[[./.ob-jupyter/57a0f6d0bb8559c90b8db2e53ef8e2138fa1e990.png]]
+
+Solve for input that yields (10K, 10K, 10K)
+
+#+BEGIN_SRC jupyter-python
+s = np.round([10000, 10000, 10000] @ np.linalg.inv(pars), 0)
+s
+#+END_SRC
+
+#+RESULTS:
+: array([41., 58., 34.])
+
+
+#+BEGIN_SRC jupyter-python
+print(measure(*s))
+#+END_SRC
+
+#+RESULTS:
+: (9435, 9838, 9742)
+
+That seems close. We can try a more sophisticated model like a quadratic polynomial.
+
+#+BEGIN_SRC jupyter-python
+from sklearn.preprocessing import PolynomialFeatures
+pf = PolynomialFeatures(degree=2, interaction_only=False, include_bias=False)
+Xp = pf.fit_transform(input)
+print(Xp.shape)
+pars, resid, rank, s = np.linalg.lstsq(Xp, output, rcond=None)
+pars
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: (15, 9)
+: array([[ 2.59449128e+02, -3.13885906e+01, -2.97263087e+01],
+:        [-5.11558725e+01,  1.67716409e+02,  5.04136913e+01],
+:        [-5.00158725e+01, -2.12035906e+01,  1.80083691e+02],
+:        [ 4.00251007e-01,  2.15163758e-01,  2.08876510e-01],
+:        [ 6.60778523e-02,  8.35973154e-02,  8.87167785e-02],
+:        [ 1.24477852e-01,  1.61197315e-01,  1.06316779e-01],
+:        [ 3.83051007e-01,  2.03563758e-01,  1.98476510e-01],
+:        [ 1.84877852e-01,  1.03197315e-01,  6.87167785e-02],
+:        [ 3.92651007e-01,  2.05963758e-01,  2.08876510e-01]])
+:END:
+
+Not surprisingly, the fit is better.
+
+#+BEGIN_SRC jupyter-python
+p = plt.plot(output, Xp@pars, '.')
+
+p[0].set_color('r')
+p[1].set_color('g')
+p[2].set_color('b')
+
+plt.legend(['R', 'G', 'B']);
+#+END_SRC
+
+#+RESULTS:
+[[./.ob-jupyter/f80dcb6c0c8e1642037732676ec8e113c85181fc.png]]
+
+It is a little trickier finding the best solution here. I use a minimize function to find the best solution.
+
+#+BEGIN_SRC jupyter-python  
+def objective(RGB):
+    Xp = pf.fit_transform(np.atleast_2d(np.array(RGB)))
+    out = (Xp @ pars) - (10000, 10000, 10000)
+    return np.sum(out**2)
+
+print(objective([50, 50, 50]))
+
+from scipy.optimize import minimize
+sol = minimize(objective, (50, 50, 50))
+print(sol.x.astype(int))
+#+END_SRC
+
+#+RESULTS:
+: 11506999.942930944
+: [44 59 35]
+
+We find a slightly better solution.
+
+#+BEGIN_SRC jupyter-python
+print(measure(*sol.x.astype(int)))
+#+END_SRC
+
+#+RESULTS:
+: (10133, 9906, 9919)
+
+We should test this solution a few times.
+
+#+BEGIN_SRC jupyter-python  
+m = np.array([measure(*sol.x.astype(int), i) for i in range(10)])
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC jupyter-python
+_, _, p = plt.hist(m)
+
+c = 'rgb'
+for i, group in enumerate(p):
+    for patch in group:
+        patch.set_color(c[i])
+plt.legend(['R', 'G', 'B']);
+#+END_SRC
+
+#+RESULTS:
+[[./.ob-jupyter/7193dd882da50380c2230b15a68374d14bc4fe1f.png]]
+
+#+BEGIN_SRC jupyter-python
+np.mean(m, axis=0)
+#+END_SRC
+
+#+RESULTS:
+: array([10125.5,  9902. ,  9917.8])
+
+#+BEGIN_SRC jupyter-python  
+np.std(m, axis=0)
+#+END_SRC
+
+#+RESULTS:
+: array([5.40832691, 6.38748777, 5.86174036])
+
+The target we want is just barely at the outside edge of the upper ~95% confidence range.
+
+#+BEGIN_SRC jupyter-python
+np.mean(m, axis=0) + 2 * np.std(m, axis=0)
+#+END_SRC
+
+#+RESULTS:
+: array([10136.31665383,  9914.77497554,  9929.52348071])
+
+The next step might be to refine the design with a second round of experiments that is more focused around the solution.
+
+Overall, this is a pretty bare-bones DOE approach. One should do a whole analysis of variance (ANOVA), and incorporate sensitivity analysis and uncertainty quantification. We may also need to do additional refining experiments that should make the average result closer to the goal we set.
