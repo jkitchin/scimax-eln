@@ -6,7 +6,7 @@
 <!-- 2024-07-04 Thu 19:16 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>scimax-ELN for molecular simulation</title>
+<title>Reproducibility, significant differences and interactions in the SDL-Light</title>
 <meta name="generator" content="Org Mode" />
 <style type="text/css">
   #content { max-width: 60em; margin: auto; }
@@ -195,375 +195,329 @@
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">scimax-ELN for molecular simulation</h1>
+<h1 class="title">Reproducibility, significant differences and interactions in the SDL-Light</h1>
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org771cff5">1. Work out how to run a bunch of volumes</a></li>
-<li><a href="#org9d931d3">2. automating the pipeline</a></li>
+<li><a href="#org8b44166">1. Reproducibility</a>
+<ul>
+<li><a href="#org68f978a">1.1. A baseline</a></li>
+<li><a href="#org9334d30">1.2. Perturbations on R, G and B</a>
+<ul>
+<li><a href="#org266f0f6">1.2.1. R channel analysis</a></li>
+<li><a href="#org0afb8ab">1.2.2. G channel analysis</a></li>
+<li><a href="#org8c126dc">1.2.3. B channel analysis</a></li>
+</ul>
+</li>
+<li><a href="#orge251f8f">1.3. How linear is it?</a></li>
+<li><a href="#orgb720c79">1.4. What states are actually accessible</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
-
-<div id="org5229823" class="figure">
-<p><img src="./screenshots/date-11-06-2024-time-20-18-42.png" alt="date-11-06-2024-time-20-18-42.png" />
-</p>
-</div>
-
-
-<p>
-Goal: Use ase to compute the lattice constant of Cu.
-</p>
-
 <div class="org-src-container">
-<pre class="src src-jupyter-python">from ase.build import bulk
-from ase.calculators.emt import EMT
+<pre class="src src-jupyter-python">import numpy as np
+import matplotlib.pyplot as plt
+from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
 
-atoms = bulk('Cu', a=3.6)
-atoms.calc = EMT()
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
 
-atoms.get_potential_energy()
+from pycse.hashcache import HashCache
+
+@HashCache
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+
+def measure(R, G, B, label=None):
+    results = get_results(R, G, B, label)
+    return results['ch620'], results['ch510'], results['ch470']
 </pre>
 </div>
-
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">from pycse.hashcache import SqlCache
-
-SqlCache.dump(atoms=atoms)
-</pre>
-</div>
-<ol class="org-ol">
-<li><a id="org875e487"></a><span class="todo TODO">TODO</span> extend SqlCache with custom serializing functions<br /></li>
-<li><a id="org8bec845"></a>END<br />
-<div class="outline-text-16" id="text-0-0-0-0-0-0-0-0-0-0-0-0-0-0-2">
-<div class="org-src-container">
-<pre class="src src-jupyter-python">from pycse.hashcache import HashCache
-
-HashCache.dump(atoms=atoms)
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">HashCache.load('4130737e96a89b0d0315bd328303e298')['atoms'].get_potential_energy()
-</pre>
-</div>
-</div>
-</li>
-</ol>
-<div id="outline-container-org771cff5" class="outline-2">
-<h2 id="org771cff5"><span class="section-number-2">1.</span> Work out how to run a bunch of volumes</h2>
+<div id="outline-container-org8b44166" class="outline-2">
+<h2 id="org8b44166"><span class="section-number-2">1.</span> Reproducibility</h2>
 <div class="outline-text-2" id="text-1">
-<div class="org-src-container">
-<pre class="src src-jupyter-python">@HashCache
-def get_energy(symbol, a):
-    """symbol is a string for a chemical element, for a metal EMT can use
-    a is a float lattice constant
-    """
-    atoms = bulk(symbol, a=a)
-    atoms.calc = EMT()
-    return atoms, atoms.get_potential_energy()
-</pre>
+<p>
+We have to evaluate how reproducible a measurement is, and whether it is impacted by how we measure it. 
+</p>
 </div>
+<div id="outline-container-org68f978a" class="outline-3">
+<h3 id="org68f978a"><span class="section-number-3">1.1.</span> A baseline</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+We establish a base line here by making the same measurement 50 times. We have to assume that what we measure here will be similar at other values.
+</p>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python">get_energy('Cu', 3.6)
+<pre class="src src-jupyter-python">from tqdm import tqdm
+base = []
+for i in tqdm(range(50)):
+    base += [measure(50, 50, 50, f'jul-4-base-{i}')]
 </pre>
 </div>
-
 
 <div class="org-src-container">
 <pre class="src src-jupyter-python">import numpy as np
 
-A = np.linspace(3.5, 3.7, 10)
-results = [get_energy('Cu', a) for a in A]
+np.mean(base, axis=0), np.std(base, axis=0)
+</pre>
+</div>
+
+<p>
+We should check if there are any temporal trends, e.g. a systematic change in the order we ran these. This could happen for a variety of reasons, e.g. something heats up and changes over time, something degrades over time, etc.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">plt.plot(base - np.mean(base, axis=0))
+plt.xlabel('sequence')
+plt.ylabel('RGB');
+</pre>
+</div>
+
+<p>
+It actually does appear there is a shift over time here, but it is not large.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">fig, axs = plt.subplots(1, 3)
+C = 'rgb'
+for i, c in enumerate(C):
+    axs[i].hist(base[:, i], color=C[i])
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9334d30" class="outline-3">
+<h3 id="org9334d30"><span class="section-number-3">1.2.</span> Perturbations on R, G and B</h3>
+<div class="outline-text-3" id="text-1-2">
+<div class="org-src-container">
+<pre class="src src-jupyter-python">R = []
+for i in tqdm(range(50)):
+    R += [measure(51, 50, 50, f'jul-4-R-{i}')]
+
+G = []
+for i in tqdm(range(50)):
+    G += [measure(50, 51, 50, f'jul-4-G-{i}')]
+
+B = []
+for i in tqdm(range(50)):
+    B += [measure(50, 50, 51, f'jul-4-B-{i}')]        
+
+base = np.array(base)
+R = np.array(R)
+G = np.array(G)
+B = np.array(B)
 </pre>
 </div>
 
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python">import matplotlib.pyplot as plt
-volumes = [x[0].get_volume() for x in results]
-energies = [x[1] for x in results]
-
-plt.plot(volumes, energies, 'bo')
-plt.xlabel('Volume')
-plt.ylabel('energy (eV)')
+<pre class="src src-jupyter-python">plt.plot(R - np.mean(R, axis=0), c='r');
+plt.plot(G - np.mean(G, axis=0), c='b');
+plt.plot(B - np.mean(B, axis=0), c='g');
 </pre>
 </div>
 
-<div class="org-src-container">
-<pre class="src src-jupyter-python">from ase.eos import EquationOfState
-
-eos = EquationOfState(volumes, energies, eos='murnaghan')
-v0, e0, B = eos.fit()
-p = eos.plot();
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">HashCache.dump(p=p, energies=energies, volumes=volumes)
-</pre>
-</div>
-
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">from pycse.hashcache import HashCache
-import matplotlib.pyplot as plt
-
-data = HashCache.load('3513cf5f94b19b0b7d8366977162b793')
-data
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">import matplotlib.pyplot as plt
-fig = plt.figure()
-fig.axes.append(data['p'])
-fig.show()
-</pre>
-</div>
-
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">dir(data['p'])
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">plt.plot(data['volumes'], data['energies']);
-</pre>
-</div>
-</div>
-<ol class="org-ol">
-<li><a id="org4cb6f61"></a><span class="todo TODO">TODO</span> look up if there is a way to reload the figure from the cache<br /></li>
-<li><a id="orga1ec3f9"></a>END<br />
-<div class="outline-text-16" id="text-1-0-0-0-0-0-0-0-0-0-0-0-0-0-2">
-<div class="org-src-container">
-<pre class="src src-jupyter-python">HashCache.dump(fig=plt.gcf())
-</pre>
-</div>
-
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">d = HashCache.load('69b4355557538be9e54d4c4f328dd76e')
-d['fig'].savefig('test.png')
-</pre>
-</div>
-
-
-<div id="org81ae946" class="figure">
-<p><img src="./test.png" alt="test.png" />
+<p>
+It is not obvious there is any drift here.
 </p>
 </div>
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">dir(d['fig'])
-</pre>
-</div>
-
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">d['fig'].get_axes()
-</pre>
-</div>
-</div>
-</li>
-</ol>
-</div>
-<div id="outline-container-org9d931d3" class="outline-2">
-<h2 id="org9d931d3"><span class="section-number-2">2.</span> automating the pipeline</h2>
-<div class="outline-text-2" id="text-2">
-<div class="org-src-container">
-<pre class="src src-jupyter-python">from pycse.hashcache import HashCache
-from ase.build import bulk
-from ase.calculators.emt import EMT
-import numpy as np
-
-@HashCache
-def get_volumes_energies(symbol, n=10, lf=0.9, uf=1.1):
-    '''symbol: chemical element
-    n number of points in eos
-    lf, lower fraction
-    uf, upper fraction
-    '''
-    a0 = bulk(symbol)
-    v0 = a0.get_volume()
-
-    # V = 1/4 a**3
-    lc0 = (4 * v0)**(1/3)
-
-    A = np.linspace(lf * lc0, uf * lc0, n)
-
-    ATOMS = [bulk(symbol, a=a) for a in A]
-    for atoms in ATOMS:
-        atoms.calc = EMT() 
-
-    volumes = [atoms.get_volume() for atoms in ATOMS]
-    energies = [atoms.get_potential_energy() for atoms in ATOMS]
-
-    return (volumes, energies)
-
-V, E = get_volumes_energies('Cu')
-</pre>
-</div>
-
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">from ase.eos import EquationOfState
-eos0 = EquationOfState(*get_volumes_energies('Cu'))
-eos0.fit()
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">eos1 = EquationOfState(*get_volumes_energies('Pd'))
-eos1.fit()
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">eos2 = EquationOfState(*get_volumes_energies('Au'))
-eos2.fit()
-</pre>
-</div>
-
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">a0 = eos0.plot()
-eos1.plot(ax=a0)
-eos2.plot(ax=a0);
-</pre>
-</div>
-
-
+<div id="outline-container-org266f0f6" class="outline-4">
+<h4 id="org266f0f6"><span class="section-number-4">1.2.1.</span> R channel analysis</h4>
+<div class="outline-text-4" id="text-1-2-1">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">import matplotlib.pyplot as plt
+fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
 
-for sym in ['Cu', 'Pd', 'Au']:
-    plt.plot(*get_volumes_energies(sym), label=sym)
-plt.xlabel('V')
-plt.ylabel('E')
-plt.legend();    
+ax1.hist(base[:, 0], color='k', alpha=0.5);
+ax1.hist(R[:, 0], color='r', alpha=0.5);
+
+ax2.hist(base[:, 1], color='k', alpha=0.5);
+ax2.hist(R[:, 1], color='g', alpha=0.5);
+
+ax3.hist(base[:, 2], color='k', alpha=0.5);
+ax3.hist(R[:, 2], color='b', alpha=0.5);
+</pre>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">np.mean(R, axis=0) - np.mean(base, axis=0)
+</pre>
+</div>
+
+<p>
+Z-scores
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">np.abs(np.mean(R, axis=0) - np.mean(base, axis=0)) / np.std(base, axis=0)
+</pre>
+</div>
+
+<p>
+For these measurements the difference in the red channel is unambigously real, and we cannot say the difference in the other channels is meaningful.
+</p>
+</div>
+</div>
+<div id="outline-container-org0afb8ab" class="outline-4">
+<h4 id="org0afb8ab"><span class="section-number-4">1.2.2.</span> G channel analysis</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<div class="org-src-container">
+<pre class="src src-jupyter-python">fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
+
+ax1.hist(base[:, 0], color='k', alpha=0.5);
+ax1.hist(G[:, 0], color='r', alpha=0.5);
+
+ax2.hist(base[:, 1], color='k', alpha=0.5);
+ax2.hist(G[:, 1], color='g', alpha=0.5);
+
+ax3.hist(base[:, 2], color='k', alpha=0.5);
+ax3.hist(G[:, 2], color='b', alpha=0.5);
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python">HashCache.dump(Cu=get_volumes_energies('Cu'),
-               Pd=get_volumes_energies('Pd'),
-               Au=get_volumes_energies('Au'))
+<pre class="src src-jupyter-python">(np.mean(G, axis=0) - np.mean(base, axis=0)).round(1)
+</pre>
+</div>
+
+<p>
+Z scores
+</p>
+<div class="org-src-container">
+<pre class="src src-jupyter-python">(np.abs(np.mean(G, axis=0) - np.mean(base, axis=0)) / np.std(base, axis=0)).round(1)
+</pre>
+</div>
+
+<p>
+Here there is a meaningful difference in G and B, and no difference in R.
+</p>
+</div>
+</div>
+<div id="outline-container-org8c126dc" class="outline-4">
+<h4 id="org8c126dc"><span class="section-number-4">1.2.3.</span> B channel analysis</h4>
+<div class="outline-text-4" id="text-1-2-3">
+<div class="org-src-container">
+<pre class="src src-jupyter-python">fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
+
+ax1.hist(base[:, 0], color='k', alpha=0.5);
+ax1.hist(B[:, 0], color='r', alpha=0.5);
+
+ax2.hist(base[:, 1], color='k', alpha=0.5);
+ax2.hist(B[:, 1], color='g', alpha=0.5);
+
+ax3.hist(base[:, 2], color='k', alpha=0.5);
+ax3.hist(B[:, 2], color='b', alpha=0.5);
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python">data = HashCache.load('a1cb8cb213c239d6ca6a70bc3daf9e55')
+<pre class="src src-jupyter-python">(np.mean(B, axis=0) - np.mean(base, axis=0)).round(1)
 </pre>
 </div>
+
+<p>
+Z-scores
+</p>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python">from ase.eos import EquationOfState
-
-table = []
-syms = ['Cu', 'Pd', 'Au']
-for sym in syms:
-    v, e = data[sym]
-    eos = EquationOfState(v, e)
-    V0, E0, _ = eos.fit()
-    table += [[sym, np.round(V0, 2), np.round(E0, 5)]]
-
-table    
+<pre class="src src-jupyter-python">np.abs(np.mean(B, axis=0) - np.mean(base, axis=0)) / np.std(base, axis=0)
 </pre>
 </div>
+
+<p>
+Curiously,  there is a significant difference in R here, but not in B.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orge251f8f" class="outline-3">
+<h3 id="orge251f8f"><span class="section-number-3">1.3.</span> How linear is it?</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+Here we check the output of the measurements over a range of settings for each color channel. We expect that the main effect should be on the channel closest in color, and the other channels should be flat. If they are not flat, it means there is some interaction or cross-talk between the channels.
+</p>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="org279ad6f">from pycse.orgmode import Table
+<pre class="src src-jupyter-python">setting = np.arange(0, 100, 5)
 
-Table(table, headers=['symbol', 'V0', 'E0'],
-      caption='Equation of state data',
-      name='tab:eos')
+R, G, B = [], [], []
+for i in setting:
+    R += [measure(i, 0, 0)]
+    G += [measure(0, i, 0)]
+    B += [measure(0, 0, i)]
+
+R = np.array(R)
+G = np.array(G)
+B = np.array(B)
+
+fig, axs = plt.subplots(1, 3)
+p = axs[0].plot(setting, R, '.-')
+axs[0].set_title('Vary R')
+for c, line in enumerate(p):
+    line.set_color('rgb'[c])
+
+p = axs[1].plot(setting, G, '.-')
+axs[1].set_title('Vary G')
+for c, line in enumerate(p):
+    line.set_color('rgb'[c])
+
+p = axs[2].plot(setting, B, '.-')
+axs[2].set_title('Vary B')
+for c, line in enumerate(p):
+    line.set_color('rgb'[c])
+
+plt.tight_layout();
 </pre>
 </div>
 
-<table id="org68948d5" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-<caption class="t-above"><span class="table-number">Table 1:</span> Equation of state data</caption>
 
-<colgroup>
-<col  class="org-left" />
+<p>
+By inspection we can see that there is certainly cross-talk, or some interaction between the channels. That probably means the R, G, B LED is not "pure", but outputs a range of wavelengths that these channels are detecting. The G channel of the LED for example, obviously outputs a blue light component, and the B channel of the LED appears to have a small amount of red and green light in it.
+</p>
 
-<col  class="org-right" />
+<p>
+It is also evident the output is nonlinear at low settings.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb720c79" class="outline-3">
+<h3 id="orgb720c79"><span class="section-number-3">1.4.</span> What states are actually accessible</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+We are going to randomly sample three states on each channel. It is important to set a random seed here for reproducibility. To retrieve these results from the cache, you have to use the same seed, otherwise you will get new random numbers which will trigger new experiments.
+</p>
 
-<col  class="org-right" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-left">symbol</th>
-<th scope="col" class="org-right">V0</th>
-<th scope="col" class="org-right">E0</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-left">Cu</td>
-<td class="org-right">11.56</td>
-<td class="org-right">-0.00629</td>
-</tr>
+<div class="org-src-container">
+<pre class="src src-jupyter-python">np.random.seed(42)
+states = []
+for i in tqdm(range(150)):
+    states += [measure(np.random.choice([43, 44, 45]),
+                       np.random.choice([58, 59, 60]),
+                       np.random.choice([34, 35, 36]),
+                       f'state-{i}')]
 
-<tr>
-<td class="org-left">Pd</td>
-<td class="org-right">14.59</td>
-<td class="org-right">-0.00065</td>
-</tr>
+states = np.array(states)    
 
-<tr>
-<td class="org-left">Au</td>
-<td class="org-right">16.68</td>
-<td class="org-right">-0.00088</td>
-</tr>
-</tbody>
-</table>
+plt.scatter(*states[:, 0:2].T, c=states[:, 2], alpha=0.2)
+plt.xlabel('R output')
+plt.ylabel('G output')
+plt.colorbar();
+</pre>
+</div>
 
-<table id="orgad6802b" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-<caption class="t-above"><span class="table-number">Table 2:</span> Equation of state data</caption>
-
-<colgroup>
-<col  class="org-left" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-left">symbol</th>
-<th scope="col" class="org-right">V0</th>
-<th scope="col" class="org-right">E0</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-left">Cu</td>
-<td class="org-right">11.56</td>
-<td class="org-right">-0.00629</td>
-</tr>
-
-<tr>
-<td class="org-left">Pd</td>
-<td class="org-right">14.59</td>
-<td class="org-right">-0.00065</td>
-</tr>
-
-<tr>
-<td class="org-left">Au</td>
-<td class="org-right">16.68</td>
-<td class="org-right">-0.00088</td>
-</tr>
-</tbody>
-</table>
+<p>
+This makes it more clear we cannot access all output state space because the input space is discretized. There are some unusual outliers too.
+</p>
+</div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
+<p class="date">Date: 2024-07-04 Thu 00:00</p>
 <p class="date">Created: 2024-07-04 Thu 19:16</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
