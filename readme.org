@@ -22,6 +22,7 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 12 - Tracking reagents in an ELN with scimax, completion and QR codes https://youtube.com/live/bLyhOCXn-Hg
 - Video 13 - Controlling a remote instrument from an ELN - the SDL-light https://youtube.com/live/qbqxSKJ1F60
 - Video 14 - SDL-Light with a design of experiment approach https://youtube.com/live/g1DEVScu6NE
+- Video 15 - Reproducibility, significant differences and interactions in the SDL-Light https://youtube.com/live/BlUzXcyyYc0
 
 * pycse
 
