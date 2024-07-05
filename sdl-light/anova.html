@@ -6,7 +6,7 @@
 <!-- 2024-07-05 Fri 16:10 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Is your electronic notebook searchable the way you want?</title>
+<title>ANOVA + DOE with the SDL-Light</title>
 <meta name="generator" content="Org Mode" />
 <style type="text/css">
   #content { max-width: 60em; margin: auto; }
@@ -195,29 +195,170 @@
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">Is your electronic notebook searchable the way you want?</h1>
-
-<div id="orgad81b81" class="figure">
-<p><img src="./screenshots/date-24-06-2024-time-13-23-38.png" alt="date-24-06-2024-time-13-23-38.png" />
+<h1 class="title">ANOVA + DOE with the SDL-Light</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgb48df26">1. The Box Behnken design</a>
+<ul>
+<li><a href="#orgeddaaab">1.1. Fitting models</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+In <a href="./doe.html">./doe.html</a> we introduced a design of experiment approach, and fitted a model to the results. We qualitatively examined the models via parity plots, but didn't do any kind of uncertainty analysis. Today we do some more quantitative analysis.
 </p>
+<div id="outline-container-orgb48df26" class="outline-2">
+<h2 id="orgb48df26"><span class="section-number-2">1.</span> The Box Behnken design</h2>
+<div class="outline-text-2" id="text-1">
+<div class="org-src-container">
+<pre class="src src-jupyter-python">from pyDOE3 import bbdesign
+import numpy as np
+import pandas as pd
+
+design = bbdesign(n=3)
+D = pd.DataFrame(design, columns=['Rc', 'Gc', 'Bc'])
+
+a, b = -1, 1
+Rmin, Rmax = 25, 75
+Gmin, Gmax = 25, 75
+Bmin, Bmax = 25, 75
+
+D['Rint'] = ((D['Rc'] - a) * (Rmax - Rmin) / (b - a) + Rmin).astype(int)
+D['Gint'] = ((D['Gc'] - a) * (Rmax - Rmin) / (b - a) + Gmin).astype(int)
+D['Bint'] = ((D['Bc'] - a) * (Rmax - Rmin) / (b - a) + Bmin).astype(int)
+
+from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
+
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
+
+from pycse.hashcache import HashCache
+
+@HashCache
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+
+def measure(R, G, B, label=None):
+    results = get_results(R, G, B, label)
+    return results['ch620'], results['ch510'], results['ch470']
+
+input = D[['Rint', 'Gint', 'Bint']].sample(frac=1)
+
+from tqdm import tqdm
+index = []
+output = []
+for i, RGB in tqdm(input.iterrows()):
+    result = measure(*RGB, f'jul-5-{i}')    
+    index += [i]
+    output += [result]
+
+output = pd.DataFrame(output, index=index)
+output
+</pre>
+</div>
+</div>
+<div id="outline-container-orgeddaaab" class="outline-3">
+<h3 id="orgeddaaab"><span class="section-number-3">1.1.</span> Fitting models</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+We have to create a DataFrame to make it easy to use statsmodels.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">import pandas as pd
+
+data = pd.concat([input, output], axis=1)
+data = data.rename(columns={0: 'Rout', 1: 'Gout', 2: 'Bout'})
+data
+</pre>
 </div>
 
 
-<ol class="org-ol">
-<li>query - file, text, image, &#x2026;</li>
-<li>scope</li>
-</ol>
+<div class="org-src-container">
+<pre class="src src-jupyter-python">import statsmodels.formula.api as smf
+
+Rmod = smf.ols(formula='Rout ~ Rint + Bint + Gint + Rint*Bint + Rint*Gint + Bint*Gint + I(Rint**2) + I(Bint**2) + I(Gint**2)',
+               data=data)
+Rresult = Rmod.fit()
+Rresult.summary()
+</pre>
+</div>
 
 
-<p>
-org-db
-</p>
-<ul class="org-ul">
-<li>headings</li>
-<li>src-block</li>
-<li>text</li>
-<li>image</li>
-</ul>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">Rresult.get_prediction({'Rint': 40, 'Bint': 0, 'Gint': 0}).summary_frame()
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">Bmod = smf.ols(formula='Bout ~ Rint + Bint + Gint + Rint*Bint + Rint*Gint + Bint*Gint + I(Rint**2) + I(Bint**2) + I(Gint**2)',
+              data=data)
+Bresult = Bmod.fit()
+Bresult.summary()
+</pre>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">Gmod = smf.ols(formula='Gout ~ Rint + Bint + Gint + Rint*Bint + Rint*Gint + Bint*Gint + I(Rint**2) + I(Bint**2) + I(Gint**2)',
+              data=data)
+Gresult = Gmod.fit()
+Gresult.summary()
+</pre>
+</div>
+
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">Gresult.predict({'Rint': 40, 'Bint': 0, 'Gint': 50})
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">def objective(RGB):
+    R, G, B = RGB
+    Rp = Rresult.predict({'Rint': R, 'Gint': G, 'Bint': B})    
+    Gp = Gresult.predict({'Rint': R, 'Gint': G, 'Bint': B})
+    Bp = Bresult.predict({'Rint': R, 'Gint': G, 'Bint': B})
+    return (Rp - 10000)**2 + (Gp - 10000)**2 + (Bp - 10000)**2
+
+from scipy.optimize import minimize
+sol = minimize(objective, [50, 50, 50])
+sol    
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">R, G, B = sol.x.astype(int)
+R, G, B
+</pre>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">Rresult.get_prediction({'Rint': 41, 'Gint': G, 'Bint': B}).summary_frame()
+</pre>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">Gresult.get_prediction({'Rint': R, 'Gint': G, 'Bint': B}).summary_frame()
+</pre>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">Bresult.get_prediction({'Rint': R, 'Gint': G, 'Bint': B}).summary_frame()
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="date">Created: 2024-07-05 Fri 16:10</p>

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-04 Thu 19:16 -->
+<!-- 2024-07-05 Fri 16:10 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Reproducibility, significant differences and interactions in the SDL-Light</title>
@@ -200,18 +200,18 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org8b44166">1. Reproducibility</a>
+<li><a href="#org70129b7">1. Reproducibility</a>
 <ul>
-<li><a href="#org68f978a">1.1. A baseline</a></li>
-<li><a href="#org9334d30">1.2. Perturbations on R, G and B</a>
+<li><a href="#orgf26b388">1.1. A baseline</a></li>
+<li><a href="#org452a15d">1.2. Perturbations on R, G and B</a>
 <ul>
-<li><a href="#org266f0f6">1.2.1. R channel analysis</a></li>
-<li><a href="#org0afb8ab">1.2.2. G channel analysis</a></li>
-<li><a href="#org8c126dc">1.2.3. B channel analysis</a></li>
+<li><a href="#org276fb27">1.2.1. R channel analysis</a></li>
+<li><a href="#orgb773506">1.2.2. G channel analysis</a></li>
+<li><a href="#org0cd31e5">1.2.3. B channel analysis</a></li>
 </ul>
 </li>
-<li><a href="#orge251f8f">1.3. How linear is it?</a></li>
-<li><a href="#orgb720c79">1.4. What states are actually accessible</a></li>
+<li><a href="#orgb8feeac">1.3. How linear is it?</a></li>
+<li><a href="#org3b5cfc5">1.4. What states are actually accessible</a></li>
 </ul>
 </li>
 </ul>
@@ -236,15 +236,15 @@ def measure(R, G, B, label=None):
     return results['ch620'], results['ch510'], results['ch470']
 </pre>
 </div>
-<div id="outline-container-org8b44166" class="outline-2">
-<h2 id="org8b44166"><span class="section-number-2">1.</span> Reproducibility</h2>
+<div id="outline-container-org70129b7" class="outline-2">
+<h2 id="org70129b7"><span class="section-number-2">1.</span> Reproducibility</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 We have to evaluate how reproducible a measurement is, and whether it is impacted by how we measure it. 
 </p>
 </div>
-<div id="outline-container-org68f978a" class="outline-3">
-<h3 id="org68f978a"><span class="section-number-3">1.1.</span> A baseline</h3>
+<div id="outline-container-orgf26b388" class="outline-3">
+<h3 id="orgf26b388"><span class="section-number-3">1.1.</span> A baseline</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 We establish a base line here by making the same measurement 50 times. We have to assume that what we measure here will be similar at other values.
@@ -289,8 +289,8 @@ for i, c in enumerate(C):
 </div>
 </div>
 </div>
-<div id="outline-container-org9334d30" class="outline-3">
-<h3 id="org9334d30"><span class="section-number-3">1.2.</span> Perturbations on R, G and B</h3>
+<div id="outline-container-org452a15d" class="outline-3">
+<h3 id="org452a15d"><span class="section-number-3">1.2.</span> Perturbations on R, G and B</h3>
 <div class="outline-text-3" id="text-1-2">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">R = []
@@ -324,8 +324,8 @@ plt.plot(B - np.mean(B, axis=0), c='g');
 It is not obvious there is any drift here.
 </p>
 </div>
-<div id="outline-container-org266f0f6" class="outline-4">
-<h4 id="org266f0f6"><span class="section-number-4">1.2.1.</span> R channel analysis</h4>
+<div id="outline-container-org276fb27" class="outline-4">
+<h4 id="org276fb27"><span class="section-number-4">1.2.1.</span> R channel analysis</h4>
 <div class="outline-text-4" id="text-1-2-1">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">import matplotlib.pyplot as plt
@@ -362,8 +362,8 @@ For these measurements the difference in the red channel is unambigously real, a
 </p>
 </div>
 </div>
-<div id="outline-container-org0afb8ab" class="outline-4">
-<h4 id="org0afb8ab"><span class="section-number-4">1.2.2.</span> G channel analysis</h4>
+<div id="outline-container-orgb773506" class="outline-4">
+<h4 id="orgb773506"><span class="section-number-4">1.2.2.</span> G channel analysis</h4>
 <div class="outline-text-4" id="text-1-2-2">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
@@ -397,8 +397,8 @@ Here there is a meaningful difference in G and B, and no difference in R.
 </p>
 </div>
 </div>
-<div id="outline-container-org8c126dc" class="outline-4">
-<h4 id="org8c126dc"><span class="section-number-4">1.2.3.</span> B channel analysis</h4>
+<div id="outline-container-org0cd31e5" class="outline-4">
+<h4 id="org0cd31e5"><span class="section-number-4">1.2.3.</span> B channel analysis</h4>
 <div class="outline-text-4" id="text-1-2-3">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
@@ -434,8 +434,8 @@ Curiously,  there is a significant difference in R here, but not in B.
 </div>
 </div>
 </div>
-<div id="outline-container-orge251f8f" class="outline-3">
-<h3 id="orge251f8f"><span class="section-number-3">1.3.</span> How linear is it?</h3>
+<div id="outline-container-orgb8feeac" class="outline-3">
+<h3 id="orgb8feeac"><span class="section-number-3">1.3.</span> How linear is it?</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 Here we check the output of the measurements over a range of settings for each color channel. We expect that the main effect should be on the channel closest in color, and the other channels should be flat. If they are not flat, it means there is some interaction or cross-talk between the channels.
@@ -484,8 +484,8 @@ It is also evident the output is nonlinear at low settings.
 </p>
 </div>
 </div>
-<div id="outline-container-orgb720c79" class="outline-3">
-<h3 id="orgb720c79"><span class="section-number-3">1.4.</span> What states are actually accessible</h3>
+<div id="outline-container-org3b5cfc5" class="outline-3">
+<h3 id="org3b5cfc5"><span class="section-number-3">1.4.</span> What states are actually accessible</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 We are going to randomly sample three states on each channel. It is important to set a random seed here for reproducibility. To retrieve these results from the cache, you have to use the same seed, otherwise you will get new random numbers which will trigger new experiments.
@@ -518,7 +518,7 @@ This makes it more clear we cannot access all output state space because the inp
 </div>
 <div id="postamble" class="status">
 <p class="date">Date: 2024-07-04 Thu 00:00</p>
-<p class="date">Created: 2024-07-04 Thu 19:16</p>
+<p class="date">Created: 2024-07-05 Fri 16:10</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
