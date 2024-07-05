@@ -23,7 +23,7 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 13 - Controlling a remote instrument from an ELN - the SDL-light https://youtube.com/live/qbqxSKJ1F60
 - Video 14 - SDL-Light with a design of experiment approach https://youtube.com/live/g1DEVScu6NE
 - Video 15 - Reproducibility, significant differences and interactions in the SDL-Light https://youtube.com/live/BlUzXcyyYc0
-
+- Video 16 - ANOVA + DOE with the SDL-Light https://youtube.com/live/pGuolCOZ8HQ
 * pycse
 
 Python computations in science and engineering. [[./pycse/readme.org]]
@@ -63,7 +63,8 @@ Notes for setup:
 See [[./sdl-light/readme.org]]
 
 A DOE approach: [[./sdl-light/doe.org]]
-
+Reproducibility: [[./sdl-light/averages.org]] 
+DOE + statistical analysis: [[./sdl-light/anova.org]].
 
 ** TODO get SDL-Light instruments
 DEADLINE: <2024-07-01 Mon>
