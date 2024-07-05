@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-05 Fri 16:10 -->
+<!-- 2024-07-05 Fri 16:14 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>scimax-ELN for molecular simulation</title>
@@ -200,13 +200,13 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org0a99439">1. Work out how to run a bunch of volumes</a></li>
-<li><a href="#org2a544ce">2. automating the pipeline</a></li>
+<li><a href="#org7d98151">1. Work out how to run a bunch of volumes</a></li>
+<li><a href="#org42ccd83">2. automating the pipeline</a></li>
 </ul>
 </div>
 </div>
 
-<div id="orgbfeedb4" class="figure">
+<div id="orga9f1cf4" class="figure">
 <p><img src="./screenshots/date-11-06-2024-time-20-18-42.png" alt="date-11-06-2024-time-20-18-42.png" />
 </p>
 </div>
@@ -235,8 +235,8 @@ SqlCache.dump(atoms=atoms)
 </pre>
 </div>
 <ol class="org-ol">
-<li><a id="org300456c"></a><span class="todo TODO">TODO</span> extend SqlCache with custom serializing functions<br /></li>
-<li><a id="org929de30"></a>END<br />
+<li><a id="org14c7e3c"></a><span class="todo TODO">TODO</span> extend SqlCache with custom serializing functions<br /></li>
+<li><a id="org5973950"></a>END<br />
 <div class="outline-text-16" id="text-0-0-0-0-0-0-0-0-0-0-0-0-0-0-2">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">from pycse.hashcache import HashCache
@@ -252,8 +252,8 @@ HashCache.dump(atoms=atoms)
 </div>
 </li>
 </ol>
-<div id="outline-container-org0a99439" class="outline-2">
-<h2 id="org0a99439"><span class="section-number-2">1.</span> Work out how to run a bunch of volumes</h2>
+<div id="outline-container-org7d98151" class="outline-2">
+<h2 id="org7d98151"><span class="section-number-2">1.</span> Work out how to run a bunch of volumes</h2>
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">@HashCache
@@ -337,8 +337,8 @@ fig.show()
 </div>
 </div>
 <ol class="org-ol">
-<li><a id="org60a719a"></a><span class="todo TODO">TODO</span> look up if there is a way to reload the figure from the cache<br /></li>
-<li><a id="org135cfc9"></a>END<br />
+<li><a id="org0923665"></a><span class="todo TODO">TODO</span> look up if there is a way to reload the figure from the cache<br /></li>
+<li><a id="org4da8398"></a>END<br />
 <div class="outline-text-16" id="text-1-0-0-0-0-0-0-0-0-0-0-0-0-0-2">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">HashCache.dump(fig=plt.gcf())
@@ -353,7 +353,7 @@ d['fig'].savefig('test.png')
 </div>
 
 
-<div id="org0f38192" class="figure">
+<div id="org78ccdeb" class="figure">
 <p><img src="./test.png" alt="test.png" />
 </p>
 </div>
@@ -372,8 +372,8 @@ d['fig'].savefig('test.png')
 </li>
 </ol>
 </div>
-<div id="outline-container-org2a544ce" class="outline-2">
-<h2 id="org2a544ce"><span class="section-number-2">2.</span> automating the pipeline</h2>
+<div id="outline-container-org42ccd83" class="outline-2">
+<h2 id="org42ccd83"><span class="section-number-2">2.</span> automating the pipeline</h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">from pycse.hashcache import HashCache
@@ -477,7 +477,7 @@ table
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="org7c7cd49">from pycse.orgmode import Table
+<pre class="src src-jupyter-python" id="org6a90ccf">from pycse.orgmode import Table
 
 Table(table, headers=['symbol', 'V0', 'E0'],
       caption='Equation of state data',
@@ -485,7 +485,7 @@ Table(table, headers=['symbol', 'V0', 'E0'],
 </pre>
 </div>
 
-<table id="org51d608a" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table id="orged08318" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 <caption class="t-above"><span class="table-number">Table 1:</span> Equation of state data</caption>
 
 <colgroup>
@@ -523,7 +523,7 @@ Table(table, headers=['symbol', 'V0', 'E0'],
 </tbody>
 </table>
 
-<table id="org534a931" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table id="org515e096" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 <caption class="t-above"><span class="table-number">Table 2:</span> Equation of state data</caption>
 
 <colgroup>
@@ -564,7 +564,7 @@ Table(table, headers=['symbol', 'V0', 'E0'],
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2024-07-05 Fri 16:10</p>
+<p class="date">Created: 2024-07-05 Fri 16:14</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
