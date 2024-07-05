@@ -1,0 +1,354 @@
+#+title: ANOVA + DOE with the SDL-Light
+
+In [[./doe.org]] we introduced a design of experiment approach, and fitted a model to the results. We qualitatively examined the models via parity plots, but didn't do any kind of uncertainty analysis. Today we do some more quantitative analysis.
+
+* The Box Behnken design
+
+#+BEGIN_SRC jupyter-python
+from pyDOE3 import bbdesign
+import numpy as np
+import pandas as pd
+
+design = bbdesign(n=3)
+D = pd.DataFrame(design, columns=['Rc', 'Gc', 'Bc'])
+
+a, b = -1, 1
+Rmin, Rmax = 25, 75
+Gmin, Gmax = 25, 75
+Bmin, Bmax = 25, 75
+
+D['Rint'] = ((D['Rc'] - a) * (Rmax - Rmin) / (b - a) + Rmin).astype(int)
+D['Gint'] = ((D['Gc'] - a) * (Rmax - Rmin) / (b - a) + Gmin).astype(int)
+D['Bint'] = ((D['Bc'] - a) * (Rmax - Rmin) / (b - a) + Bmin).astype(int)
+
+from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
+
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
+
+from pycse.hashcache import HashCache
+
+@HashCache
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+
+def measure(R, G, B, label=None):
+    results = get_results(R, G, B, label)
+    return results['ch620'], results['ch510'], results['ch470']
+
+input = D[['Rint', 'Gint', 'Bint']].sample(frac=1)
+
+from tqdm import tqdm
+index = []
+output = []
+for i, RGB in tqdm(input.iterrows()):
+    result = measure(*RGB, f'jul-5-{i}')    
+    index += [i]
+    output += [result]
+
+output = pd.DataFrame(output, index=index)
+output
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: 15it [00:00, 1982.56it/s]
+|    |     0 |     1 |     2 |
+|----+-------+-------+-------|
+| 13 | 12741 |  8837 | 12747 |
+|  4 |  4924 |  8458 |  7473 |
+| 12 | 12746 |  8834 | 12739 |
+|  8 | 12758 |  3606 |  5578 |
+| 11 | 13077 | 14157 | 20012 |
+| 10 | 13040 |  4300 | 16153 |
+|  5 | 20611 |  8655 |  7625 |
+|  3 | 20572 | 13877 | 14775 |
+|  1 | 20797 |  4094 | 10946 |
+|  9 | 12792 | 13523 |  9525 |
+|  2 |  5256 | 13774 | 14735 |
+|  6 |  5357 |  9137 | 18064 |
+| 14 | 12742 |  8832 | 12743 |
+|  0 |  5020 |  3806 | 10781 |
+|  7 | 20768 |  9329 | 18122 |
+:END:
+
+** Fitting models
+
+We have to create a DataFrame to make it easy to use statsmodels.
+
+#+BEGIN_SRC jupyter-python
+import pandas as pd
+
+data = pd.concat([input, output], axis=1)
+data = data.rename(columns={0: 'Rout', 1: 'Gout', 2: 'Bout'})
+data
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|    | Rint | Gint | Bint |  Rout |  Gout |  Bout |
+|----+------+------+------+-------+-------+-------|
+| 13 |   50 |   50 |   50 | 12741 |  8837 | 12747 |
+|  4 |   25 |   50 |   25 |  4924 |  8458 |  7473 |
+| 12 |   50 |   50 |   50 | 12746 |  8834 | 12739 |
+|  8 |   50 |   25 |   25 | 12758 |  3606 |  5578 |
+| 11 |   50 |   75 |   75 | 13077 | 14157 | 20012 |
+| 10 |   50 |   25 |   75 | 13040 |  4300 | 16153 |
+|  5 |   75 |   50 |   25 | 20611 |  8655 |  7625 |
+|  3 |   75 |   75 |   50 | 20572 | 13877 | 14775 |
+|  1 |   75 |   25 |   50 | 20797 |  4094 | 10946 |
+|  9 |   50 |   75 |   25 | 12792 | 13523 |  9525 |
+|  2 |   25 |   75 |   50 |  5256 | 13774 | 14735 |
+|  6 |   25 |   50 |   75 |  5357 |  9137 | 18064 |
+| 14 |   50 |   50 |   50 | 12742 |  8832 | 12743 |
+|  0 |   25 |   25 |   50 |  5020 |  3806 | 10781 |
+|  7 |   75 |   50 |   75 | 20768 |  9329 | 18122 |
+:END:
+
+
+#+BEGIN_SRC jupyter-python  
+import statsmodels.formula.api as smf
+
+Rmod = smf.ols(formula='Rout ~ Rint + Bint + Gint + Rint*Bint + Rint*Gint + Bint*Gint + I(Rint**2) + I(Bint**2) + I(Gint**2)',
+               data=data)
+Rresult = Rmod.fit()
+Rresult.summary()
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: /Users/jkitchin/anaconda3/lib/python3.11/site-packages/scipy/stats/_stats_py.py:1806: UserWarning: kurtosistest only valid for n>=20 ... continuing anyway, n=15
+:   warnings.warn("kurtosistest only valid for n>=20 ... continuing "
+| Dep. Variable:    | Rout             | R-squared:          |     1.000 |
+| Model:            | OLS              | Adj. R-squared:     |     1.000 |
+| Method:           | Least Squares    | F-statistic:        | 5.040e+05 |
+| Date:             | Fri, 05 Jul 2024 | Prob (F-statistic): |  2.38e-14 |
+| Time:             | 11:58:08         | Log-Likelihood:     |   -48.066 |
+| No. Observations: | 15               | AIC:                |     116.1 |
+| Df Residuals:     | 5                | BIC:                |     123.2 |
+| Df Model:         | 9                |                     |           |
+| Covariance Type:  | nonrobust        |                     |           |
+#+caption: OLS Regression Results
+
+|              |       coef | std err |       t |    P> |         t |           | [0.025 | 0.975] |
+| Intercept    | -2820.5000 |  51.463 | -54.806 | 0.000 | -2952.791 | -2688.209 |        |        |
+| Rint         |   312.3750 |   1.050 | 297.561 | 0.000 |   309.676 |   315.074 |        |        |
+| Bint         |    -2.9550 |   1.050 |  -2.815 | 0.037 |    -5.654 |    -0.256 |        |        |
+| Gint         |    -4.0300 |   1.050 |  -3.839 | 0.012 |    -6.729 |    -1.331 |        |        |
+| Rint:Bint    |    -0.1104 |   0.008 | -13.363 | 0.000 |    -0.132 |    -0.089 |        |        |
+| Rint:Gint    |    -0.1844 |   0.008 | -22.320 | 0.000 |    -0.206 |    -0.163 |        |        |
+| Bint:Gint    |     0.0012 |   0.008 |   0.145 | 0.890 |    -0.020 |     0.022 |        |        |
+| I(Rint ** 2) |     0.1332 |   0.009 |  15.490 | 0.000 |     0.111 |     0.155 |        |        |
+| I(Bint ** 2) |     0.1420 |   0.009 |  16.513 | 0.000 |     0.120 |     0.164 |        |        |
+| I(Gint ** 2) |     0.1360 |   0.009 |  15.816 | 0.000 |     0.114 |     0.158 |        |        |
+
+| Omnibus:       | 0.774 | Durbin-Watson:    |    2.339 |
+| Prob(Omnibus): | 0.679 | Jarque-Bera (JB): |    0.638 |
+| Skew:          | 0.006 | Prob(JB):         |    0.727 |
+| Kurtosis:      | 1.990 | Cond. No.         | 1.36e+05 |
+
+\\
+\\
+Notes:\\
+[1] Standard Errors assume that the covariance matrix of the errors is
+correctly specified.\\
+[2] The condition number is large, 1.36e+05. This might indicate that
+there are\\
+strong multicollinearity or other numerical problems.
+:END:
+
+
+
+#+BEGIN_SRC jupyter-python  
+Rresult.get_prediction({'Rint': 40, 'Bint': 0, 'Gint': 0}).summary_frame()
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|   |    mean |   mean_se | mean_ci_lower | mean_ci_upper | obs_ci_lower | obs_ci_upper |
+|---+---------+-----------+---------------+---------------+--------------+--------------|
+| 0 | 9887.62 | 36.287745 |   9794.339382 |   9980.900618 |  9790.635438 |  9984.604562 |
+:END:
+
+#+BEGIN_SRC jupyter-python
+Bmod = smf.ols(formula='Bout ~ Rint + Bint + Gint + Rint*Bint + Rint*Gint + Bint*Gint + I(Rint**2) + I(Bint**2) + I(Gint**2)',
+              data=data)
+Bresult = Bmod.fit()
+Bresult.summary()
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: /Users/jkitchin/anaconda3/lib/python3.11/site-packages/scipy/stats/_stats_py.py:1806: UserWarning: kurtosistest only valid for n>=20 ... continuing anyway, n=15
+:   warnings.warn("kurtosistest only valid for n>=20 ... continuing "
+| Dep. Variable:    | Bout             | R-squared:          |     1.000 |
+| Model:            | OLS              | Adj. R-squared:     |     1.000 |
+| Method:           | Least Squares    | F-statistic:        | 7.552e+05 |
+| Date:             | Fri, 05 Jul 2024 | Prob (F-statistic): |  8.65e-15 |
+| Time:             | 11:40:25         | Log-Likelihood:     |   -40.157 |
+| No. Observations: | 15               | AIC:                |     100.3 |
+| Df Residuals:     | 5                | BIC:                |     107.4 |
+| Df Model:         | 9                |                     |           |
+| Covariance Type:  | nonrobust        |                     |           |
+#+caption: OLS Regression Results
+
+|              |       coef | std err |       t |    P> |         t |           | [0.025 | 0.975] |
+| Intercept    | -1666.0000 |  30.374 | -54.850 | 0.000 | -1744.078 | -1587.922 |        |        |
+| Rint         |     0.8350 |   0.620 |   1.348 | 0.236 |    -0.758 |     2.428 |        |        |
+| Bint         |   207.5300 |   0.620 | 334.951 | 0.000 |   205.937 |   209.123 |        |        |
+| Gint         |    77.2250 |   0.620 | 124.640 | 0.000 |    75.632 |    78.818 |        |        |
+| Rint:Bint    |    -0.0376 |   0.005 |  -7.711 | 0.001 |    -0.050 |    -0.025 |        |        |
+| Rint:Gint    |    -0.0500 |   0.005 | -10.254 | 0.000 |    -0.063 |    -0.037 |        |        |
+| Bint:Gint    |    -0.0352 |   0.005 |  -7.219 | 0.001 |    -0.048 |    -0.023 |        |        |
+| I(Rint ** 2) |     0.0562 |   0.005 |  11.074 | 0.000 |     0.043 |     0.069 |        |        |
+| I(Bint ** 2) |     0.0686 |   0.005 |  13.517 | 0.000 |     0.056 |     0.082 |        |        |
+| I(Gint ** 2) |     0.0498 |   0.005 |   9.812 | 0.000 |     0.037 |     0.063 |        |        |
+
+| Omnibus:       |  1.543 | Durbin-Watson:    |    1.556 |
+| Prob(Omnibus): |  0.462 | Jarque-Bera (JB): |    0.846 |
+| Skew:          | -0.000 | Prob(JB):         |    0.655 |
+| Kurtosis:      |  1.836 | Cond. No.         | 1.36e+05 |
+
+\\
+\\
+Notes:\\
+[1] Standard Errors assume that the covariance matrix of the errors is
+correctly specified.\\
+[2] The condition number is large, 1.36e+05. This might indicate that
+there are\\
+strong multicollinearity or other numerical problems.
+:END:
+
+
+#+BEGIN_SRC jupyter-python
+Gmod = smf.ols(formula='Gout ~ Rint + Bint + Gint + Rint*Bint + Rint*Gint + Bint*Gint + I(Rint**2) + I(Bint**2) + I(Gint**2)',
+              data=data)
+Gresult = Gmod.fit()
+Gresult.summary()
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: /Users/jkitchin/anaconda3/lib/python3.11/site-packages/scipy/stats/_stats_py.py:1806: UserWarning: kurtosistest only valid for n>=20 ... continuing anyway, n=15
+:   warnings.warn("kurtosistest only valid for n>=20 ... continuing "
+| Dep. Variable:    | Gout             | R-squared:          | 1.000     |
+| Model:            | OLS              | Adj. R-squared:     | 1.000     |
+| Method:           | Least Squares    | F-statistic:        | 6.927e+05 |
+| Date:             | Fri, 05 Jul 2024 | Prob (F-statistic): | 1.07e-14  |
+| Time:             | 12:07:26         | Log-Likelihood:     | -38.915   |
+| No. Observations: | 15               | AIC:                | 97.83     |
+| Df Residuals:     | 5                | BIC:                | 104.9     |
+| Df Model:         | 9                |                     |           |
+| Covariance Type:  | nonrobust        |                     |           |
+#+caption: OLS Regression Results
+
+|              | coef       | std err | t       | P>|t| | [0.025    | 0.975]    |
+| Intercept    | -1810.1667 | 27.961  | -64.738 | 0.000 | -1882.044 | -1738.290 |
+| Rint         | 3.5667     | 0.570   | 6.253   | 0.002 | 2.100     | 5.033     |
+| Bint         | 9.1717     | 0.570   | 16.080  | 0.000 | 7.705     | 10.638    |
+| Gint         | 198.1117   | 0.570   | 347.336 | 0.000 | 196.645   | 199.578   |
+| Rint:Bint    | -0.0020    | 0.004   | -0.446  | 0.675 | -0.014    | 0.010     |
+| Rint:Gint    | -0.0740    | 0.004   | -16.485 | 0.000 | -0.086    | -0.062    |
+| Bint:Gint    | -0.0240    | 0.004   | -5.347  | 0.003 | -0.036    | -0.012    |
+| I(Rint ** 2) | 0.0413     | 0.005   | 8.847   | 0.000 | 0.029     | 0.053     |
+| I(Bint ** 2) | 0.0553     | 0.005   | 11.843  | 0.000 | 0.043     | 0.067     |
+| I(Gint ** 2) | 0.0441     | 0.005   | 9.446   | 0.000 | 0.032     | 0.056     |
+
+| Omnibus:       | 0.628 | Durbin-Watson:    | 1.921    |
+| Prob(Omnibus): | 0.731 | Jarque-Bera (JB): | 0.588    |
+| Skew:          | 0.012 | Prob(JB):         | 0.745    |
+| Kurtosis:      | 2.030 | Cond. No.         | 1.36e+05 |
+
+\\
+\\
+Notes:\\
+[1] Standard Errors assume that the covariance matrix of the errors is
+correctly specified.\\
+[2] The condition number is large, 1.36e+05. This might indicate that
+there are\\
+strong multicollinearity or other numerical problems.
+:END:
+
+
+
+#+BEGIN_SRC jupyter-python
+Gresult.predict({'Rint': 40, 'Bint': 0, 'Gint': 50})
+#+END_SRC
+
+#+RESULTS:
+: 0    8266.55
+: dtype: float64
+
+#+BEGIN_SRC jupyter-python
+def objective(RGB):
+    R, G, B = RGB
+    Rp = Rresult.predict({'Rint': R, 'Gint': G, 'Bint': B})    
+    Gp = Gresult.predict({'Rint': R, 'Gint': G, 'Bint': B})
+    Bp = Bresult.predict({'Rint': R, 'Gint': G, 'Bint': B})
+    return (Rp - 10000)**2 + (Gp - 10000)**2 + (Bp - 10000)**2
+
+from scipy.optimize import minimize
+sol = minimize(objective, [50, 50, 50])
+sol    
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  message: Optimization terminated successfully.
+  success: True
+   status: 0
+      fun: 8.56339565658717e-12
+        x: [ 4.131e+01  5.700e+01  3.436e+01]
+      nit: 9
+      jac: [ 9.225e-07  2.862e-06  9.022e-07]
+ hess_inv: [[ 5.233e-06 -2.001e-07 -4.279e-08]
+            [-2.001e-07  1.318e-05 -5.716e-06]
+            [-4.279e-08 -5.716e-06  1.392e-05]]
+     nfev: 56
+     njev: 14
+#+end_example
+
+#+BEGIN_SRC jupyter-python  
+R, G, B = sol.x.astype(int)
+R, G, B
+#+END_SRC
+
+#+RESULTS:
+| 41 | 57 | 34 |
+
+
+#+BEGIN_SRC jupyter-python  
+Rresult.get_prediction({'Rint': 41, 'Gint': G, 'Bint': B}).summary_frame()
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|   |      mean |  mean_se | mean_ci_lower | mean_ci_upper | obs_ci_lower | obs_ci_upper |
+|---+-----------+----------+---------------+---------------+--------------+--------------|
+| 0 | 9904.1054 | 5.504779 |   9889.954915 |   9918.255885 |  9874.022717 |  9934.188083 |
+:END:
+
+
+#+BEGIN_SRC jupyter-python  
+Gresult.get_prediction({'Rint': R, 'Gint': G, 'Bint': B}).summary_frame()
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|   |      mean |  mean_se | mean_ci_lower | mean_ci_upper | obs_ci_lower | obs_ci_upper |
+|---+-----------+----------+---------------+---------------+--------------+--------------|
+| 0 | 9994.8662 | 2.990886 |   9987.177884 |  10002.554516 |  9978.521518 | 10011.210882 |
+:END:
+
+
+#+BEGIN_SRC jupyter-python  
+Bresult.get_prediction({'Rint': R, 'Gint': G, 'Bint': B}).summary_frame()
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|   |     mean |  mean_se | mean_ci_lower | mean_ci_upper | obs_ci_lower | obs_ci_upper |
+|---+----------+----------+---------------+---------------+--------------+--------------|
+| 0 | 9924.172 | 3.248919 |   9915.820388 |   9932.523612 |   9906.41721 |   9941.92679 |
+:END:
+
