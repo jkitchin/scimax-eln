@@ -24,6 +24,8 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 14 - SDL-Light with a design of experiment approach https://youtube.com/live/g1DEVScu6NE
 - Video 15 - Reproducibility, significant differences and interactions in the SDL-Light https://youtube.com/live/BlUzXcyyYc0
 - Video 16 - ANOVA + DOE with the SDL-Light https://youtube.com/live/pGuolCOZ8HQ
+- Video 17 - Active learning and surrogates - take 1 https://youtube.com/live/mgxSuNgQmNQ
+
 * pycse
 
 Python computations in science and engineering. [[./pycse/readme.org]]
@@ -65,6 +67,7 @@ See [[./sdl-light/readme.org]]
 A DOE approach: [[./sdl-light/doe.org]]
 Reproducibility: [[./sdl-light/averages.org]] 
 DOE + statistical analysis: [[./sdl-light/anova.org]].
+Surrogates and active learning - take 1 [[./sdl-light/surrogate.org]]
 
 ** TODO get SDL-Light instruments
 DEADLINE: <2024-07-01 Mon>
