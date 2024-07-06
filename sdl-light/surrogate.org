@@ -1,0 +1,338 @@
+#+title: DOE vs active learning and surrogate models of the SDL-Light
+
+* Introduction
+
+One of the reasons we use design of experiments is to fit a surrogate model. That model may be a linear, polynomial surface model, or it could be a physics-based model. Either way, you need at least as many experiments as parameters before you can fit anything. In the case of a second-order surface response with 3 components, you have at least 10 parameters to fit, so you have to run those experiments before you can even start.
+
+If you use an ML model instead, you can employ active learning which may result in a solution with fewer experiments. This is not guaranteed though and it depends on the nature of the model you choose.
+
+As before, we start by setting up the measurement code.
+
+#+BEGIN_SRC jupyter-python 
+import numpy as np
+import matplotlib.pyplot as plt
+from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
+
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
+
+from pycse.hashcache import HashCache
+
+@HashCache
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+#+END_SRC
+
+#+RESULTS:
+
+** Optimization with a surrogate model
+
+I create a custom estimator for linear regression with uncertainty quantification here. I use the features I wrote in ~pycse~ for this, most notably the regress and predict functions. Then I make a Pipeline that generates the quadratic polynomial surface features and regresses them.
+
+#+BEGIN_SRC jupyter-python 
+from pycse import regress
+from pycse import predict as _predict
+from sklearn.base import BaseEstimator, RegressorMixin
+
+class LR(BaseEstimator, RegressorMixin):
+
+    def fit(self, X, y):
+        self.xtrain = np.array(X)
+        self.ytrain = np.array(y)
+        self.coefs_, _, _ = regress(X, y, rcond=None)
+        return self
+
+    def predict(self, X, return_std=False):
+        y, _, se = _predict(self.xtrain, self.ytrain, self.coefs_, X)
+        if return_std:
+            return y, se
+        else:
+            return y
+
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import Pipeline
+
+model = Pipeline([('poly', PolynomialFeatures()),
+                  ('LR', LR())])
+#+END_SRC
+
+#+RESULTS:
+
+This is the most important block. Here I introduce a new concept called the ~Surrogate~ decorator. This decorator wraps the function with a surrogate model. When you call the function the wrapper tries to use the surrogate. If the surrogate is not accurate enough then the true function is used and the surrogate is retrained.
+
+#+BEGIN_SRC jupyter-python
+from pycse.pyroxy import Surrogate
+from tqdm import tqdm
+
+@Surrogate(model=model, tol=100) 
+def measure(RGB, label=None):
+    results = []
+    for rgb in tqdm(RGB):
+        result = get_results(*rgb, label)
+        results += [[result['ch620'], result['ch510'], result['ch470']]]
+    return np.array(results)
+#+END_SRC
+
+#+RESULTS:
+
+The surrogate we have defined needs a minimal amount of data to get started. You probably should have at least as many data points as parameters to start with plus some or you may get division by zero errors with degrees of freedom, or poorly conditioned Hessians. I initialize it here.
+
+#+BEGIN_SRC jupyter-python  
+import numpy as np
+np.random.seed(42)
+
+r = measure(np.random.randint(25, 75, (12, 3)))
+#+END_SRC
+
+#+RESULTS:
+: 100% 12/12 [00:22<00:00,  1.88s/it]
+
+Once we have initialized the model, we can try an optimization. 
+
+I found it helpful to put bounds in to avoid going out of bounds. I think because I use integer inputs, it was also necessary to use Nelder-Mead.
+
+#+BEGIN_SRC jupyter-python
+def objective(RGB):
+    RGB = np.array(RGB)
+    res = measure(np.atleast_2d(RGB.astype(int)))
+    return np.sum(np.abs(res - 10000))
+
+from scipy.optimize import minimize
+
+sol = minimize(objective, np.array([55, 45, 45]),
+               bounds=[[25, 75],
+                       [25, 75],
+                       [25, 75]],
+               method='Nelder-mead')
+
+print(sol)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+100% 1/1 [00:07<00:00,  7.01s/it]
+100% 1/1 [00:07<00:00,  7.01s/it]
+100% 1/1 [00:06<00:00,  6.93s/it]
+100% 1/1 [00:07<00:00,  7.05s/it]
+100% 1/1 [00:07<00:00,  7.01s/it]
+100% 1/1 [00:06<00:00,  6.96s/it]
+100% 1/1 [00:06<00:00,  6.97s/it]
+100% 1/1 [00:07<00:00,  7.06s/it]       message: Optimization terminated successfully.
+       success: True
+        status: 0
+           fun: 151.46993939409913
+             x: [ 4.330e+01  5.961e+01  3.584e+01]
+           nit: 40
+          nfev: 117
+ final_simplex: (array([[ 4.330e+01,  5.961e+01,  3.584e+01],
+                       [ 4.330e+01,  5.961e+01,  3.584e+01],
+                       [ 4.330e+01,  5.961e+01,  3.584e+01],
+                       [ 4.330e+01,  5.961e+01,  3.584e+01]]), array([ 1.515e+02,  1.515e+02,  1.515e+02,  1.515e+02]))
+
+#+end_example
+
+#+BEGIN_SRC jupyter-python
+sol.x.astype(int)
+#+END_SRC
+
+#+RESULTS:
+: array([43, 59, 35])
+
+#+BEGIN_SRC jupyter-python
+print(measure([sol.x.astype(int)]))
+#+END_SRC
+
+#+RESULTS:
+: [[9901.20839615 9968.6118412  9978.70982325]]
+
+
+#+BEGIN_SRC jupyter-python
+print(model.predict([sol.x.astype(int)], return_std=True))
+#+END_SRC
+
+#+RESULTS:
+: (array([[9901.20839615, 9968.6118412 , 9978.70982325]]), array([[57.60481297, 39.46767027, 30.01064046]]))
+
+
+#+BEGIN_SRC jupyter-python
+print(measure)
+#+END_SRC
+
+#+RESULTS:
+: 20 data points obtained.
+:         The model was fitted 9 times.
+:         The surrogate was successful 110 times.
+
+#+BEGIN_SRC jupyter-python
+measure.plot();
+#+END_SRC
+
+#+RESULTS:
+[[./.ob-jupyter/27aee75cb46b36bd509cc5c1909ec9a3abdfc599.png]]
+
+
+
+
+
+
+* An actively learned Gaussian process surrogate
+
+#+BEGIN_SRC jupyter-python :restart
+import numpy as np
+import matplotlib.pyplot as plt
+from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
+
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
+
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+#+END_SRC
+
+#+RESULTS:
+
+I use a linear kernel here, because I know the output is practically linear in the inputs and we add a WhiteKernel to account for noise we know is present. This choice is probably important; I am injecting knowledge into the model.
+
+#+BEGIN_SRC jupyter-python
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel
+
+kernel = DotProduct() + WhiteKernel(noise_level_bounds=(5, 20))
+gpr = GaussianProcessRegressor(kernel=kernel, random_state=0)
+
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import Pipeline
+
+model = Pipeline([('poly', PolynomialFeatures()),
+                  ('gpr', gpr)])
+
+from tqdm import tqdm
+from pycse.pyroxy import Surrogate
+
+@Surrogate(model=model, tol=50, verbose=True)
+def measure(RGB, label=None):
+    results = []
+    for rgb in tqdm(RGB):
+        result = get_results(*rgb, label)
+        results += [[ result['ch620'], result['ch510'], result['ch470']]]
+    return np.array(results)
+#+END_SRC
+
+#+RESULTS:
+
+I think it is a good idea to initialize the model. Here we look at 4 points that span the space. It is not comprehensive, just enough to get some points.
+
+#+BEGIN_SRC jupyter-python
+measure([[25, 25, 25],
+         [75, 75, 75],
+         [25, 75, 75],
+         [75, 75, 25],
+         [75, 25, 75]])
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: Running [[25, 25, 25], [75, 75, 75], [25, 75, 75], [75, 75, 25], [75, 25, 75]] to initialize the model.
+: 100% 5/5 [00:36<00:00,  7.33s/it]
+: /Users/jkitchin/anaconda3/lib/python3.11/site-packages/sklearn/gaussian_process/kernels.py:429: ConvergenceWarning: The optimal value found for dimension 0 of parameter k2__noise_level is close to the specified upper bound 20. Increasing the bound and calling fit again may find a better value.
+:   warnings.warn(
+: array([[ 4161,  3020,  5150],
+:        [19918, 13708, 19655],
+:        [ 4824, 13640, 19672],
+:        [19753, 13065,  9199],
+:        [20189,  3997, 15920]])
+:END:
+
+We define an objective.
+
+#+BEGIN_SRC jupyter-python
+def objective(RGB):
+    RGB = np.array(RGB).astype(int)
+    result = measure(np.atleast_2d(RGB))
+    return np.sum(np.abs(result - [10000, 10000, 10000]))
+#+END_SRC
+
+#+RESULTS:
+
+
+
+
+We try the ~brute~ global optimization algorithm here. I suppress warnings because I don't want to see the GPR fitting warnings on every iteration.
+
+#+BEGIN_SRC jupyter-python
+import warnings
+warnings.filterwarnings("ignore")
+np.random.seed(42)
+
+from scipy.optimize import brute
+
+sol = brute(objective, 
+            ranges=[[25, 75],
+                    [25, 75],
+                    [25, 75]])
+
+print(sol)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+For [[25 25 30]] -> [[4224.44969063 3083.23200727 5687.61229574]] err=[[53.49930477 53.49930477 53.49930477]] is greater than 50, running true function and returning function values and retraining
+100% 1/1 [00:06<00:00,  7.00s/it]
+For [[25 25 48]] -> [[ 4695.28931145  3642.85292931 12797.65386958]] err=[[51.58648109 51.58648109 51.58648109]] is greater than 50, running true function and returning function values and retraining
+100% 1/1 [00:06<00:00,  6.96s/it]
+For [[25 30 59]] -> [[ 4504.52521531  4183.59101667 13606.34120946]] err=[[51.3111157 51.3111157 51.3111157]] is greater than 50, running true function and returning function values and retraining
+100% 1/1 [00:07<00:00,  7.07s/it]
+For [[25 43 25]] -> [[4264.98615481 3438.6430885  9758.68950428]] err=[[54.05131403 54.05131403 54.05131403]] is greater than 50, running true function and returning function values and retraining
+100% 1/1 [00:06<00:00,  6.99s/it]
+For [[75 25 25]] -> [[18671.33407277 -4378.48640721  -261.91359169]] err=[[52.51911997 52.51911997 52.51911997]] is greater than 50, running true function and returning function values and retraining
+100% 1/1 [00:06<00:00,  6.99s/it][49.92187218 60.20257168 40.2541643 ]
+
+#+end_example
+
+#+BEGIN_SRC jupyter-python
+measure([sol.astype(int)])
+#+END_SRC
+
+#+RESULTS:
+: array([[ 9862.0107999 ,  9900.52363676, 10027.68428239]])
+
+#+BEGIN_SRC jupyter-python
+model.predict([sol.astype(int)], return_std=True)
+#+END_SRC
+
+#+RESULTS:
+| array | (((9862.0107999 9900.52363676 10027.68428239))) | array | (((10.15916065 10.15916065 10.15916065))) |
+
+The true values here are not close to the Surrogate; the surrogate seems over-confident. There is not currently a way to change that.
+
+*************** TODO add way to update surrogate when you find it is over-confident
+probably also should add some random checks with true functions.
+*************** END
+
+#+BEGIN_SRC jupyter-python
+measure.func([sol.astype(int)])
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: 100% 1/1 [00:07<00:00,  7.07s/it]
+: array([[11902, 10295, 11158]])
+:END:
+
+#+BEGIN_SRC jupyter-python  
+measure.plot();
+#+END_SRC
+
+#+RESULTS:
+[[./.ob-jupyter/a1386f6efb5b7d62c1a7973441c976e2b327b650.png]]
+
+#+BEGIN_SRC jupyter-python
+print(measure)
+#+END_SRC
+
+#+RESULTS:
+: 10 data points obtained.
+:         The model was fitted 6 times.
+:         The surrogate was successful 8083 times.
+
+
