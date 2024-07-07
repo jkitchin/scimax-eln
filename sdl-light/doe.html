@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-05 Fri 16:14 -->
+<!-- 2024-07-07 Sun 18:42 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>SDL-Light with a design of experiment approach</title>
@@ -232,14 +232,14 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgd51adf4">1. A design of experiment</a></li>
-<li><a href="#orgcd1620d">2. Run the experiments</a></li>
-<li><a href="#orgb1b062f">3. A simple linear model</a></li>
+<li><a href="#org7730629">1. A design of experiment</a></li>
+<li><a href="#org665f32c">2. Run the experiments</a></li>
+<li><a href="#orgbef2af4">3. A simple linear model</a></li>
 </ul>
 </div>
 </div>
 
-<div id="orgcfc3c63" class="figure">
+<div id="org14ebcc0" class="figure">
 <p><img src="./screenshots/date-03-07-2024-time-14-19-43.png" alt="date-03-07-2024-time-14-19-43.png" />
 </p>
 </div>
@@ -253,8 +253,8 @@ There are three "knobs" you can vary in the SDL-Light demo: the R, G and B inten
 <p>
 We previously saw that at least the blue channel is slightly nonlinear in the B setting, and we can assume that is true here too. Rather than randomly sample the RGB space, we will use a design of experiment (DOE) approach.
 </p>
-<div id="outline-container-orgd51adf4" class="outline-2">
-<h2 id="orgd51adf4"><span class="section-number-2">1.</span> A design of experiment</h2>
+<div id="outline-container-org7730629" class="outline-2">
+<h2 id="org7730629"><span class="section-number-2">1.</span> A design of experiment</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 We will use <a href="https://pydoe3.readthedocs.io/en/latest/">https://pydoe3.readthedocs.io/en/latest/</a> to set up our DOE.
@@ -325,8 +325,8 @@ Test that it works.
 </div>
 </div>
 </div>
-<div id="outline-container-orgcd1620d" class="outline-2">
-<h2 id="orgcd1620d"><span class="section-number-2">2.</span> Run the experiments</h2>
+<div id="outline-container-org665f32c" class="outline-2">
+<h2 id="org665f32c"><span class="section-number-2">2.</span> Run the experiments</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 We should run the experiments in a randomized order. This is important to remove run-order artifacts. For example, suppose the output of the LED is sensitive to temperature, and the LED heats up during the experiment. That would result in a systematic increase in temperature over the runs. By randomizing the run order, this still happens, but the effect is not systematic in the order of the experiments, it is randomized.
@@ -367,8 +367,8 @@ We should explore the data a little. First we look at the replicates. Since we s
 </div>
 </div>
 </div>
-<div id="outline-container-orgb1b062f" class="outline-2">
-<h2 id="orgb1b062f"><span class="section-number-2">3.</span> A simple linear model</h2>
+<div id="outline-container-orgbef2af4" class="outline-2">
+<h2 id="orgbef2af4"><span class="section-number-2">3.</span> A simple linear model</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Now we need to build a model. A simple model is \(out = in @ pars\), in other words, a simple linear model.
@@ -521,7 +521,7 @@ Overall, this is a pretty bare-bones DOE approach. One should do a whole analysi
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2024-07-05 Fri 16:14</p>
+<p class="date">Created: 2024-07-07 Sun 18:42</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

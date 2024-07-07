@@ -6,7 +6,7 @@
 <!-- 2024-07-07 Sun 18:42 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>&lrm;</title>
+<title>DOE vs active learning and surrogate models of the SDL-Light</title>
 <meta name="generator" content="Org Mode" />
 <style type="text/css">
   #content { max-width: 60em; margin: auto; }
@@ -195,183 +195,306 @@
 </head>
 <body>
 <div id="content" class="content">
+<h1 class="title">DOE vs active learning and surrogate models of the SDL-Light</h1>
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org01ee7a8">1. hashcache</a>
+<li><a href="#org1a5d79e">1. Introduction</a>
 <ul>
-<li><a href="#org227448d">1.1. run as python in org-mode</a></li>
-<li><a href="#org5022257">1.2. from a python file</a></li>
-<li><a href="#orgc8da71b">1.3. serializing data with json</a></li>
+<li><a href="#org94c1a38">1.1. Optimization with a surrogate model</a></li>
 </ul>
 </li>
+<li><a href="#org042f354">2. An actively learned Gaussian process surrogate</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org01ee7a8" class="outline-2">
-<h2 id="org01ee7a8"><span class="section-number-2">1.</span> hashcache</h2>
+<div id="outline-container-org1a5d79e" class="outline-2">
+<h2 id="org1a5d79e"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
-
-<div id="orgec83259" class="figure">
-<p><img src="./screenshots/date-16-06-2024-time-08-59-47.png" alt="date-16-06-2024-time-08-59-47.png" />
+<p>
+One of the reasons we use design of experiments is to fit a surrogate model. That model may be a linear, polynomial surface model, or it could be a physics-based model. Either way, you need at least as many experiments as parameters before you can fit anything. In the case of a second-order surface response with 3 components, you have at least 10 parameters to fit, so you have to run those experiments before you can even start.
 </p>
-</div>
 
-<div class="org-src-container">
-<pre class="src src-jupyter-python">from pycse.hashcache import hashcache
-import nava
+<p>
+If you use an ML model instead, you can employ active learning which may result in a solution with fewer experiments. This is not guaranteed though and it depends on the nature of the model you choose.
+</p>
 
-@hashcache(verbose=True)
-def f(a, b=1):
-    nava.play('../../../../cash-register-fake-88639.mp3')
-    return (a, b)
-
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">f(1)
-</pre>
-</div>
-
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">f(b=1, a=10)
-</pre>
-</div>
-
-
+<p>
+As before, we start by setting up the measurement code.
+</p>
 
 <div class="org-src-container">
 <pre class="src src-jupyter-python">import numpy as np
-f(np.linspace(0, 1, 5))
-</pre>
-</div>
+import matplotlib.pyplot as plt
+from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
 
-<div class="org-src-container">
-<pre class="src src-jupyter-python">from ase.build import bulk
-a = bulk('Cu')
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
 
-f(a)
-</pre>
-</div>
+from pycse.hashcache import HashCache
 
-<div class="org-src-container">
-<pre class="src src-jupyter-python">import glob
-import joblib
-for _f in glob.glob('cache/**/*'):
-    data = joblib.load(_f)
-#    if data['standardized-kwargs'].get('a') == 10:
-#        print(data)
-    print(data)
+@HashCache
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
 </pre>
 </div>
 </div>
-<div id="outline-container-org227448d" class="outline-3">
-<h3 id="org227448d"><span class="section-number-3">1.1.</span> run as python in org-mode</h3>
+<div id="outline-container-org94c1a38" class="outline-3">
+<h3 id="org94c1a38"><span class="section-number-3">1.1.</span> Optimization with a surrogate model</h3>
 <div class="outline-text-3" id="text-1-1">
+<p>
+I create a custom estimator for linear regression with uncertainty quantification here. I use the features I wrote in <code>pycse</code> for this, most notably the regress and predict functions. Then I make a Pipeline that generates the quadratic polynomial surface features and regresses them.
+</p>
+
 <div class="org-src-container">
-<pre class="src src-python">from pycse.hashcache import hashcache
-import nava
+<pre class="src src-jupyter-python">from pycse import regress
+from pycse import predict as _predict
+from sklearn.base import BaseEstimator, RegressorMixin
 
-@hashcache(verbose=True)
-def f(a, b=1):
-    nava.play('../../../../cash-register-fake-88639.mp3')
-    return (a, b)
+class LR(BaseEstimator, RegressorMixin):
 
-print(f(1))
+    def fit(self, X, y):
+        self.xtrain = np.array(X)
+        self.ytrain = np.array(y)
+        self.coefs_, _, _ = regress(X, y, rcond=None)
+        return self
+
+    def predict(self, X, return_std=False):
+        y, _, se = _predict(self.xtrain, self.ytrain, self.coefs_, X)
+        if return_std:
+            return y, se
+        else:
+            return y
+
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import Pipeline
+
+model = Pipeline([('poly', PolynomialFeatures()),
+                  ('LR', LR())])
+</pre>
+</div>
+
+<p>
+This is the most important block. Here I introduce a new concept called the <code>Surrogate</code> decorator. This decorator wraps the function with a surrogate model. When you call the function the wrapper tries to use the surrogate. If the surrogate is not accurate enough then the true function is used and the surrogate is retrained.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">from pycse.pyroxy import Surrogate
+from tqdm import tqdm
+
+@Surrogate(model=model, tol=100) 
+def measure(RGB, label=None):
+    results = []
+    for rgb in tqdm(RGB):
+        result = get_results(*rgb, label)
+        results += [[result['ch620'], result['ch510'], result['ch470']]]
+    return np.array(results)
+</pre>
+</div>
+
+<p>
+The surrogate we have defined needs a minimal amount of data to get started. You probably should have at least as many data points as parameters to start with plus some or you may get division by zero errors with degrees of freedom, or poorly conditioned Hessians. I initialize it here.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">import numpy as np
+np.random.seed(42)
+
+r = measure(np.random.randint(25, 75, (12, 3)))
+</pre>
+</div>
+
+<p>
+Once we have initialized the model, we can try an optimization. 
+</p>
+
+<p>
+I found it helpful to put bounds in to avoid going out of bounds. I think because I use integer inputs, it was also necessary to use Nelder-Mead.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">def objective(RGB):
+    RGB = np.array(RGB)
+    res = measure(np.atleast_2d(RGB.astype(int)))
+    return np.sum(np.abs(res - 10000))
+
+from scipy.optimize import minimize
+
+sol = minimize(objective, np.array([55, 45, 45]),
+               bounds=[[25, 75],
+                       [25, 75],
+                       [25, 75]],
+               method='Nelder-mead')
+
+print(sol)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">sol.x.astype(int)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">print(measure([sol.x.astype(int)]))
+</pre>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">print(model.predict([sol.x.astype(int)], return_std=True))
+</pre>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">print(measure)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">measure.plot();
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org5022257" class="outline-3">
-<h3 id="org5022257"><span class="section-number-3">1.2.</span> from a python file</h3>
-<div class="outline-text-3" id="text-1-2">
+</div>
+<div id="outline-container-org042f354" class="outline-2">
+<h2 id="org042f354"><span class="section-number-2">2.</span> An actively learned Gaussian process surrogate</h2>
+<div class="outline-text-2" id="text-2">
 <div class="org-src-container">
-<pre class="src src-python">from pycse.hashcache import hashcache
-import nava
+<pre class="src src-jupyter-python">import numpy as np
+import matplotlib.pyplot as plt
+from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
 
-@hashcache(verbose=True)
-def f(a, b=1):
-    nava.play('../../../../cash-register-fake-88639.mp3')
-    return (a, b)
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
 
-print(f(1))
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+</pre>
+</div>
+
+<p>
+I use a linear kernel here, because I know the output is practically linear in the inputs and we add a WhiteKernel to account for noise we know is present. This choice is probably important; I am injecting knowledge into the model.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel
+
+kernel = DotProduct() + WhiteKernel(noise_level_bounds=(5, 20))
+gpr = GaussianProcessRegressor(kernel=kernel, random_state=0)
+
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import Pipeline
+
+model = Pipeline([('poly', PolynomialFeatures()),
+                  ('gpr', gpr)])
+
+from tqdm import tqdm
+from pycse.pyroxy import Surrogate
+
+@Surrogate(model=model, tol=50, verbose=True)
+def measure(RGB, label=None):
+    results = []
+    for rgb in tqdm(RGB):
+        result = get_results(*rgb, label)
+        results += [[ result['ch620'], result['ch510'], result['ch470']]]
+    return np.array(results)
+</pre>
+</div>
+
+<p>
+I think it is a good idea to initialize the model. Here we look at 4 points that span the space. It is not comprehensive, just enough to get some points.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">measure([[25, 25, 25],
+         [75, 75, 75],
+         [25, 75, 75],
+         [75, 75, 25],
+         [75, 25, 75]])
+</pre>
+</div>
+
+<p>
+We define an objective.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">def objective(RGB):
+    RGB = np.array(RGB).astype(int)
+    result = measure(np.atleast_2d(RGB))
+    return np.sum(np.abs(result - [10000, 10000, 10000]))
+</pre>
+</div>
+
+
+
+
+<p>
+We try the <code>brute</code> global optimization algorithm here. I suppress warnings because I don't want to see the GPR fitting warnings on every iteration.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">import warnings
+warnings.filterwarnings("ignore")
+np.random.seed(42)
+
+from scipy.optimize import brute
+
+sol = brute(objective, 
+            ranges=[[25, 75],
+                    [25, 75],
+                    [25, 75]])
+
+print(sol)
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-sh">python ph.py
+<pre class="src src-jupyter-python">measure([sol.astype(int)])
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python">@hashcache(verbose=True)
-def f(x, b=1):
-    'return a tuple of (a,b)'
-    # a comment
-    nava.play('../../../../cash-register-fake-88639.mp3')
-    return (x, b)
-
-f(1)
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-orgc8da71b" class="outline-3">
-<h3 id="orgc8da71b"><span class="section-number-3">1.3.</span> serializing data with json</h3>
-<div class="outline-text-3" id="text-1-3">
-<div class="org-src-container">
-<pre class="src src-jupyter-python">from scipy.integrate import solve_ivp
-
-def ode(x, y):
-    return y
-
-sol = solve_ivp(ode, (0, 1), (1,))
-sol
+<pre class="src src-jupyter-python">model.predict([sol.astype(int)], return_std=True)
 </pre>
 </div>
 
-<div class="org-src-container">
-<pre class="src src-jupyter-python">import json
-
-d = {'a': 1,
-            'b': 'a string',
-            'c': (1, 3),
-            'd': [1, '2'],
-            'e': sol,
-            2: {1: 'tree'}}
-print(json.dumps(d))
-</pre>
-</div>
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python">import orjson
-
-d = {'a': 1,
-            'b': 'a string',
-            'c': (1, 3),
-            'd': [1, '2'],
-            'e': sol,
-            'atoms': bulk('Cu').todict(),
-            '2': {'1': 'tree'}}
-
-orjson.dumps(d, option=orjson.OPT_SERIALIZE_NUMPY)
-</pre>
-</div>
+<p>
+The true values here are not close to the Surrogate; the surrogate seems over-confident. There is not currently a way to change that.
+</p>
 </div>
 <ol class="org-ol">
-<li><a id="org4215517"></a><span class="todo TODO">TODO</span> next time<br />
-<div class="outline-text-16" id="text-1-3-0-0-0-0-0-0-0-0-0-0-0-0-1">
+<li><a id="orga3d7894"></a><span class="todo TODO">TODO</span> add way to update surrogate when you find it is over-confident<br />
+<div class="outline-text-16" id="text-2-0-0-0-0-0-0-0-0-0-0-0-0-0-1">
 <p>
-Integrate orjson for serialization into hashcache with storage in sqlite, and searching from json.
+probably also should add some random checks with true functions.
 </p>
 </div>
 </li>
-<li><a id="org7b35621"></a>END<br /></li>
-</ol>
+<li><a id="org949fb3d"></a>END<br />
+<div class="outline-text-16" id="text-2-0-0-0-0-0-0-0-0-0-0-0-0-0-2">
+<div class="org-src-container">
+<pre class="src src-jupyter-python">measure.func([sol.astype(int)])
+</pre>
 </div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">measure.plot();
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">print(measure)
+</pre>
+</div>
+</div>
+</li>
+</ol>
 </div>
 </div>
 <div id="postamble" class="status">

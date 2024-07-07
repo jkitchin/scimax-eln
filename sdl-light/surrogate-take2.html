@@ -6,7 +6,7 @@
 <!-- 2024-07-07 Sun 18:42 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>&lrm;</title>
+<title>DOE vs active learning and surrogate models of the SDL-Light - take 2</title>
 <meta name="generator" content="Org Mode" />
 <style type="text/css">
   #content { max-width: 60em; margin: auto; }
@@ -195,7 +195,178 @@
 </head>
 <body>
 <div id="content" class="content">
-<meta http-equiv="refresh" content="0; url=readme.html" />
+<h1 class="title">DOE vs active learning and surrogate models of the SDL-Light - take 2</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org10393cb">1. An actively learned Gaussian process surrogate</a></li>
+</ul>
+</div>
+</div>
+<p>
+In <a href="./surrogate.html">./surrogate.html</a> I introduced the Surrogate decorator. I highlighted some issues with the implementation there. Here I have fixed many of the issues, and explore the new updated version.
+</p>
+
+<p>
+I am skipping the linear regression example.
+</p>
+<div id="outline-container-org10393cb" class="outline-2">
+<h2 id="org10393cb"><span class="section-number-2">1.</span> An actively learned Gaussian process surrogate</h2>
+<div class="outline-text-2" id="text-1">
+<div class="org-src-container">
+<pre class="src src-jupyter-python">import numpy as np
+import matplotlib.pyplot as plt
+from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
+
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
+
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+</pre>
+</div>
+
+<p>
+I use a linear kernel here, because I know the output is practically linear in the inputs. This choice is probably important; I am injecting knowledge into the model.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import DotProduct
+
+kernel = DotProduct()
+gpr = GaussianProcessRegressor(kernel=kernel, alpha=10, random_state=0)
+
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import Pipeline
+
+model = Pipeline([('poly', PolynomialFeatures()),
+                  ('gpr', gpr)])
+
+from tqdm import tqdm
+from pycse.pyroxy import Surrogate
+
+@Surrogate(model=model, tol=100, verbose=True)
+def measure(RGB, label=None):
+    results = []
+    for rgb in tqdm(RGB):
+        result = get_results(*rgb, label)
+        results += [[result['ch620'], result['ch510'], result['ch470']]]
+    return np.array(results)
+</pre>
+</div>
+
+
+<p>
+I think it is a good idea to initialize the model. Here we look at 6 points that span the space. It is not comprehensive, just enough to get some points.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">np.random.seed(42)
+measure(np.random.randint(25, 75, (6, 3)))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">print(measure)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">measure.plot();
+</pre>
+</div>
+
+<p>
+We define an objective to find the desired settings.
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">def objective(RGB):
+    RGB = np.array(RGB).astype(int)
+    result = measure(np.atleast_2d(RGB))
+    return np.sum((result - [10000, 10000, 10000])**2)
+</pre>
+</div>
+
+<p>
+We try the <code>brute</code> global optimization algorithm here. I suppress warnings because I don't want to see the GPR fitting warnings on every iteration.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">import warnings
+warnings.filterwarnings("ignore")
+np.random.seed(42)
+
+from scipy.optimize import brute
+
+sol = brute(objective, 
+            ranges=[[25, 75],
+                    [25, 75],
+                    [25, 75]])
+
+print(sol)
+</pre>
+</div>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">print(measure.test([sol.astype(int)]))
+</pre>
+</div>
+
+<p>
+You have to use some judgement. The model is over-confident here. You might want to add data to see if that improves the model.
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">measure.plot();
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">print(measure)
+</pre>
+</div>
+
+<p>
+You can save the model for later.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">measure.dump('model.pkl')
+</pre>
+</div>
+
+<p>
+You reload it like this. This is probably risky in the long-term since it relies on dill.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">from pycse.pyroxy import Surrogate
+
+m = Surrogate.load('model.pkl')
+
+print(m)
+</pre>
+</div>
+
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">print(m.test([[50, 50, 50]]))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python">
+</pre>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="date">Created: 2024-07-07 Sun 18:42</p>
