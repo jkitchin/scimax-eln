@@ -25,6 +25,7 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 15 - Reproducibility, significant differences and interactions in the SDL-Light https://youtube.com/live/BlUzXcyyYc0
 - Video 16 - ANOVA + DOE with the SDL-Light https://youtube.com/live/pGuolCOZ8HQ
 - Video 17 - Active learning and surrogates - take 1 https://youtube.com/live/mgxSuNgQmNQ
+- Video 18 - Active learning and surrogates - take 2 https://youtube.com/live/-cH4mXnulwk
 
 * pycse
 
