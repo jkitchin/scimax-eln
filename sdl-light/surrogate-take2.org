@@ -1,0 +1,242 @@
+#+title: DOE vs active learning and surrogate models of the SDL-Light - take 2
+
+In [[./surrogate.org]] I introduced the Surrogate decorator. I highlighted some issues with the implementation there. Here I have fixed many of the issues, and explore the new updated version.
+
+I am skipping the linear regression example.
+
+* An actively learned Gaussian process surrogate
+
+#+BEGIN_SRC jupyter-python :restart
+import numpy as np
+import matplotlib.pyplot as plt
+from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
+
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
+
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+#+END_SRC
+
+#+RESULTS:
+
+I use a linear kernel here, because I know the output is practically linear in the inputs. This choice is probably important; I am injecting knowledge into the model.
+
+#+BEGIN_SRC jupyter-python
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import DotProduct
+
+kernel = DotProduct()
+gpr = GaussianProcessRegressor(kernel=kernel, alpha=10, random_state=0)
+
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import Pipeline
+
+model = Pipeline([('poly', PolynomialFeatures()),
+                  ('gpr', gpr)])
+
+from tqdm import tqdm
+from pycse.pyroxy import Surrogate
+
+@Surrogate(model=model, tol=100, verbose=True)
+def measure(RGB, label=None):
+    results = []
+    for rgb in tqdm(RGB):
+        result = get_results(*rgb, label)
+        results += [[result['ch620'], result['ch510'], result['ch470']]]
+    return np.array(results)
+#+END_SRC
+
+#+RESULTS:
+
+
+I think it is a good idea to initialize the model. Here we look at 6 points that span the space. It is not comprehensive, just enough to get some points.
+
+#+BEGIN_SRC jupyter-python
+np.random.seed(42)
+measure(np.random.randint(25, 75, (6, 3)))
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: Running [[63 53 39]
+:  [67 32 45]
+:  [63 43 47]
+:  [35 35 48]
+:  [60 64 48]
+:  [27 46 26]] to initialize the model.
+: 100% 6/6 [00:44<00:00,  7.35s/it]
+: array([[16258,  8954, 10445],
+:        [17645,  4944, 10105],
+:        [16333,  7098, 11342],
+:        [ 7529,  5392, 10852],
+:        [15330, 11218, 13167],
+:        [ 4967,  7275,  7081]])
+:END:
+
+#+BEGIN_SRC jupyter-python
+print(measure)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+6 data points obtained.
+        The model was fitted 1 times.
+        The surrogate was successful 0 times.
+
+        model score: 0.9999999975493065
+        Errors:
+        MAE: 0.08542445875016508
+        RMSE: 0.11008417913168872
+        (tol = 100)
+#+end_example
+
+#+BEGIN_SRC jupyter-python
+measure.plot();
+#+END_SRC
+
+#+RESULTS:
+[[./.ob-jupyter/d7056fca45d534125d694b820299687016e9ffb5.png]]
+
+We define an objective to find the desired settings.
+
+
+#+BEGIN_SRC jupyter-python
+def objective(RGB):
+    RGB = np.array(RGB).astype(int)
+    result = measure(np.atleast_2d(RGB))
+    return np.sum((result - [10000, 10000, 10000])**2)
+#+END_SRC
+
+#+RESULTS:
+
+We try the ~brute~ global optimization algorithm here. I suppress warnings because I don't want to see the GPR fitting warnings on every iteration.
+
+#+BEGIN_SRC jupyter-python
+import warnings
+warnings.filterwarnings("ignore")
+np.random.seed(42)
+
+from scipy.optimize import brute
+
+sol = brute(objective, 
+            ranges=[[25, 75],
+                    [25, 75],
+                    [25, 75]])
+
+print(sol)
+#+END_SRC
+
+#+RESULTS:
+: For [[25 25 51]] -> [[ 5913.97254658  3260.40643891 11105.85915533]] err=[[116.67650087 116.67650087 116.67650087]] is greater than 100, running true function and returning function values and retraining
+: 100% 1/1 [00:07<00:00,  7.04s/it]
+: For [[25 51 72]] -> [[12704.21987092  3330.55525099 20968.99329707]] err=[[102.25140416 102.25140416 102.25140416]] is greater than 100, running true function and returning function values and retraining
+: 100% 1/1 [00:06<00:00,  7.00s/it]
+: [48.55742873 62.38250792 35.85320724]
+
+
+#+BEGIN_SRC jupyter-python  
+print(measure.test([sol.astype(int)]))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+100% 1/1 [00:06<00:00,  6.97s/it]Testing [array([48, 62, 35])]
+            y = [[11581 10631 10277]]
+            yp = [[10039.38956678 10004.58545548  9918.20860964]]
+
+            ypse = [[7.60767902 7.60767902 7.60767902]]
+            ypse < tol = [[ True  True  True]]
+
+            errs = [[1541.61043322  626.41454452  358.79139036]]
+            errs < tol = [[False False False]]
+            
+False
+
+#+end_example
+
+You have to use some judgement. The model is over-confident here. You might want to add data to see if that improves the model.
+
+
+#+BEGIN_SRC jupyter-python  
+measure.plot();
+#+END_SRC
+
+#+RESULTS:
+[[./.ob-jupyter/12fae39a46a8ecd0a838d026bbd7c0e0920dbdce.png]]
+
+#+BEGIN_SRC jupyter-python
+print(measure)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+8 data points obtained.
+        The model was fitted 3 times.
+        The surrogate was successful 8088 times.
+
+        model score: 0.999709346767281
+        Errors:
+        MAE: 43.72694121343668
+        RMSE: 57.779905042631526
+        (tol = 100)
+#+end_example
+
+You can save the model for later.
+
+#+BEGIN_SRC jupyter-python
+measure.dump('model.pkl')
+#+END_SRC
+
+#+RESULTS:
+: model.pkl
+
+You reload it like this. This is probably risky in the long-term since it relies on dill.
+
+#+BEGIN_SRC jupyter-python 
+from pycse.pyroxy import Surrogate
+
+m = Surrogate.load('model.pkl')
+
+print(m)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+8 data points obtained.
+        The model was fitted 3 times.
+        The surrogate was successful 8088 times.
+
+        model score: 0.999709346767281
+        Errors:
+        MAE: 43.72694121343668
+        RMSE: 57.779905042631526
+        (tol = 100)
+#+end_example
+
+
+
+#+BEGIN_SRC jupyter-python  
+print(m.test([[50, 50, 50]]))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+100% 1/1 [00:07<00:00,  7.05s/it]Testing [[50, 50, 50]]
+            y = [[12184  8433 12447]]
+            yp = [[12032.10500872  8333.74412304 12448.7256979 ]]
+
+            ypse = [[3.35928906 3.35928906 3.35928906]]
+            ypse < tol = [[ True  True  True]]
+
+            errs = [[151.89499128  99.25587696  -1.7256979 ]]
+            errs < tol = [[False  True  True]]
+            
+False
+
+#+end_example
+
+#+BEGIN_SRC jupyter-python  
+
+#+END_SRC
+
