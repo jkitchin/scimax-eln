@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-07 Sun 18:42 -->
+<!-- 2024-07-08 Mon 17:15 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>DOE vs active learning and surrogate models of the SDL-Light</title>
@@ -200,17 +200,17 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org1a5d79e">1. Introduction</a>
+<li><a href="#org813e004">1. Introduction</a>
 <ul>
-<li><a href="#org94c1a38">1.1. Optimization with a surrogate model</a></li>
+<li><a href="#org3c0daa9">1.1. Optimization with a surrogate model</a></li>
 </ul>
 </li>
-<li><a href="#org042f354">2. An actively learned Gaussian process surrogate</a></li>
+<li><a href="#org2f86980">2. An actively learned Gaussian process surrogate</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org1a5d79e" class="outline-2">
-<h2 id="org1a5d79e"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-org813e004" class="outline-2">
+<h2 id="org813e004"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 One of the reasons we use design of experiments is to fit a surrogate model. That model may be a linear, polynomial surface model, or it could be a physics-based model. Either way, you need at least as many experiments as parameters before you can fit anything. In the case of a second-order surface response with 3 components, you have at least 10 parameters to fit, so you have to run those experiments before you can even start.
@@ -240,8 +240,8 @@ def get_results(R, G, B, label=None):
 </pre>
 </div>
 </div>
-<div id="outline-container-org94c1a38" class="outline-3">
-<h3 id="org94c1a38"><span class="section-number-3">1.1.</span> Optimization with a surrogate model</h3>
+<div id="outline-container-org3c0daa9" class="outline-3">
+<h3 id="org3c0daa9"><span class="section-number-3">1.1.</span> Optimization with a surrogate model</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 I create a custom estimator for linear regression with uncertainty quantification here. I use the features I wrote in <code>pycse</code> for this, most notably the regress and predict functions. Then I make a Pipeline that generates the quadratic polynomial surface features and regresses them.
@@ -360,8 +360,8 @@ print(sol)
 </div>
 </div>
 </div>
-<div id="outline-container-org042f354" class="outline-2">
-<h2 id="org042f354"><span class="section-number-2">2.</span> An actively learned Gaussian process surrogate</h2>
+<div id="outline-container-org2f86980" class="outline-2">
+<h2 id="org2f86980"><span class="section-number-2">2.</span> An actively learned Gaussian process surrogate</h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">import numpy as np
@@ -469,14 +469,14 @@ The true values here are not close to the Surrogate; the surrogate seems over-co
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="orga3d7894"></a><span class="todo TODO">TODO</span> add way to update surrogate when you find it is over-confident<br />
+<li><a id="org5b834b8"></a><span class="todo TODO">TODO</span> add way to update surrogate when you find it is over-confident<br />
 <div class="outline-text-16" id="text-2-0-0-0-0-0-0-0-0-0-0-0-0-0-1">
 <p>
 probably also should add some random checks with true functions.
 </p>
 </div>
 </li>
-<li><a id="org949fb3d"></a>END<br />
+<li><a id="orgc8322c8"></a>END<br />
 <div class="outline-text-16" id="text-2-0-0-0-0-0-0-0-0-0-0-0-0-0-2">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">measure.func([sol.astype(int)])
@@ -498,7 +498,7 @@ probably also should add some random checks with true functions.
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2024-07-07 Sun 18:42</p>
+<p class="date">Created: 2024-07-08 Mon 17:15</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
