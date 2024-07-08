@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-08 Mon 17:15 -->
+<!-- 2024-07-08 Mon 17:19 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>An sklearn-doe package with application to the SDL-Light</title>
@@ -200,19 +200,19 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org6cf2b6d">1. Setup the design</a>
+<li><a href="#orgbd267da">1. Setup the design</a>
 <ul>
-<li><a href="#orga5f7a84">1.1. Run the experiments</a></li>
-<li><a href="#org1269757">1.2. Doing the analysis</a></li>
-<li><a href="#orgf380648">1.3. Making predictions</a></li>
-<li><a href="#orgf9c65be">1.4. Using the model for optimization</a></li>
+<li><a href="#orgaa60fdd">1.1. Run the experiments</a></li>
+<li><a href="#org3e69bab">1.2. Doing the analysis</a></li>
+<li><a href="#org61e0b7e">1.3. Making predictions</a></li>
+<li><a href="#org037461b">1.4. Using the model for optimization</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="org038de91" class="figure">
+<div id="org4af0d85" class="figure">
 <p><img src="./screenshots/date-08-07-2024-time-12-03-07.png" alt="date-08-07-2024-time-12-03-07.png" />
 </p>
 </div>
@@ -221,8 +221,8 @@
 <p>
 In previous efforts (<a href="./doe.html">./doe.html</a> and <a href="./anova.html">./anova.html</a>) we manually setup a design of experiments. Here I build on those works with a new sklearn-compatible library for a surface response design.
 </p>
-<div id="outline-container-org6cf2b6d" class="outline-2">
-<h2 id="org6cf2b6d"><span class="section-number-2">1.</span> Setup the design</h2>
+<div id="outline-container-orgbd267da" class="outline-2">
+<h2 id="orgbd267da"><span class="section-number-2">1.</span> Setup the design</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 The main work is done by a pyDOE3 function to set up the design. This outputs a design in randomized order. This is the order you should run the experiments.
@@ -242,8 +242,8 @@ input
 </pre>
 </div>
 </div>
-<div id="outline-container-orga5f7a84" class="outline-3">
-<h3 id="orga5f7a84"><span class="section-number-3">1.1.</span> Run the experiments</h3>
+<div id="outline-container-orgaa60fdd" class="outline-3">
+<h3 id="orgaa60fdd"><span class="section-number-3">1.1.</span> Run the experiments</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Each row in that input array is an experiment we have to run. This is the measurement code.
@@ -288,8 +288,8 @@ output
 </div>
 </div>
 </div>
-<div id="outline-container-org1269757" class="outline-3">
-<h3 id="org1269757"><span class="section-number-3">1.2.</span> Doing the analysis</h3>
+<div id="outline-container-org3e69bab" class="outline-3">
+<h3 id="org3e69bab"><span class="section-number-3">1.2.</span> Doing the analysis</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 We use the sklearn API to <code>.fit</code> the results.
@@ -316,8 +316,8 @@ The class provides a summary report.
 </div>
 </div>
 </div>
-<div id="outline-container-orgf380648" class="outline-3">
-<h3 id="orgf380648"><span class="section-number-3">1.3.</span> Making predictions</h3>
+<div id="outline-container-org61e0b7e" class="outline-3">
+<h3 id="org61e0b7e"><span class="section-number-3">1.3.</span> Making predictions</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 We can use the instance in sklearn predictions.
@@ -330,8 +330,8 @@ We can use the instance in sklearn predictions.
 </div>
 </div>
 </div>
-<div id="outline-container-orgf9c65be" class="outline-3">
-<h3 id="orgf9c65be"><span class="section-number-3">1.4.</span> Using the model for optimization</h3>
+<div id="outline-container-org037461b" class="outline-3">
+<h3 id="org037461b"><span class="section-number-3">1.4.</span> Using the model for optimization</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 Finally, we can use the model we fit in optimization. Here we look for the inputs that result in an output of (10000, 10000, 10000).
@@ -363,7 +363,7 @@ That is pretty close.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="org2c03c62"></a><span class="done DONE">DONE</span> <br />
+<li><a id="org8b7eb7d"></a><span class="done DONE">DONE</span> <br />
 <div class="outline-text-16" id="text-1-4-0-0-0-0-0-0-0-0-0-0-0-0-1">
 <ul class="org-ul">
 <li class="on"><code>[X]</code> add parameter values in the summary report</li>
@@ -371,13 +371,13 @@ That is pretty close.
 </ul>
 </div>
 </li>
-<li><a id="orge985420"></a>END<br /></li>
+<li><a id="orgfe0ae23"></a>END<br /></li>
 </ol>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2024-07-08 Mon 17:15</p>
+<p class="date">Created: 2024-07-08 Mon 17:19</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
