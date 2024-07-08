@@ -26,6 +26,7 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 16 - ANOVA + DOE with the SDL-Light https://youtube.com/live/pGuolCOZ8HQ
 - Video 17 - Active learning and surrogates - take 1 https://youtube.com/live/mgxSuNgQmNQ
 - Video 18 - Active learning and surrogates - take 2 https://youtube.com/live/-cH4mXnulwk
+- Video 19 - An sklearn-doe package with application to the SDL-Light https://youtube.com/live/Sfbmk4zTFCw
 
 * pycse
 
@@ -69,6 +70,7 @@ A DOE approach: [[./sdl-light/doe.org]]
 Reproducibility: [[./sdl-light/averages.org]] 
 DOE + statistical analysis: [[./sdl-light/anova.org]].
 Surrogates and active learning - take 1 [[./sdl-light/surrogate.org]]
+sklearn-doe [[./sdl-light/sklearn-doe.org]]
 
 ** TODO get SDL-Light instruments
 DEADLINE: <2024-07-01 Mon>
