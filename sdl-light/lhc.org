@@ -1,0 +1,307 @@
+#+title: A Latin Hypercube experimental design to estimate effects in the SDL-Light
+
+#+attr_org: :width 800
+[[./screenshots/date-09-07-2024-time-10-05-58.png]]
+
+
+** An example
+
+We are testing the effects of an additive on car performance. We have 4 additives to test. We are worried however, that the effect may vary by the car (e.g. different kinds of cars) and driver (e.g. from different driving habits). A Latin Square design of experiments allows us to estimate the significance of these factors with a minimum of experiments. At 4 cars, 4 drivers, and 4 additives, we would have to do 64 experiments to try all the combinations.
+
+In a Latin square design we will only do 16 experiments. These experiments are "blocked" so we can separate the effects from each factor. Then we consider this simple model:
+
+result = average + effect_1 + effect_2 + effect_3 + residuals
+
+We can compute the variance for each of these and compare that to the variance of the residuals. If the variance of an effect is much larger than that of the residuals, it is an important factor.
+
+Here we introduce ~pycse.sklearn.lhc~ for this kind of work.
+
+This is a simple setup.
+
+#+BEGIN_SRC jupyter-python
+from pycse.sklearn.lhc import LatinSquare
+
+ls = LatinSquare({'car': [1, 2, 3, 4],
+                  'driver': ['I', 'II', 'III', 'IV'],
+                  'additive': ['A', 'B', 'C', 'D']})
+#+END_SRC
+
+#+RESULTS:
+
+In the next example we will get the design from the class. This data and design is from 
+
+- Box, G., Hunter, J., & Hunter, W. (1978). Statistics for experimenters: an
+  introduction to design, data analysis, and model building. 
+
+It is a named table in org-mode.
+
+#+name: results
+|    | car | driver | additive | result |
+|----+-----+--------+----------+--------|
+|  0 |   1 | I      | A        |     21 |
+|  1 |   1 | II     | D        |     23 |
+|  2 |   1 | III    | B        |     15 |
+|  3 |   1 | IV     | C        |     17 |
+|  4 |   2 | I      | B        |     26 |
+|  5 |   2 | II     | C        |     26 |
+|  6 |   2 | III    | D        |     13 |
+|  7 |   2 | IV     | A        |     15 |
+|  8 |   3 | I      | D        |     20 |
+|  9 |   3 | II     | A        |     20 |
+| 10 |   3 | III    | C        |     16 |
+| 11 |   3 | IV     | B        |     20 |
+| 12 |   4 | I      | C        |     25 |
+| 13 |   4 | II     | B        |     27 |
+| 14 |   4 | III    | A        |     16 |
+| 15 |   4 | IV     | D        |     20 |
+
+Here I use the named table to make a Dataframe in Python. The use of ~:colnames no~ is unintuitive, but it means to include the column names in the table. org-mode by default does not include those, but we want them as column names.
+
+#+BEGIN_SRC jupyter-python :var data=results :colnames no
+import pandas as pd
+
+df = pd.DataFrame(data)
+df.columns = df.iloc[0]
+df = df.drop(columns='')
+df = df[1:]
+df
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|    | car | driver | additive | result |
+|----+-----+--------+----------+--------|
+|  1 |   1 | I      | A        |     21 |
+|  2 |   1 | II     | D        |     23 |
+|  3 |   1 | III    | B        |     15 |
+|  4 |   1 | IV     | C        |     17 |
+|  5 |   2 | I      | B        |     26 |
+|  6 |   2 | II     | C        |     26 |
+|  7 |   2 | III    | D        |     13 |
+|  8 |   2 | IV     | A        |     15 |
+|  9 |   3 | I      | D        |     20 |
+| 10 |   3 | II     | A        |     20 |
+| 11 |   3 | III    | C        |     16 |
+| 12 |   3 | IV     | B        |     20 |
+| 13 |   4 | I      | C        |     25 |
+| 14 |   4 | II     | B        |     27 |
+| 15 |   4 | III    | A        |     16 |
+| 16 |   4 | IV     | D        |     20 |
+:END:
+
+Next we fit the data.
+
+#+BEGIN_SRC jupyter-python
+ls.fit(df[['car', 'driver', 'additive']], df['result'])
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|    | car | driver | additive | result |  avg | car_effect | driver_effect | additive_effect | residuals |
+|----+-----+--------+----------+--------+------+------------+---------------+-----------------+-----------|
+|  1 |   1 | I      | A        |     21 | 20.0 |       -1.0 |           3.0 |            -2.0 |       1.0 |
+|  2 |   1 | II     | D        |     23 | 20.0 |       -1.0 |           4.0 |            -1.0 |       1.0 |
+|  3 |   1 | III    | B        |     15 | 20.0 |       -1.0 |          -5.0 |             2.0 |      -1.0 |
+|  4 |   1 | IV     | C        |     17 | 20.0 |       -1.0 |          -2.0 |             1.0 |      -1.0 |
+|  5 |   2 | I      | B        |     26 | 20.0 |        0.0 |           3.0 |             2.0 |       1.0 |
+|  6 |   2 | II     | C        |     26 | 20.0 |        0.0 |           4.0 |             1.0 |       1.0 |
+|  7 |   2 | III    | D        |     13 | 20.0 |        0.0 |          -5.0 |            -1.0 |      -1.0 |
+|  8 |   2 | IV     | A        |     15 | 20.0 |        0.0 |          -2.0 |            -2.0 |      -1.0 |
+|  9 |   3 | I      | D        |     20 | 20.0 |       -1.0 |           3.0 |            -1.0 |      -1.0 |
+| 10 |   3 | II     | A        |     20 | 20.0 |       -1.0 |           4.0 |            -2.0 |      -1.0 |
+| 11 |   3 | III    | C        |     16 | 20.0 |       -1.0 |          -5.0 |             1.0 |       1.0 |
+| 12 |   3 | IV     | B        |     20 | 20.0 |       -1.0 |          -2.0 |             2.0 |       1.0 |
+| 13 |   4 | I      | C        |     25 | 20.0 |        2.0 |           3.0 |             1.0 |      -1.0 |
+| 14 |   4 | II     | B        |     27 | 20.0 |        2.0 |           4.0 |             2.0 |      -1.0 |
+| 15 |   4 | III    | A        |     16 | 20.0 |        2.0 |          -5.0 |            -2.0 |       1.0 |
+| 16 |   4 | IV     | D        |     20 | 20.0 |        2.0 |          -2.0 |            -1.0 |       1.0 |
+:END:
+
+And do the analysis of variance.
+
+#+BEGIN_SRC jupyter-python
+ls.anova()
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|   | result effect   | F-score (fc=4.8) | Significant |
+|---+-----------------+------------------+-------------|
+| 0 | car_effect      |              3.0 | False       |
+| 1 | driver_effect   |             27.0 | True        |
+| 2 | additive_effect |              5.0 | True        |
+| 3 | residuals       |              1.0 | False       |
+:END:
+
+This means the biggest effect on the results is due to the drivers. 
+
+#+BEGIN_SRC jupyter-python
+ls.effects['driver']
+#+END_SRC
+
+#+RESULTS:
+: driver
+: I      3.0
+: II     4.0
+: III   -5.0
+: IV    -2.0
+: Name: result, dtype: float64
+
+It is not that easy to say which additive is best. B appears to have the most positive effect, but more data is needed in more controlled conditions to be sure.
+
+#+BEGIN_SRC jupyter-python
+ls.effects['additive']
+#+END_SRC
+
+#+RESULTS:
+: additive
+: A   -2.0
+: B    2.0
+: C    1.0
+: D   -1.0
+: Name: result, dtype: float64
+
+** SDL-Light example
+
+Here we use the SDL-Light instrument and try to determine if the R, G, B variables have an effect on each channel that we measure. We previously explored this in [[./averages.org::*How linear is it?]].
+
+We set this up as a three factor Latin square, with three levels for each factor.
+
+#+BEGIN_SRC jupyter-python
+ls = LatinSquare({'R': [25, 50, 75],
+                  'G': [25, 50, 75],
+                  'B': [25, 50, 75]})
+
+df = ls.design(shuffle=True)
+df
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|   |  R |  G |  B |
+|---+----+----+----|
+| 5 | 50 | 75 | 25 |
+| 0 | 25 | 25 | 25 |
+| 3 | 50 | 25 | 50 |
+| 6 | 75 | 25 | 75 |
+| 2 | 25 | 75 | 75 |
+| 1 | 25 | 50 | 50 |
+| 8 | 75 | 75 | 50 |
+| 4 | 50 | 50 | 75 |
+| 7 | 75 | 50 | 25 |
+:END:
+
+We can see a more conventional matrix with a pivot table.
+
+#+BEGIN_SRC jupyter-python
+ls.pivot()
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|    |  B |    |    |
+|----+----+----+----|
+|  G | 25 | 50 | 75 |
+|  R |    |    |    |
+| 25 | 25 | 50 | 75 |
+| 50 | 50 | 75 | 25 |
+| 75 | 75 | 25 | 50 |
+:END:
+
+Now we setup the experiment code.
+
+#+BEGIN_SRC jupyter-python
+import numpy as np
+import matplotlib.pyplot as plt
+from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
+
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
+
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+
+from tqdm import tqdm
+from pycse.hashcache import HashCache
+
+@HashCache
+def measure(RGB, label=None):
+    results = []
+    for rgb in tqdm(RGB):
+        result = get_results(*rgb, label)
+        results += [[result['ch620'], result['ch510'], result['ch470']]]
+    return np.array(results)
+#+END_SRC
+
+#+RESULTS:
+
+And run the experiments. We store the outputs in the dataframe.
+
+#+BEGIN_SRC jupyter-python
+results = measure(df[['R', 'G', 'B']].values)
+df = df.assign(Rout=results[:, 0],
+               Gout=results[:, 1],
+               Bout=results[:, 2])
+df
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|   |  R |  G |  B |  Rout |  Gout |  Bout |
+|---+----+----+----+-------+-------+-------|
+| 5 | 50 | 75 | 25 | 11913 | 12922 |  9088 |
+| 0 | 25 | 25 | 25 |  3946 |  2880 |  5037 |
+| 3 | 50 | 25 | 50 | 11968 |  3365 | 10403 |
+| 6 | 75 | 25 | 75 | 19990 |  3852 | 15775 |
+| 2 | 25 | 75 | 75 |  4607 | 13512 | 19577 |
+| 1 | 25 | 50 | 50 |  4273 |  8199 | 12309 |
+| 8 | 75 | 75 | 50 | 19702 | 13291 | 14358 |
+| 4 | 50 | 50 | 75 | 12073 |  8598 | 17637 |
+| 7 | 75 | 50 | 25 | 19728 |  8071 |  7197 |
+:END:
+
+We can fit the model to one of the outputs.
+
+#+BEGIN_SRC jupyter-python  
+ls.fit(df[['R', 'G', 'B']], df['Bout'])
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|   |  R |  G |  B |  Bout |          avg |   R_effect |     G_effect |     B_effect |  residuals |
+|---+----+----+----+-------+--------------+------------+--------------+--------------+------------|
+| 5 | 50 | 75 | 25 |  9088 | 12375.666667 |   0.333333 |  1965.333333 | -5268.333333 |  15.000000 |
+| 0 | 25 | 25 | 25 |  5037 | 12375.666667 | -68.000000 | -1970.666667 | -5268.333333 | -31.666667 |
+| 3 | 50 | 25 | 50 | 10403 | 12375.666667 |   0.333333 | -1970.666667 |   -19.000000 |  16.666667 |
+| 6 | 75 | 25 | 75 | 15775 | 12375.666667 |  67.666667 | -1970.666667 |  5287.333333 |  15.000000 |
+| 2 | 25 | 75 | 75 | 19577 | 12375.666667 | -68.000000 |  1965.333333 |  5287.333333 |  16.666667 |
+| 1 | 25 | 50 | 50 | 12309 | 12375.666667 | -68.000000 |     5.333333 |   -19.000000 |  15.000000 |
+| 8 | 75 | 75 | 50 | 14358 | 12375.666667 |  67.666667 |  1965.333333 |   -19.000000 | -31.666667 |
+| 4 | 50 | 50 | 75 | 17637 | 12375.666667 |   0.333333 |     5.333333 |  5287.333333 | -31.666667 |
+| 7 | 75 | 50 | 25 |  7197 | 12375.666667 |  67.666667 |     5.333333 | -5268.333333 |  16.666667 |
+:END:
+
+#+BEGIN_SRC jupyter-python
+print(ls.anova())
+#+END_SRC
+
+#+RESULTS:
+:   Bout effect F-score (fc=19.0) Significant
+: 0    R_effect           6.11262       False
+: 1    G_effect       5145.004871        True
+: 2    B_effect      37004.008708        True
+: 3   residuals               1.0       False
+
+
+
+#+BEGIN_SRC jupyter-python
+ls.effects['R']
+#+END_SRC
+
+#+RESULTS:
+: R
+: 25   -68.000000
+: 50     0.333333
+: 75    67.666667
+: Name: Bout, dtype: float64
+
