@@ -223,6 +223,9 @@ np.abs(np.mean(B, axis=0) - np.mean(base, axis=0)) / np.std(base, axis=0)
 Curiously,  there is a significant difference in R here, but not in B.
 
 ** How linear is it?
+:PROPERTIES:
+:ID:       1EDE044E-5371-43EC-9AE0-89373DB350EF
+:END:
 
 Here we check the output of the measurements over a range of settings for each color channel. We expect that the main effect should be on the channel closest in color, and the other channels should be flat. If they are not flat, it means there is some interaction or cross-talk between the channels.
 

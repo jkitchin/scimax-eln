@@ -1,5 +1,7 @@
 #+title: DOE vs active learning and surrogate models of the SDL-Light
 
+See [[./surrogate-take2.org]] for an updated version.
+
 * Introduction
 
 One of the reasons we use design of experiments is to fit a surrogate model. That model may be a linear, polynomial surface model, or it could be a physics-based model. Either way, you need at least as many experiments as parameters before you can fit anything. In the case of a second-order surface response with 3 components, you have at least 10 parameters to fit, so you have to run those experiments before you can even start.
@@ -305,7 +307,8 @@ model.predict([sol.astype(int)], return_std=True)
 
 The true values here are not close to the Surrogate; the surrogate seems over-confident. There is not currently a way to change that.
 
-*************** TODO add way to update surrogate when you find it is over-confident
+*************** DONE add way to update surrogate when you find it is over-confident
+CLOSED: [2024-07-07 Sun 14:24]
 probably also should add some random checks with true functions.
 *************** END
 

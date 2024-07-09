@@ -27,6 +27,7 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 17 - Active learning and surrogates - take 1 https://youtube.com/live/mgxSuNgQmNQ
 - Video 18 - Active learning and surrogates - take 2 https://youtube.com/live/-cH4mXnulwk
 - Video 19 - An sklearn-doe package with application to the SDL-Light https://youtube.com/live/Sfbmk4zTFCw
+- Video 20 - An sklearn-doe package for Latin square designs https://youtube.com/live/VH8ooOeN4RI
 
 * pycse
 
