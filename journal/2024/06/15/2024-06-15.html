@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-10 Wed 15:09 -->
+<!-- 2024-07-10 Wed 15:15 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -199,13 +199,13 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgc3efa0b">1. Using joblib in an eln for cache</a>
+<li><a href="#orge72d387">1. Using joblib in an eln for cache</a>
 <ul>
-<li><a href="#org2e16752">1.1. Finding what we have done</a></li>
-<li><a href="#orgcbed0c7">1.2. limitations</a>
+<li><a href="#org9550fe1">1.1. Finding what we have done</a></li>
+<li><a href="#orgfb25c47">1.2. limitations</a>
 <ul>
-<li><a href="#org6c2e093">1.2.1. Running in different ways leads to running multiple times</a></li>
-<li><a href="#org045b4b2">1.2.2. internal changes to functions don't invalidate the cache</a></li>
+<li><a href="#orgd9af3a7">1.2.1. Running in different ways leads to running multiple times</a></li>
+<li><a href="#orga7dbbcf">1.2.2. internal changes to functions don't invalidate the cache</a></li>
 </ul>
 </li>
 </ul>
@@ -213,8 +213,8 @@
 </ul>
 </div>
 </div>
-<div id="outline-container-orgc3efa0b" class="outline-2">
-<h2 id="orgc3efa0b"><span class="section-number-2">1.</span> Using joblib in an eln for cache</h2>
+<div id="outline-container-orge72d387" class="outline-2">
+<h2 id="orge72d387"><span class="section-number-2">1.</span> Using joblib in an eln for cache</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 We explore using joblib to cache results for reuse.
@@ -266,8 +266,8 @@ SOL = [solution(k) for k in K]
 </pre>
 </div>
 </div>
-<div id="outline-container-org2e16752" class="outline-3">
-<h3 id="org2e16752"><span class="section-number-3">1.1.</span> Finding what we have done</h3>
+<div id="outline-container-org9550fe1" class="outline-3">
+<h3 id="org9550fe1"><span class="section-number-3">1.1.</span> Finding what we have done</h3>
 <div class="outline-text-3" id="text-1-1">
 <div class="org-src-container">
 <pre class="src src-sh">find joblib -name metadata.json
@@ -308,12 +308,12 @@ Many other good ideas: hash, json data storage
 </p>
 </div>
 </div>
-<div id="outline-container-orgcbed0c7" class="outline-3">
-<h3 id="orgcbed0c7"><span class="section-number-3">1.2.</span> limitations</h3>
+<div id="outline-container-orgfb25c47" class="outline-3">
+<h3 id="orgfb25c47"><span class="section-number-3">1.2.</span> limitations</h3>
 <div class="outline-text-3" id="text-1-2">
 </div>
-<div id="outline-container-org6c2e093" class="outline-4">
-<h4 id="org6c2e093"><span class="section-number-4">1.2.1.</span> Running in different ways leads to running multiple times</h4>
+<div id="outline-container-orgd9af3a7" class="outline-4">
+<h4 id="orgd9af3a7"><span class="section-number-4">1.2.1.</span> Running in different ways leads to running multiple times</h4>
 <div class="outline-text-4" id="text-1-2-1">
 <div class="org-src-container">
 <pre class="src src-python">from joblib import Memory
@@ -370,8 +370,8 @@ print(solution(0.1))
 </div>
 </div>
 </div>
-<div id="outline-container-org045b4b2" class="outline-4">
-<h4 id="org045b4b2"><span class="section-number-4">1.2.2.</span> internal changes to functions don't invalidate the cache</h4>
+<div id="outline-container-orga7dbbcf" class="outline-4">
+<h4 id="orga7dbbcf"><span class="section-number-4">1.2.2.</span> internal changes to functions don't invalidate the cache</h4>
 <div class="outline-text-4" id="text-1-2-2">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">def f(x):
@@ -399,7 +399,7 @@ def g(x):
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2024-07-10 Wed 15:09</p>
+<p class="date">Created: 2024-07-10 Wed 15:15</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
