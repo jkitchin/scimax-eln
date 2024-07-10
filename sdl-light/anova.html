@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-09 Tue 15:00 -->
+<!-- 2024-07-10 Wed 15:09 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ANOVA + DOE with the SDL-Light</title>
@@ -200,9 +200,9 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org2c4cf63">1. The Box Behnken design</a>
+<li><a href="#org4413403">1. The Box Behnken design</a>
 <ul>
-<li><a href="#org949c2a8">1.1. Fitting models</a></li>
+<li><a href="#org3f1956e">1.1. Fitting models</a></li>
 </ul>
 </li>
 </ul>
@@ -211,8 +211,8 @@
 <p>
 In <a href="./doe.html">./doe.html</a> we introduced a design of experiment approach, and fitted a model to the results. We qualitatively examined the models via parity plots, but didn't do any kind of uncertainty analysis. Today we do some more quantitative analysis.
 </p>
-<div id="outline-container-org2c4cf63" class="outline-2">
-<h2 id="org2c4cf63"><span class="section-number-2">1.</span> The Box Behnken design</h2>
+<div id="outline-container-org4413403" class="outline-2">
+<h2 id="org4413403"><span class="section-number-2">1.</span> The Box Behnken design</h2>
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">from pyDOE3 import bbdesign
@@ -261,8 +261,8 @@ output
 </pre>
 </div>
 </div>
-<div id="outline-container-org949c2a8" class="outline-3">
-<h3 id="org949c2a8"><span class="section-number-3">1.1.</span> Fitting models</h3>
+<div id="outline-container-org3f1956e" class="outline-3">
+<h3 id="org3f1956e"><span class="section-number-3">1.1.</span> Fitting models</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 We have to create a DataFrame to make it easy to use statsmodels.
@@ -361,7 +361,7 @@ R, G, B
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2024-07-09 Tue 15:00</p>
+<p class="date">Created: 2024-07-10 Wed 15:09</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
