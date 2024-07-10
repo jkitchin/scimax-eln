@@ -1,0 +1,445 @@
+#+title: sklearn-doe v2 - more flexible designs and models
+
+#+attr_org: :width 800
+[[./screenshots/date-10-07-2024-time-10-04-55.png]]
+
+* Adding flexibility to sklearn-doe
+
+The first version of ~pycse.sklearn.surface_response~ only supported the Box-Behnken design. The newer version here supports almost all the designs in pyDOE3. I also added flexibility to support user-defined models.
+
+** The default is Box-Behnken
+
+#+BEGIN_SRC jupyter-python
+from pycse.sklearn.surface_response import SurfaceResponse
+
+sr = SurfaceResponse(inputs=['R', 'G', 'B'],
+                     outputs=['Ro', 'Go', 'Bo'],
+                     bounds=[[25, 75],
+                             [25, 75],
+                             [25, 75]])
+
+input = sr.design()
+print(input)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+       R     G     B
+2   25.0  75.0  50.0
+5   75.0  50.0  25.0
+11  50.0  75.0  75.0
+13  50.0  50.0  50.0
+12  50.0  50.0  50.0
+8   50.0  25.0  25.0
+10  50.0  25.0  75.0
+1   75.0  25.0  50.0
+7   75.0  50.0  75.0
+3   75.0  75.0  50.0
+6   25.0  50.0  75.0
+0   25.0  25.0  50.0
+4   25.0  50.0  25.0
+9   50.0  75.0  25.0
+14  50.0  50.0  50.0
+#+end_example
+
+** multi-level full-factorial
+
+Here we make a design with 4 levels of R, 3 levels of G, and 2 levels of B.
+
+#+BEGIN_SRC jupyter-python
+sr = SurfaceResponse(inputs=['R', 'G', 'B'],
+                     outputs=['Ro', 'Go', 'Bo'],
+                     bounds=[[25, 75],
+                             [25, 75],
+                             [25, 75]],
+                     design='fullfact',
+                     levels=[4, 3, 2])
+
+input = sr.design()
+input
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|    | R     | G     | B    |
+|----+-------+-------+------|
+| 2  | 100.0 | 50.0  | 50.0 |
+| 23 | 125.0 | 100.0 | 75.0 |
+| 22 | 100.0 | 100.0 | 75.0 |
+| 14 | 100.0 | 50.0  | 75.0 |
+| 9  | 75.0  | 100.0 | 50.0 |
+| 13 | 75.0  | 50.0  | 75.0 |
+| 0  | 50.0  | 50.0  | 50.0 |
+| 10 | 100.0 | 100.0 | 50.0 |
+| 12 | 50.0  | 50.0  | 75.0 |
+| 8  | 50.0  | 100.0 | 50.0 |
+| 6  | 100.0 | 75.0  | 50.0 |
+| 20 | 50.0  | 100.0 | 75.0 |
+| 15 | 125.0 | 50.0  | 75.0 |
+| 19 | 125.0 | 75.0  | 75.0 |
+| 18 | 100.0 | 75.0  | 75.0 |
+| 16 | 50.0  | 75.0  | 75.0 |
+| 21 | 75.0  | 100.0 | 75.0 |
+| 1  | 75.0  | 50.0  | 50.0 |
+| 4  | 50.0  | 75.0  | 50.0 |
+| 7  | 125.0 | 75.0  | 50.0 |
+| 11 | 125.0 | 100.0 | 50.0 |
+| 17 | 75.0  | 75.0  | 75.0 |
+| 3  | 125.0 | 50.0  | 50.0 |
+| 5  | 75.0  | 75.0  | 50.0 |
+:END:
+
+** 2-level full-factorial
+
+#+BEGIN_SRC jupyter-python  
+sr = SurfaceResponse(inputs=['R', 'G', 'B'],
+                     outputs=['Ro', 'Go', 'Bo'],
+                     bounds=[[25, 75],
+                             [25, 75],
+                             [25, 75]],
+                     design='ff2n')
+
+input = sr.design()
+input
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|   | R    | G    | B    |
+|---+------+------+------|
+| 6 | 25.0 | 75.0 | 75.0 |
+| 4 | 25.0 | 25.0 | 75.0 |
+| 3 | 75.0 | 75.0 | 25.0 |
+| 0 | 25.0 | 25.0 | 25.0 |
+| 7 | 75.0 | 75.0 | 75.0 |
+| 2 | 25.0 | 75.0 | 25.0 |
+| 1 | 75.0 | 25.0 | 25.0 |
+| 5 | 75.0 | 25.0 | 75.0 |
+:END:
+
+** Latin Hypercube sampling
+
+#+BEGIN_SRC jupyter-python
+sr = SurfaceResponse(inputs=['R', 'G', 'B'],
+                     outputs=['Ro', 'Go', 'Bo'],
+                     bounds=[[25, 75],
+                             [25, 75],
+                             [25, 75]],                     
+                     design='lhs',
+                     samples=15, criterion='c',
+                     random_state=42)
+
+input = sr.design()
+input
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|    |         R |         G |         B |
+|----+-----------+-----------+-----------|
+| 10 | 69.166667 | 64.166667 | 50.833333 |
+| 13 | 55.833333 | 55.833333 | 74.166667 |
+|  3 | 64.166667 | 74.166667 | 57.500000 |
+|  6 | 57.500000 | 67.500000 | 62.500000 |
+|  7 | 67.500000 | 65.833333 | 67.500000 |
+|  9 | 65.833333 | 70.833333 | 70.833333 |
+|  5 | 70.833333 | 52.500000 | 55.833333 |
+| 14 | 62.500000 | 72.500000 | 69.166667 |
+|  1 | 54.166667 | 50.833333 | 52.500000 |
+| 11 | 59.166667 | 60.833333 | 64.166667 |
+|  2 | 60.833333 | 59.166667 | 65.833333 |
+| 12 | 52.500000 | 62.500000 | 72.500000 |
+|  8 | 72.500000 | 57.500000 | 60.833333 |
+|  0 | 50.833333 | 54.166667 | 59.166667 |
+|  4 | 74.166667 | 69.166667 | 54.166667 |
+:END:
+
+#+END_SRC
+
+
+#+BEGIN_SRC jupyter-python 
+import numpy as np
+import matplotlib.pyplot as plt
+from self_driving_lab_demo import (get_paho_client, mqtt_observe_sensor_data)
+
+PICO_ID = 'test'
+client = get_paho_client(f"sdl-demo/picow/{PICO_ID}/as7341/")
+
+from pycse.hashcache import HashCache
+
+@HashCache
+def get_results(R, G, B, label=None):
+    return mqtt_observe_sensor_data(R, G, B, pico_id=PICO_ID, client=client)
+
+def measure(R, G, B, label=None):
+    results = get_results(R, G, B, label)
+    return results['ch620'], results['ch510'], results['ch470']
+#+END_SRC
+
+#+RESULTS:
+
+Now we run the experiments.
+
+#+BEGIN_SRC jupyter-python :async yes
+import pandas as pd
+from tqdm import tqdm
+
+output = []
+for i, RGB in tqdm(input.iterrows()):
+    result = measure(*RGB.values.astype(int), f'jul-9-{i}')    
+    output += [result]
+
+
+output = sr.set_output(output)
+output
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: 15it [00:00, 1161.51it/s]
+|    |    Ro |    Go |    Bo |
+|----+-------+-------+-------|
+| 10 | 18068 | 11241 | 13598 |
+| 13 | 13836 |  9724 | 17934 |
+|  3 | 16562 | 13294 | 15832 |
+|  6 | 14421 | 11959 | 16327 |
+|  7 | 17508 | 11660 | 17236 |
+|  9 | 16933 | 12674 | 18249 |
+|  5 | 18462 |  8971 | 13729 |
+| 14 | 16002 | 13049 | 18211 |
+|  1 | 13387 |  8459 | 12889 |
+| 11 | 14999 | 10588 | 16192 |
+|  2 | 15324 | 10412 | 16333 |
+| 12 | 12958 | 11091 | 18061 |
+|  8 | 19074 | 10017 | 15164 |
+|  0 | 12192 |  9312 | 14667 |
+|  4 | 19655 | 12308 | 14847 |
+:END:
+
+#+BEGIN_SRC jupyter-python  
+sr.fit()
+print(sr.score())
+sr.parity();
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: 0.9995362156806792
+[[./.ob-jupyter/87a56c2224cabe402182c3aa3e288aa8aaadf9fd.png]]
+:END:
+
+#+BEGIN_SRC jupyter-python
+print(sr.summary())
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+15 data points
+  score: 0.9995362156806792
+  mae  = [47.7, 22.3, 24.2]
+
+  rmse = [3020.0, 964.0, 1000.0]
+
+Output_0 = Ro
+| var     |       value |   ci_lower |   ci_upper |       se |   significant |
+|---------+-------------+------------+------------+----------+---------------|
+| 1_0     | 15937.7     | 15753.3    |  16122.1   |  66.4128 |             1 |
+| x0_0    |  3580.91    |  3421.42   |   3740.39  |  57.442  |             1 |
+| x1_0    |    90.8044  |   -75.6052 |    257.214 |  59.9362 |             0 |
+| x2_0    |   -44.9787  |  -191.064  |    101.106 |  52.6159 |             0 |
+| x0^2_0  |    36.7542  |  -339.858  |    413.366 | 135.645  |             0 |
+| x0 x1_0 |   -63.5449  |  -496.661  |    369.571 | 155.997  |             0 |
+| x0 x2_0 |    -9.50306 |  -558.716  |    539.71  | 197.812  |             0 |
+| x1^2_0  |   -25.7017  |  -276.772  |    225.369 |  90.4288 |             0 |
+| x1 x2_0 |    -2.87295 |  -354.204  |    348.458 | 126.54   |             0 |
+| x2^2_0  |    61.4348  |  -328.872  |    451.742 | 140.578  |             0 |
+
+Output_1 = Go
+| var     |       value |   ci_lower |   ci_upper |       se |   significant |
+|---------+-------------+------------+------------+----------+---------------|
+| 1_1     | 10978.2     | 10874      |  11082.4   |  37.5343 |             1 |
+| x0_1    |    14.9074  |   -75.2282 |    105.043 |  32.4644 |             0 |
+| x1_1    |  2332.12    |  2238.07   |   2426.17  |  33.874  |             1 |
+| x2_1    |    98.9157  |    16.3532 |    181.478 |  29.7368 |             1 |
+| x0^2_1  |    28.3089  |  -184.54   |    241.158 |  76.6623 |             0 |
+| x0 x1_1 |     4.49717 |  -240.286  |    249.28  |  88.1641 |             0 |
+| x0 x2_1 |   -95.8631  |  -406.26   |    214.534 | 111.797  |             0 |
+| x1^2_1  |    25.235   |  -116.662  |    167.132 |  51.1074 |             0 |
+| x1 x2_1 |    -2.57453 |  -201.135  |    195.986 |  71.5161 |             0 |
+| x2^2_1  |   -72.6087  |  -293.197  |    147.98  |  79.45   |             0 |
+
+Output_2 = Bo
+| var     |      value |   ci_lower |   ci_upper |       se |   significant |
+|---------+------------+------------+------------+----------+---------------|
+| 1_2     | 15936.8    | 15830.5    | 16043      |  38.2821 |             1 |
+| x0_2    |   -12.8958 |  -104.827  |    79.0354 |  33.1111 |             0 |
+| x1_2    |   915.809  |   819.886  |  1011.73   |  34.5488 |             1 |
+| x2_2    |  2457.56   |  2373.35   |  2541.77   |  30.3292 |             1 |
+| x0^2_2  |   -10.6791 |  -227.768  |   206.41   |  78.1896 |             0 |
+| x0 x1_2 |   148.131  |  -101.528  |   397.791  |  89.9206 |             0 |
+| x0 x2_2 |  -196.801  |  -513.382  |   119.78   | 114.024  |             0 |
+| x1^2_2  |    63.6294 |   -81.0944 |   208.353  |  52.1256 |             0 |
+| x1 x2_2 |    26.6824 |  -175.834  |   229.199  |  72.9409 |             0 |
+| x2^2_2  |  -134.636  |  -359.619  |    90.3475 |  81.0328 |             0 |
+#+end_example
+
+*************** TODO Find out why labels above changed from R, G, B to x_i
+if possible fix this to use the user-defined names.
+*************** END
+
+
+** Latin Hypercube sampling with a custom model
+
+If you have a good reason to do so, you can provide your own model. Some of those reasons could include:
+
+1. You want a nonlinear model, or different order 
+2. You don't want an intercept in the polynomial features
+3. You want a different kind of scaling, e.g. standard, or robust scaling
+4. You have your own preprocessing for feature generation
+5. etc.
+
+Here we show an unscaled regression. The model fits well, but has very poor uncertainty quantification
+
+#+BEGIN_SRC jupyter-python
+from sklearn.preprocessing import PolynomialFeatures
+from pycse.sklearn.lr_uq import LinearRegressionUQ
+from sklearn.pipeline import Pipeline
+
+sr = SurfaceResponse(inputs=['R', 'G', 'B'],
+                     outputs=['Ro', 'Go', 'Bo'],
+                     bounds=[[25, 75],
+                             [25, 75],
+                             [25, 75]],                     
+                     design='lhs',
+                     samples=15, criterion='c',
+                     random_state=42,
+                     model=Pipeline(steps=[('poly', PolynomialFeatures(2)),
+                                           ('lr', LinearRegressionUQ())]))
+
+input = sr.design()
+
+output = sr.set_output(output)
+output
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|    |    Ro |    Go |    Bo |
+|----+-------+-------+-------|
+| 11 | 14999 | 10588 | 16192 |
+|  6 | 14421 | 11959 | 16327 |
+| 12 | 12958 | 11091 | 18061 |
+| 13 | 13836 |  9724 | 17934 |
+|  7 | 17508 | 11660 | 17236 |
+|  3 | 16562 | 13294 | 15832 |
+|  4 | 19655 | 12308 | 14847 |
+|  1 | 13387 |  8459 | 12889 |
+|  0 | 12192 |  9312 | 14667 |
+| 10 | 18068 | 11241 | 13598 |
+| 14 | 16002 | 13049 | 18211 |
+|  8 | 19074 | 10017 | 15164 |
+|  9 | 16933 | 12674 | 18249 |
+|  5 | 18462 |  8971 | 13729 |
+|  2 | 15324 | 10412 | 16333 |
+:END:
+
+#+BEGIN_SRC jupyter-python  
+sr.fit()
+print(sr.score())
+sr.parity();
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: 0.9995362156806792
+[[./.ob-jupyter/462d40afc779e37e567a6472a247a398ed39db78.png]]
+:END:
+
+#+BEGIN_SRC jupyter-python
+print(sr.summary())
+#+END_SRC
+
+#+RESULTS:
+: 15 data points
+: User defined model:
+: Pipeline(steps=[('poly', PolynomialFeatures()), ('lr', LinearRegressionUQ())])
+:   score: 0.9995362156806792
+:   mae  = [47.7, 22.3, 24.2]
+: 
+:   rmse = [3020.0, 964.0, 1000.0]
+: 
+
+#+BEGIN_SRC jupyter-python
+sr.predict([[50, 50, 50]])
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: /Users/jkitchin/anaconda3/lib/python3.11/site-packages/sklearn/base.py:464: UserWarning: X does not have valid feature names, but PolynomialFeatures was fitted with feature names
+:   warnings.warn(
+: array([[12047.95462632,  8227.81653912, 12217.23186596]])
+:END:
+
+There is a hidden issue here though. Because we did not scale the inputs, the Hessian is poorly scaled, and confidence intervals are huge.
+
+#+BEGIN_SRC jupyter-python
+with np.printoptions(precision=3):
+    print(np.array([sr['usermodel']['lr'].coefs_.flatten(),
+          sr['usermodel']['lr'].pars_cint[0].flatten(),
+          sr['usermodel']['lr'].pars_cint[1].flatten(),
+          np.sign(sr['usermodel']['lr'].pars_cint[0].flatten() * sr['usermodel']['lr'].pars_cint[1].flatten()) > 0]).T)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+[[-3.590e+03 -2.129e+04  1.411e+04  0.000e+00]
+ [-5.368e+03 -1.537e+04  4.634e+03  0.000e+00]
+ [-5.041e+03 -1.524e+04  5.160e+03  0.000e+00]
+ [ 3.067e+02 -1.070e+02  7.204e+02  0.000e+00]
+ [ 1.723e+01 -2.166e+02  2.510e+02  0.000e+00]
+ [ 3.105e+01 -2.074e+02  2.695e+02  0.000e+00]
+ [ 6.188e+01 -3.395e+02  4.633e+02  0.000e+00]
+ [ 1.758e+02 -5.103e+01  4.027e+02  0.000e+00]
+ [-6.021e+01 -2.916e+02  1.712e+02  0.000e+00]
+ [-5.459e+01 -5.360e+02  4.268e+02  0.000e+00]
+ [ 1.204e+02 -1.517e+02  3.924e+02  0.000e+00]
+ [ 4.124e+02  1.349e+02  6.899e+02  1.000e+00]
+ [ 2.700e-01 -2.497e+00  3.037e+00  0.000e+00]
+ [ 2.080e-01 -1.356e+00  1.772e+00  0.000e+00]
+ [-7.846e-02 -1.673e+00  1.516e+00  0.000e+00]
+ [-4.669e-01 -3.649e+00  2.715e+00  0.000e+00]
+ [ 3.304e-02 -1.765e+00  1.831e+00  0.000e+00]
+ [ 1.088e+00 -7.459e-01  2.923e+00  0.000e+00]
+ [-6.982e-02 -4.105e+00  3.965e+00  0.000e+00]
+ [-7.043e-01 -2.985e+00  1.576e+00  0.000e+00]
+ [-1.446e+00 -3.772e+00  8.800e-01  0.000e+00]
+ [-1.888e-01 -2.033e+00  1.656e+00  0.000e+00]
+ [ 1.854e-01 -8.571e-01  1.228e+00  0.000e+00]
+ [ 4.675e-01 -5.958e-01  1.531e+00  0.000e+00]
+ [-2.111e-02 -2.602e+00  2.560e+00  0.000e+00]
+ [-1.891e-02 -1.478e+00  1.440e+00  0.000e+00]
+ [ 1.960e-01 -1.292e+00  1.684e+00  0.000e+00]
+ [ 4.514e-01 -2.416e+00  3.319e+00  0.000e+00]
+ [-5.335e-01 -2.154e+00  1.087e+00  0.000e+00]
+ [-9.892e-01 -2.642e+00  6.638e-01  0.000e+00]]
+#+end_example
+
+#+BEGIN_SRC jupyter-python
+X = sr['usermodel']['poly'].fit_transform(input)
+H = X.T @ X
+np.linalg.cond(H)
+#+END_SRC
+
+#+RESULTS:
+: 6370391174009.104
+
+#+BEGIN_SRC jupyter-python
+np.linalg.eigvals(H)
+#+END_SRC
+
+#+RESULTS:
+: array([1.41846194e+09, 2.07667160e+07, 8.49069162e+06, 6.46852236e+04,
+:        2.03050399e+04, 1.02676299e+04, 6.44370258e+02, 2.22665205e-04,
+:        3.40827573e-01, 1.34018485e+00])
+
+
