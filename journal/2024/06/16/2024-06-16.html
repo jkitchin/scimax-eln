@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-10 Wed 15:15 -->
+<!-- 2024-07-10 Wed 15:20 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -199,21 +199,21 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org7bece95">1. hashcache</a>
+<li><a href="#org3b71b26">1. hashcache</a>
 <ul>
-<li><a href="#org02651c3">1.1. run as python in org-mode</a></li>
-<li><a href="#orga4f0d5e">1.2. from a python file</a></li>
-<li><a href="#org4bc1822">1.3. serializing data with json</a></li>
+<li><a href="#org5f00326">1.1. run as python in org-mode</a></li>
+<li><a href="#org76593bc">1.2. from a python file</a></li>
+<li><a href="#org477d9dd">1.3. serializing data with json</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org7bece95" class="outline-2">
-<h2 id="org7bece95"><span class="section-number-2">1.</span> hashcache</h2>
+<div id="outline-container-org3b71b26" class="outline-2">
+<h2 id="org3b71b26"><span class="section-number-2">1.</span> hashcache</h2>
 <div class="outline-text-2" id="text-1">
 
-<div id="org6166413" class="figure">
+<div id="orga7c6f7d" class="figure">
 <p><img src="./screenshots/date-16-06-2024-time-08-59-47.png" alt="date-16-06-2024-time-08-59-47.png" />
 </p>
 </div>
@@ -268,8 +268,8 @@ for _f in glob.glob('cache/**/*'):
 </pre>
 </div>
 </div>
-<div id="outline-container-org02651c3" class="outline-3">
-<h3 id="org02651c3"><span class="section-number-3">1.1.</span> run as python in org-mode</h3>
+<div id="outline-container-org5f00326" class="outline-3">
+<h3 id="org5f00326"><span class="section-number-3">1.1.</span> run as python in org-mode</h3>
 <div class="outline-text-3" id="text-1-1">
 <div class="org-src-container">
 <pre class="src src-python">from pycse.hashcache import hashcache
@@ -285,8 +285,8 @@ print(f(1))
 </div>
 </div>
 </div>
-<div id="outline-container-orga4f0d5e" class="outline-3">
-<h3 id="orga4f0d5e"><span class="section-number-3">1.2.</span> from a python file</h3>
+<div id="outline-container-org76593bc" class="outline-3">
+<h3 id="org76593bc"><span class="section-number-3">1.2.</span> from a python file</h3>
 <div class="outline-text-3" id="text-1-2">
 <div class="org-src-container">
 <pre class="src src-python">from pycse.hashcache import hashcache
@@ -319,8 +319,8 @@ f(1)
 </div>
 </div>
 </div>
-<div id="outline-container-org4bc1822" class="outline-3">
-<h3 id="org4bc1822"><span class="section-number-3">1.3.</span> serializing data with json</h3>
+<div id="outline-container-org477d9dd" class="outline-3">
+<h3 id="org477d9dd"><span class="section-number-3">1.3.</span> serializing data with json</h3>
 <div class="outline-text-3" id="text-1-3">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">from scipy.integrate import solve_ivp
@@ -362,20 +362,20 @@ orjson.dumps(d, option=orjson.OPT_SERIALIZE_NUMPY)
 </div>
 </div>
 <ol class="org-ol">
-<li><a id="org97cfe05"></a><span class="todo TODO">TODO</span> next time<br />
+<li><a id="orgdc4cc3f"></a><span class="todo TODO">TODO</span> next time<br />
 <div class="outline-text-16" id="text-1-3-0-0-0-0-0-0-0-0-0-0-0-0-1">
 <p>
 Integrate orjson for serialization into hashcache with storage in sqlite, and searching from json.
 </p>
 </div>
 </li>
-<li><a id="orgf56c615"></a>END<br /></li>
+<li><a id="org99ca63e"></a>END<br /></li>
 </ol>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2024-07-10 Wed 15:15</p>
+<p class="date">Created: 2024-07-10 Wed 15:20</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

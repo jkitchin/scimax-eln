@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-07-10 Wed 15:15 -->
+<!-- 2024-07-10 Wed 15:20 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>sklearn-doe v2 - more flexible designs and models</title>
@@ -200,32 +200,32 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org1abf255">1. Adding flexibility to sklearn-doe</a>
+<li><a href="#org9bba5e2">1. Adding flexibility to sklearn-doe</a>
 <ul>
-<li><a href="#orga2c15b7">1.1. The default is Box-Behnken</a></li>
-<li><a href="#orga92b280">1.2. multi-level full-factorial</a></li>
-<li><a href="#org8c842b7">1.3. 2-level full-factorial</a></li>
-<li><a href="#org6e9efd3">1.4. Latin Hypercube sampling</a></li>
-<li><a href="#org8776413">1.5. Latin Hypercube sampling with a custom model</a></li>
+<li><a href="#org659fa54">1.1. The default is Box-Behnken</a></li>
+<li><a href="#org1307abc">1.2. multi-level full-factorial</a></li>
+<li><a href="#org7ddd306">1.3. 2-level full-factorial</a></li>
+<li><a href="#org8b4c1a8">1.4. Latin Hypercube sampling</a></li>
+<li><a href="#orgd8d4df0">1.5. Latin Hypercube sampling with a custom model</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="org0d1d3dd" class="figure">
+<div id="org0c99602" class="figure">
 <p><img src="./screenshots/date-10-07-2024-time-10-04-55.png" alt="date-10-07-2024-time-10-04-55.png" />
 </p>
 </div>
-<div id="outline-container-org1abf255" class="outline-2">
-<h2 id="org1abf255"><span class="section-number-2">1.</span> Adding flexibility to sklearn-doe</h2>
+<div id="outline-container-org9bba5e2" class="outline-2">
+<h2 id="org9bba5e2"><span class="section-number-2">1.</span> Adding flexibility to sklearn-doe</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 The first version of <code>pycse.sklearn.surface_response</code> only supported the Box-Behnken design. The newer version here supports almost all the designs in pyDOE3. I also added flexibility to support user-defined models.
 </p>
 </div>
-<div id="outline-container-orga2c15b7" class="outline-3">
-<h3 id="orga2c15b7"><span class="section-number-3">1.1.</span> The default is Box-Behnken</h3>
+<div id="outline-container-org659fa54" class="outline-3">
+<h3 id="org659fa54"><span class="section-number-3">1.1.</span> The default is Box-Behnken</h3>
 <div class="outline-text-3" id="text-1-1">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">from pycse.sklearn.surface_response import SurfaceResponse
@@ -242,8 +242,8 @@ print(input)
 </div>
 </div>
 </div>
-<div id="outline-container-orga92b280" class="outline-3">
-<h3 id="orga92b280"><span class="section-number-3">1.2.</span> multi-level full-factorial</h3>
+<div id="outline-container-org1307abc" class="outline-3">
+<h3 id="org1307abc"><span class="section-number-3">1.2.</span> multi-level full-factorial</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Here we make a design with 4 levels of R, 3 levels of G, and 2 levels of B.
@@ -264,8 +264,8 @@ input
 </div>
 </div>
 </div>
-<div id="outline-container-org8c842b7" class="outline-3">
-<h3 id="org8c842b7"><span class="section-number-3">1.3.</span> 2-level full-factorial</h3>
+<div id="outline-container-org7ddd306" class="outline-3">
+<h3 id="org7ddd306"><span class="section-number-3">1.3.</span> 2-level full-factorial</h3>
 <div class="outline-text-3" id="text-1-3">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">sr = SurfaceResponse(inputs=['R', 'G', 'B'],
@@ -281,8 +281,8 @@ input
 </div>
 </div>
 </div>
-<div id="outline-container-org6e9efd3" class="outline-3">
-<h3 id="org6e9efd3"><span class="section-number-3">1.4.</span> Latin Hypercube sampling</h3>
+<div id="outline-container-org8b4c1a8" class="outline-3">
+<h3 id="org8b4c1a8"><span class="section-number-3">1.4.</span> Latin Hypercube sampling</h3>
 <div class="outline-text-3" id="text-1-4">
 <div class="org-src-container">
 <pre class="src src-jupyter-python">sr = SurfaceResponse(inputs=['R', 'G', 'B'],
@@ -356,7 +356,7 @@ sr.parity();
 </div>
 </div>
 <ol class="org-ol">
-<li><a id="org4b5bc61"></a><span class="done DONE">DONE</span> Find out why labels above changed from R, G, B to x<sub>i</sub><br />
+<li><a id="org33d0e4f"></a><span class="done DONE">DONE</span> Find out why labels above changed from R, G, B to x<sub>i</sub><br />
 <div class="outline-text-16" id="text-1-4-0-0-0-0-0-0-0-0-0-0-0-0-1">
 <p>
 if possible fix this to use the user-defined names.
@@ -368,11 +368,11 @@ Fixed in code with set<sub>output</sub>!
 </p>
 </div>
 </li>
-<li><a id="org059f5cb"></a>END<br /></li>
+<li><a id="orgce58d5d"></a>END<br /></li>
 </ol>
 </div>
-<div id="outline-container-org8776413" class="outline-3">
-<h3 id="org8776413"><span class="section-number-3">1.5.</span> Latin Hypercube sampling with a custom model</h3>
+<div id="outline-container-orgd8d4df0" class="outline-3">
+<h3 id="orgd8d4df0"><span class="section-number-3">1.5.</span> Latin Hypercube sampling with a custom model</h3>
 <div class="outline-text-3" id="text-1-5">
 <p>
 If you have a good reason to do so, you can provide your own model. Some of those reasons could include:
@@ -459,7 +459,7 @@ np.linalg.cond(H)
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2024-07-10 Wed 15:15</p>
+<p class="date">Created: 2024-07-10 Wed 15:20</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
