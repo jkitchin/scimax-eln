@@ -301,7 +301,7 @@ If you have a good reason to do so, you can provide your own model. Some of thos
 4. You have your own preprocessing for feature generation
 5. etc.
 
-Here we show an unscaled regression. The model fits well, but has very poor uncertainty quantification
+Here we show an unscaled regression. The model fits well, but has very poor uncertainty quantification. You also have to do some of your own work to get details of the fit.
 
 #+BEGIN_SRC jupyter-python
 from sklearn.preprocessing import PolynomialFeatures
