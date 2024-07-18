@@ -1,0 +1,539 @@
+#+title: How tables in org-mode support an ELN
+#+options: toc:nil
+@@latex:\maketitle@@
+
+#+attr_org: :width 800
+[[./screenshots/date-11-07-2024-time-08-25-00.png]]
+
+
+Tables are ubiquitous in scientific papers. Your notebook should support tables as first-class citizens to represent data. That means it should be easy to make them, manipulate them, and use them as data sources.
+
+The manual is great for tables: [[info:org#Tables][org#Tables]]
+
+
+#+BEGIN_SRC emacs-lisp
+(require 'emacs-keybinding-command-tooltip-mode)
+(emacs-keybinding-command-tooltip-mode)
+#+END_SRC
+
+#+RESULTS:
+: t
+
+* Creating tables
+
+** Manually create tables
+
+You start a table with the | character at the beginning of a line. Use | to separate the cells. To make a horizontal line, start the line with |-
+
+| x |    y |
+|---+------|
+| 1 |    2 |
+| 4 | 5458 |
+
+Once you get started, use <tab> to move forward a cell, and S-<tab> to go back a cell. A new row will be created when you tab past the end of a row.
+
+At any time use C-c C-c to realign a table.
+
+| reagent | concentration | volume (mL) |
+|---------+---------------+-------------|
+| AuCl3   |           0.5 |           2 |
+| water   |            55 |          10 |
+
+** Tables from snippets
+
+I have some snippets in scimax for making tables. You type these and then press <tab> to expand them.
+
+
+| 4 |
+| 8 |
+| 9 |
+
+
+|  |  |
+
+
+|  |  |  |
+
+
+|  |  |  |  |
+
+tttttttt
+
+| 4 | 6 | 7 |   |   |   |   |   |
+|   |   |   |   |   |   |   |   |
+
+#+name: tab
+#+caption: some caption
+| 5 |
+ 
+
+** Create a table from a region
+
+If you highlight this text and type C-c | it will be converted to a table.
+
+| name | reactant-concentration | vol |
+|------+------------------------+-----|
+| a    |                      2 |   3 |
+| b    |                      4 |   5 |
+
+| name     | concentration | vol |
+|----------+---------------+-----|
+| AuCl3    |           0.5 |   2 |
+| glycerol |             1 |  10 |
+| SDS      |          0.01 |   2 |
+
+*** Getting help on these key-bindings
+
+Every key-binding maps to an actual Emacs command. You can use Emacs to help you find out what these are.
+
+Use C-h k to access help on a key. This will pop up a help window describing the command that key uses. You can also use M-x cmd to run these if you don't remember the key bindings. Note that you will see a reminder in the mini-buffer on the key-bindings (when they exist).
+
+| a | b |
+| 1 | 4 |
+| 2 | 6 |
+
+*** scimax-org-table hydra
+
+There is a scimax-hydra for tables too. The key bindings in the hydra don't map onto the official org-bindings; they are perhaps a bit more intuitive.
+
+- M-x scimax-org-table/body
+- f12 o t
+
+| name     | concentration | vol |
+|----------+---------------+-----|
+| AuCl3    |           0.5 |   2 |
+| glycerol |             1 |  10 |
+| SDS      |          0.01 |   2 |
+
+** import a table
+
+If you have an external data file you can insert it into your notebook. See `org-table-import'.
+
+- Try it with this data file ([[file+emacs:./data.csv]])
+
+| name     | concentration | vol |
+| AuCl3    |           0.5 |   2 |
+| glycerol |             1 |  10 |
+| SDS      |          0.01 |   2 |
+
+** export a table
+
+You may need to export your table to an external file for use in another process. See `org-table-export'.
+
+
+| name     | concentration | vol |
+|----------+---------------+-----|
+| AuCl3    |               |   2 |
+| glycerol |             1 |  10 |
+| SDS      |          0.01 |   2 |
+
+
+[[file+emacs:table.csv]]
+
+** Create a table with code
+
+Many src-blocks automatically convert tabular output to tables in org-mode. If you use a named src-block, the results are named, and reusable later (see [[*Using tables as data sources in src blocks]].
+
+#+name: elisp-tab
+#+BEGIN_SRC emacs-lisp
+(list '("elisp" "y" "z")
+      'hline
+      '(1 2 3)
+      '(4 5 6)
+      '(7 8 10))
+#+END_SRC
+
+#+RESULTS: elisp-tab
+| elisp | y |  z |
+|-------+---+----|
+|     1 | 2 |  3 |
+|     4 | 5 |  6 |
+|     7 | 8 | 10 |
+
+
+
+#+name: python-tab
+#+BEGIN_SRC python
+data = [['python', 'y', 'z'],
+        None,
+        [4, 5, 6],
+        [7, 18, 9]]
+
+return data
+#+END_SRC
+
+#+RESULTS: python-tab
+| python |  y | z |
+|--------+----+---|
+|      4 |  5 | 6 |
+|      7 | 18 | 9 |
+
+#+name: jupyter-tab
+#+BEGIN_SRC jupyter-python
+data = [['jupyter', 'y', 'z'],
+        None,
+        [4, 5, 6],
+        [7, 8, 9]]
+
+data
+#+END_SRC
+
+#+RESULTS: jupyter-tab
+| jupyter | y | z |
+|---------+---+---|
+|       4 | 5 | 6 |
+|       7 | 8 | 9 |
+
+
+
+* Navigating tables
+
+You can move around a table with some key-bindings. The arrows do what you expect in moving the cursor.
+
+- <tab> :: advance a cell, wrap to next line, create new row if needed.
+- S-<tab> :: go back a cell
+- <ret> :: Go to next row
+- M-a :: go to beginning of cell, or previous cell
+- M-e :: go to end of cell, or next cell
+- C-a :: go to beginning of row
+- C-e :: go to end of row
+
+|  x |   y |  z |
+|----+-----+----|
+|  4 | 556 | 61 |
+| 74 |   8 | 19 |
+
+
+* Using tables as data sources in src blocks
+
+Any named table can be used as a data source. 
+
+#+BEGIN_SRC jupyter-python :var data=python-tab 
+data
+#+END_SRC
+
+#+RESULTS:
+| 4 |  5 | 6 |
+| 7 | 18 | 9 |
+
+Usually the column names are stripped out. We can get those too with this header arg.
+
+#+BEGIN_SRC jupyter-python :var data=python-tab :colnames no
+data[1]
+#+END_SRC
+
+#+RESULTS:
+| 4 | 5 | 6 |
+
+#+BEGIN_SRC jupyter-python :var data=jupyter-tab 
+data
+#+END_SRC
+
+#+RESULTS:
+| jupyter | y | z |
+|---------+---+---|
+|       4 | 5 | 6 |
+|       7 | 8 | 9 |
+The column names are the first row when there is a horizontal line. We can get them from the table if we use the :colnames header set to no. I find it unintuitive, but it apparently means not to remove them.
+
+#+BEGIN_SRC sh :var edata=elisp-tab 
+echo $edata
+#+END_SRC
+
+#+RESULTS:
+: 1 2 3 4 5 6 7 8 10
+
+#+BEGIN_SRC emacs-lisp :var edata=elisp-tab 
+(nth 0 edata)
+#+END_SRC
+
+#+RESULTS:
+| 1 | 2 | 3 |
+
+#+BEGIN_SRC emacs-lisp :var edata=elisp-tab :colnames no
+(nth 0 edata)
+#+END_SRC
+
+#+RESULTS:
+| elisp | y | z |
+
+** using subsets of tables as data
+
+There is a syntax for using subsets of tables. It is a little subtle though. In this example, row 0 is the column names, row 1 is a horizontal line, and 2-4 are the data lines. Here we get the last two rows.
+
+#+BEGIN_SRC emacs-lisp :var table=elisp-tab[3:4]
+table
+#+END_SRC
+
+#+RESULTS:
+| 4 | 5 |  6 |
+| 7 | 8 | 10 |
+
+We can also slice out columns with a second index.
+
+#+BEGIN_SRC emacs-lisp :var table=elisp-tab[3:4, 1:2]
+table
+#+END_SRC
+
+#+RESULTS:
+| 5 |  6 |
+| 8 | 10 |
+
+To get just the first column, we leave the first index blank.
+
+#+BEGIN_SRC emacs-lisp :var table=elisp-tab[*, 0]
+table
+#+END_SRC
+
+#+RESULTS:
+| 1 | 4 | 7 |
+
+This indexing is described more in [[info:org#Environment of a Code Block][org#Environment of a Code Block]]
+
+** Using tables from other org-files
+
+You can read a table from another file using the syntax filename:table-name.
+
+See [[./data.org]] which has a table named from-data-org.
+
+#+BEGIN_SRC emacs-lisp :var table=data.org:from-data-org
+table
+#+END_SRC
+
+#+RESULTS:
+| x | y |  z |
+| 1 | 3 |  6 |
+| 4 | 8 | 12 |
+
+
+* Manipulating tables
+
+** Sort rows
+
+In a column type C-c ^. You will be prompted to sort alphabetically or numerically, and for the sort order.
+
+| label    | mass |
+|----------+------|
+| sample 3 |   29 |
+| sample 2 |   38 |
+| sample 1 |   19 |
+
+** Manipulate rows up and down
+
+- M-<up> :: move row up
+- M-<down> :: move row down
+- S-<up> :: swap cell up
+- S-<down> :: swap cell down
+
+
+| label    | mass |
+|----------+------|
+| sample 2 |   28 |
+| sample 1 |   19 |
+| sample 3 |   39 |
+
+** Manipulate columns left and right
+
+- M-<left> :: move column to the left
+- M-<right> :: move column to the right
+- S-<left> :: swap cell to the left
+- S-<right> :: swap cell to the right 
+
+| mass | label    |
+|------+----------|
+|   28 | sample 2 |
+|   19 | sample 1 |
+|   39 | sample 3 |
+
+** Add / remove columns
+
+- M-S-<right> :: insert a new column to the left
+- M-S-<left>  :: kill the current column
+
+| label    | mass |   |
+|----------+------+---|
+| sample 1 |   19 |   |
+| sample 2 |   28 |   |
+| sample 3 |   39 |   |
+
+
+** Add / remove rows
+
+- M-S-<down> :: insert row above (with prefix below)
+- M-S-<up :: Kill the current row
+
+| label    | mass |
+|----------+------|
+| sample 1 |   19 |
+| sample 2 |   28 |
+| sample 3 |   39 |
+
+** Insert lines
+
+- C-c - :: insert line below the current row. With prefix above the row
+- C-c <ret> :: insert line below current row and move to the row below it 
+
+| label    | mass |
+|----------+------|
+| sample 1 |   19 |
+|----------+------|
+| sample 2 |   28 |
+|----------+------|
+| sample 3 |   39 |
+|----------+------|
+|          |      |
+
+
+
+** Transpose tables
+
+- org-table-transpose-table-at-point :: run on table at point
+
+| label    | mass |
+|----------+------|
+| sample 1 |   19 |
+| sample 2 |   28 |
+| sample 3 |   39 |
+
+
+* Finetuning table display
+
+Sometimes the table will have annoying long lines. You can temporarily shrink a column with C-c <tab>.
+
+|---+-------+-------------------------------------------------|
+| 1 | one   | water                                           |
+| 2 | two   | ethanol                                         |
+| 3 | three | mix of water and ethanol at 4/6 ratio by volume |
+|---+-------+-------------------------------------------------|
+
+You can specify a column width with <n>. C-u C-c<tab> or M-x org-table-shrink will temporarily shrink that column.
+
+|---+-------+-------------------------------------------------|
+|   |       | <6>                                             |
+| 1 | one   | water                                           |
+| 2 | two   | ethanol                                         |
+| 3 | three | mix of water and ethanol at 4/6 ratio by volume |
+|---+-------+-------------------------------------------------|
+
+
+Use M-x org-table-expand to see the whole thing.
+
+* Programming with tables in elisp
+
+I wrote `scimax-org-table' to provide some additional utilities for programming in elisp. They are mostly to get data from tables for use in an elisp cell.
+
+You can get a column.
+
+#+BEGIN_SRC emacs-lisp
+(require 'scimax-org-table)
+
+(scimax-org-table-column "tab-samples" 1)
+#+END_SRC
+
+#+RESULTS:
+| mass | 19 | 28 | 39 |
+
+or row.
+
+#+BEGIN_SRC emacs-lisp
+(scimax-org-table-row "python-tab" 2)
+#+END_SRC
+
+#+RESULTS:
+| 4 | 5 | 6 |
+
+
+You can also get the whole table. Note all of these return a lisp structure that you can do further computations with.
+
+#+BEGIN_SRC emacs-lisp :results code
+(scimax-org-get-named-table "data.org:from-data-org")
+#+END_SRC
+
+#+RESULTS:
+#+begin_src emacs-lisp
+(("x" "y" "z") (1 3 6) (4 8 12))
+#+end_src
+
+This works because these documents can be viewed as data.
+
+We can think of the tables as mini-databases. For example, consider this table as a data source.
+
+#+name: tab-db
+| animal | sound |
+|--------+-------|
+| dog    | bark  |
+| cat    | meow  |
+| bird   | chirp |
+
+Here is an elisp function that looks up the sound an animal makes from that table.
+
+#+BEGIN_SRC emacs-lisp
+(defun lookup-sound (animal)
+  (let ((data (scimax-org-get-named-table "tab-db")))
+    (nth 1 (assoc animal data))))
+
+(lookup-sound "cat")
+#+END_SRC
+
+#+RESULTS:
+: meow
+
+You could even use this from another document using the syntax we described before for the name!
+
+#+BEGIN_SRC emacs-lisp
+(scimax-org-get-named-table "data.org:from-data-org")
+#+END_SRC
+
+#+RESULTS:
+| x | y |  z |
+| 1 | 3 |  6 |
+| 4 | 8 | 12 |
+
+
+* Exporting documents with tables
+
+If you need to export your org-file with tables to LaTeX or HTML, and you want to reference them, you can use org-ref. You should give the table a name, and optionally a caption. Then you can use org-ref to link to them, e.g. Table ref:tab-samples. You might prefer an autoref link like this one autoref:tab-samples. This will autogenerate the "Table" prefix in your export.
+
+#+name: tab-samples
+#+caption: List of samples and mass.
+| label    | mass |
+|----------+------|
+| sample 1 |   19 |
+| sample 2 |   28 |
+| sample 3 |   39 |
+
+** pycse.orgmode support
+
+I built support for making full org tables from Python in ~pycse.orgmode~. Here is an example src block that only exports the results (a table) that we can also reference with org-ref like autoref:tab-pycse.
+
+#+BEGIN_SRC jupyter-python :exports results
+import numpy as np
+from pycse.orgmode import Table
+
+Table(np.random.randint(1, 9, (3, 3)),
+      headers=['x', 'y', 'z'],
+      name='tab-pycse',
+      caption='A table of random integers.',
+      attributes=[['latex', ':placement [H]']])
+#+END_SRC
+
+#+RESULTS:
+#+attr_latex: :placement [H]
+#+name: tab-pycse
+#+caption: A table of random integers.
+| x | y | z |
+|---+---+---|
+| 6 | 6 | 8 |
+| 1 | 8 | 5 |
+| 5 | 3 | 2 |
+
+
+* Summary
+
+Tables are amazing in org-mode. For "smallish" data they are very useful. 
+
+I wouldn't use this for more than a few dozen rows probably. There are other tools that are better for that IMO, including good old Excel, and you can always link to those files from the notebook.
+
+There is another dimension of them I have not covered here and that is they can also be used as spreadsheets, complete with computed columns from formulas. I usually use pandas, or other tools for this, and I don't use it often enough to remember the formula syntax, so I am going to save that for another day.
+
+For future reference, start here [[info:org#The Spreadsheet][org#The Spreadsheet]].

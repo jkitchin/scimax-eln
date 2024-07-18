@@ -29,6 +29,7 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 19 - An sklearn-doe package with application to the SDL-Light https://youtube.com/live/Sfbmk4zTFCw
 - Video 20 - An sklearn-doe package for Latin square designs https://youtube.com/live/VH8ooOeN4RI
 - Video 21 - update on sklearn-doe package https://youtube.com/live/uxLCNEj1FbY
+- Video 22 - Tables in the ELN https://youtube.com/live/qZfpz1Pp0UI
 
 * pycse
 
@@ -74,10 +75,17 @@ DOE + statistical analysis: [[./sdl-light/anova.org]].
 Surrogates and active learning - take 1 [[./sdl-light/surrogate.org]]
 sklearn-doe [[./sdl-light/sklearn-doe.org]]
 
-** TODO get SDL-Light instruments
-DEADLINE: <2024-07-01 Mon>
+** TODO unboxing and setup for local SDL-Light
 
-ordered: https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox/FMfcgzQVwxGRSPSPlBmblnVHLqHkVTTj
+* org-mode topics
+
+- [[./orgmode/tables.org]]
+
+* Potential future topics
+
+** Templates
+
+Need some ideas on applications of templates in an ELN. Some simple ones are src block expansions and code expansions. I have a bunch of templates in ox-manuscript, and in snippets, but not ones I used in a notebook setting as much.
 
 * Manually publishing your ELN to GitHUB Pages
 
