@@ -4,7 +4,7 @@
 [[./screenshots/date-13-06-2024-time-08-08-29.png]]
 
 
-I plan to use this repo to explore using scimax as an electronic laboratory notebook. I will use the examples to determine the extent to which it provides FAIR [fn:1] (Findable, Accessible, Interoperable, Reusable) data, and how to balance that with usability.
+I plan to use this repo to explore using scimax (https://github.com/jkitchin/scimax) as an electronic laboratory notebook. I will use the examples to determine the extent to which it provides FAIR [fn:1] (Findable, Accessible, Interoperable, Reusable) data, and how to balance that with usability.
 
 Repo: https://github.com/jkitchin/scimax-eln
 
@@ -60,9 +60,6 @@ Talk about interoperability with software, instruments
 
 https://apmonitor.com/pdc/index.php/Main/PurchaseLabKit
 
-See [[./tclab/]] and [[./tclab_jupyter/]]
-
-Notes for setup:
 
 
 * SDL-light - running a remote instrument
