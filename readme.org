@@ -30,6 +30,11 @@ Repo: https://github.com/jkitchin/scimax-eln
 - Video 20 - An sklearn-doe package for Latin square designs https://youtube.com/live/VH8ooOeN4RI
 - Video 21 - update on sklearn-doe package https://youtube.com/live/uxLCNEj1FbY
 - Video 22 - Tables in the ELN https://youtube.com/live/qZfpz1Pp0UI
+- Video 23 - Claude Desktop + pycse design of experiment MCP + Claude Light MCP https://youtube.com/live/EhahWlZHszc
+- Video 24 - Scheduling experiments with org-mode and huey https://youtube.com/live/mQ0s16w2Q3Q
+- Video 25 - An electronic notebook with Emacs + gptel + mcp and claude-light https://youtube.com/live/9RR9UzViXj4
+- Video 26 - Emacs + GPTel: A Scientist's AI Notebook https://youtube.com/live/6jd1uYEGLDs
+- Video 27 - Emacs + GPTel to solve an optimization problem https://youtube.com/live/4FoWKm0bKVE
 
 * pycse
 
@@ -56,7 +61,7 @@ Talk about interoperability with software, instruments
 
 [[./qr/readme.org]]
 
-* TODO Temperature control lab
+* Temperature control lab
 
 https://apmonitor.com/pdc/index.php/Main/PurchaseLabKit
 
@@ -67,12 +72,12 @@ https://apmonitor.com/pdc/index.php/Main/PurchaseLabKit
 See [[./sdl-light/readme.org]]
 
 A DOE approach: [[./sdl-light/doe.org]]
-Reproducibility: [[./sdl-light/averages.org]] 
+Reproducibility: [[./sdl-light/averages.org]]
 DOE + statistical analysis: [[./sdl-light/anova.org]].
 Surrogates and active learning - take 1 [[./sdl-light/surrogate.org]]
 sklearn-doe [[./sdl-light/sklearn-doe.org]]
 
-** TODO unboxing and setup for local SDL-Light
+
 
 * org-mode topics
 
@@ -96,7 +101,7 @@ Need some ideas on applications of templates in an ELN. Some simple ones are src
 
 The notebook as I use it daily is local on my computer. I do commit and push changes to GitHUB, and GitHUB does an ok job rendering org-files, but we can take it one step further. You can set up a workflow to publish your notebook as html (or pdf, or other format if you want). We will publish this notebook to html, and then push it to GitHub which will serve the html via GitHUB Pages.
 
-I am going to keep this simple and use the main branch and put the html in a folder called docs. 
+I am going to keep this simple and use the main branch and put the html in a folder called docs.
 
 
 ** Setup Pages on GitHUB
@@ -134,7 +139,7 @@ We need a small elisp script to setup and publish  it.
 				     :publishing-function org-latex-publish-to-pdf
 				     :auto-preamble t
 				     :auto-sitemap t)
-				    
+
 				    ("static-html"
 				     :base-directory ,base-directory
 				     :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|dat\\|mov\\|txt\\|svg\\|aiff"
@@ -185,10 +190,15 @@ I added this after I made the video. You need a publish script (see [[./publish.
 
 Trying this was a minor disaster. I accidentally seem to have overwritten/deleted the org-files on GitHUB, and then pulled that locally. I was able to do some git-fu to revert changes and reconstruct the files (I also could have relied on Dropbox to rewind). This almost certainly resulted in some loss of work. I am noting it here to remind anyone reading this to have a backup strategy. There are a lot of moving parts that can lead to loss of data in unintended ways. I don't think I lost much data here, but it was a little stressful trying to figure out how to revert the changes, and to see if the content I wanted here was back the way I anticipated.
 
+* ELN vendors
+
+https://www.scinote.net/solutions/electronic-lab-notebook-for-academic-research
+
+https://www.albertinvent.com/
 
 * Footnotes
 
-[fn:1] https://www.go-fair.org/fair-principles/ 
+[fn:1] https://www.go-fair.org/fair-principles/
 
 # Local Variables:
 # eval: (sem-mode)
